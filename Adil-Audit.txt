@@ -1,0 +1,403 @@
+Review and Improvements for TwoPartyEscrow Contract
+
+Overview
+
+
+The TwoPartyEscrow contract has several areas where improvements can be made to enhance code
+readability, reusability, and security. This review highlights some of these areas and provides
+examples of how to address them.
+
+
+Use of Custom Errors
+
+
+Using custom errors instead of require statements with string messages can save gas and improve
+clarity.
+
+
+Example:
+
+
+// CustomErrors.sol
+
+ pragma solidity ^0.8.4;
+ contract CustomErrors {
+     error Unauthorized();
+     error InvalidOperation();
+     error InsufficientBalance();
+     error TransferFailed();
+ }
+
+In TwoPartyEscrow, import CustomErrors and use these errors:
+
+ import "./CustomErrors.sol";
+ contract TwoPartyEscrow is CustomErrors {
+     ...
+     function withdraw(address token, uint amount) public {
+         if (lock != 0) revert InvalidOperation();
+         ...
+     }
+ }
+
+
+Extracting Common Logic
+
+
+Some methods share common logic that can be extracted into separate functions to increase code
+reusability and readability.
+
+
+Example:
+Many functions check if the caller is authorized as a custodian or has specific permissions. This check
+can be extracted:
+ function isAuthorizedUser(address user, bytes32 hash) internal view returns
+ (bool) {
+     return isCustodian[user][msg.sender] ||
+ isAuthorized[user][msg.sender][hash] ||
+ isAuthorized[user][msg.sender][bytes32(0)] ||
+ isAuthorized[user][address(0)][bytes32(0)];
+ }
+
+Use this function in cancelPrivateOffer, completeEscrow, etc.:
+
+ function cancelPrivateOffer(bytes32 hash, address user) public {
+     if (msg.sender != user) {
+         require(isAuthorizedUser(user, hash), "Not authorized");
+     }
+ }
+
+
+Improving Code Readability and Security
+Checks-Effects-Interactions Pattern: Ensure this pattern is strictly followed to mitigate reentrancy
+attacks.
+
+
+Repeated Logic for Balance Checks
+
+Original:
+
+     if(style % 2 == 0) {
+         require(userBalance[msg.sender][_token] >= (_amount +
+ _depositSender) * _quantity[0]);
+     } else {
+         require(userBalance[msg.sender][_token] >= (_amount +
+ _depositSender));
+     }
+
+Suggested Change:
+
+     uint requiredBalance = style % 2 == 0 ? (_amount + _depositSender) *
+ _quantity[0] : (_amount + _depositSender);
+     if (userBalance[msg.sender][_token] < requiredBalance) revert
+ InsufficientBalance();
+
+Reason: Consolidating the balance check into a single conditional expression reduces code
+duplication and improves readability. Using a custom error (InsufficientBalance) for insufficient
+balance situations enhances error clarity and gas efficiency.
+
+
+
+Magic Numbers for style Validation
+
+Original:
+      require(style < 5);
+
+Suggested Change:
+
+ enum ContractStyle { InstantAcceptance, NoInstantWithCounters,
+ InstantNoCounters, NoInstantNoCounters, PrivateOfferWithCustomFee }
+     if (style >= ContractStyle.PrivateOfferWithCustomFee) revert
+ InvalidStyle();
+
+Reason: Replacing magic numbers with an enum makes the code more readable and maintainable by
+providing meaningful names for the style values. This approach also prevents invalid style values
+from being used.
+
+
+
+
+Hashtag Length Check
+
+Original:
+
+      require(_hashtags.length < 11);
+
+Suggested Change:
+
+      if (_hashtags.length >= 11) revert HashtagLimitExceeded();
+
+Reason: Using a custom error (HashtagLimitExceeded) for exceeding the hashtag limit is more
+gas-efficient than a require statement with a string. It also improves the clarity of the error condition.
+
+
+
+
+Referral Logic Simplification
+
+Original:
+
+ if(affiliate != address(0) && completed[affiliate][2] >= 10) {
+     if(referral[msg.sender] == address(0)) {
+          referral[msg.sender] = affiliate;
+     }
+ } else {
+     if(referral[msg.sender] != address(0)) {
+          affiliate = referral[msg.sender];
+     }
+ }
+
+Suggested Change:
+
+ // Extract to a method for clarity
+ function updateAffiliate(address affiliate) internal returns (address) {
+     if (affiliate != address(0) && completed[affiliate][2] >= 10 &&
+ referral[msg.sender] == address(0)) {
+         referral[msg.sender] = affiliate;
+      } else if (referral[msg.sender] != address(0)) {
+          return referral[msg.sender];
+      }
+      return affiliate;
+ }
+
+And in acceptOffer, replace the original block with:
+
+ affiliate = updateAffiliate(affiliate);
+
+Reason: Extracting the referral logic to a separate method improves readability and maintainability. It
+also makes the acceptOffer method cleaner and focused on its primary responsibility.
+
+
+Simplify Final Offer Logic
+
+Original:
+
+ if(finalOffer) {
+     require(sender == msg.sender || recipient == msg.sender);
+     require(quantity == contracts[hash].quantity[0]);
+     if(contracts[hash].status[0] > 0 && msg.sender == sender) {
+         require(false);
+     }
+     if(contracts[hash].status[1] > 0 && msg.sender == recipient) {
+         require(false);
+     }
+     contracts[hash].status = [uint(1),uint(1)];
+ }
+
+Suggested Change:
+
+ error Unauthorized();
+ error InvalidQuantityForFinalOffer();
+ error InvalidStatus();
+ if (finalOffer) {
+     if (sender != msg.sender && recipient != msg.sender) revert
+ Unauthorized();
+     if (quantity != contracts[hash].quantity[0]) revert
+ InvalidQuantityForFinalOffer();
+     if ((contracts[hash].status[0] > 0 && msg.sender == sender) ||
+ (contracts[hash].status[1] > 0 && msg.sender == recipient)) {
+         revert InvalidStatus();
+     }
+ }
+
+Reason: Replacing require(false) with meaningful custom errors enhances the understandability
+of the conditions under which the transaction will fail.
+
+
+Comparison Optimization
+Original Code
+
+ require(lock != 1);
+
+
+Suggested Code
+
+ require(lock < 1);
+
+
+Reason
+
+
+Using < 0 instead of != 0 for comparisons can be cheaper in terms of gas usage. This is because
+certain EVM operations are optimized for specific comparison operations. However, it's crucial to
+ensure that this change does not alter the logic of the contract, especially if lock can only be 0 or 1.
+
+
+Optimizing Storage Access
+
+
+Original Code
+
+
+Multiple calls to contracts[hash] throughout the function.
+
+
+Suggested Code
+
+ function acceptOffer(bytes32 hash, uint quantity, uint offerlimit, address
+ affiliate) public {
+     Contract memory newContract = contracts[hash]; // Called once at the
+ beginning
+     ...
+ }
+
+
+Reason
+
+Fetching contract data from storage only once and storing it in a memory variable reduces gas costs
+associated with storage access. This approach also simplifies the code by reducing the number of
+direct storage access calls. Placing this line at the beginning of the function ensures that all
+subsequent operations use this memory variable, optimizing gas usage and improving code
+readability.
+
+
+
+Balance Checks and Transfers
+
+Original:
+
+ require(userBalance[recipient][newContract.token] >=
+ (newContract.depositRecipient)); //Insufficient recipient balance
+ userBalance[recipient][newContract.token] -= (newContract.depositRecipient);
+ require(userBalance[sender][newContract.token] >= (newContract.amount +
+ newContract.depositSender)); //Insufficient sender balance
+ userBalance[sender][newContract.token] -= (newContract.amount +
+ newContract.depositSender);
+
+Suggested Change:
+
+ error InsufficientBalance(string role);
+ function checkAndTransfer(address user, address token, uint256 amount)
+ internal {
+     if (userBalance[user][token] < amount) revert InsufficientBalance(user
+ == sender ? "sender" : "recipient");
+     userBalance[user][token] -= amount;
+ }
+ // Use the function in the main logic
+ checkAndTransfer(recipient, newContract.token,
+ newContract.depositRecipient);
+ checkAndTransfer(sender, newContract.token, newContract.amount +
+ newContract.depositSender);
+
+Reason: Extracting the balance check and transfer logic into a separate function reduces duplication
+and centralizes the logic for handling balances. It also allows for more specific error messages and
+easier updates to the logic if needed.
+
+
+
+Functions not used internally could be marked external:
+Calling each function, we can see that the public function uses 496 gas, while the external function uses less
+
+
+
+
+Use of Constants for Hardcoded Numbers
+
+
+Original Code Snippet
+
+ if(block.timestamp < contracts[hash].timelimit[2] + 31556952) {
+
+
+
+
+  uint256 private constant SECONDS_IN_A_YEAR = 31556952
+     if(block.timestamp < contracts[hash].timelimit[2] + SECONDS_IN_A_YEAR)
+
+
+
+
+Reason
+
+Using constants for hardcoded numbers improves code readability and maintainability.
+Balance Verification Placement in acceptOffer
+
+Original Code
+
+The balance checks for both the sender and recipient are performed after several other operations,
+including modifying contract states and calculating new contract parameters.
+
+ if(style == 0) {
+     newContract.timelimit[0] += block.timestamp;
+     require(userBalance[recipient][newContract.token] >=
+ (newContract.depositRecipient)); //Insufficient recipient balance
+     userBalance[recipient][newContract.token] -=
+ (newContract.depositRecipient);
+     require(userBalance[sender][newContract.token] >= (newContract.amount +
+ newContract.depositSender)); //Insufficient sender balance
+     userBalance[sender][newContract.token] -= (newContract.amount +
+ newContract.depositSender);
+     ...
+ }
+
+
+Suggested Code
+
+Move the balance checks to the beginning of the acceptOffer method to ensure that both parties
+have sufficient funds before proceeding with any contract logic or state changes.
+
+ function acceptOffer(bytes32 hash, uint quantity, uint offerlimit, address
+ affiliate) public {
+     Contract memory newContract = contracts[hash];
+     require(userBalance[newContract.recipient][newContract.token] >=
+ (newContract.depositRecipient), "Insufficient recipient balance");
+     require(userBalance[newContract.sender][newContract.token] >=
+ (newContract.amount + newContract.depositSender), "Insufficient sender
+ balance");
+     ...
+ }
+
+
+Reason
+
+Performing balance checks at the start of the method ensures that the contract does not execute any
+logic or modify any state if the fundamental requirement of sufficient funds is not met. This approach
+aligns with the principle of failing fast, which improves contract efficiency and security by preventing
+unnecessary computation and state changes that would ultimately be reverted due to insufficient
+balances. It also enhances clarity and predictability of contract behavior, as it establishes clear
+prerequisites for the successful execution of the contract logic. This adjustment adheres to the
+SCSVS guidelines on code clarity (G11.1) and business logic verification (G4.3), ensuring that
+contracts enforce business limits correctly and that the logic is modular and straightforward (SCSVS
+G11.1, G4.3).
+
+Refinement of Status Update Logic in completeEscrow
+
+Original Code
+
+The method updates the escrow status based on the role of the user (sender or recipient) but does
+not clearly separate the logic for handling the completion status.
+
+ if(user == sender) {
+     require(contracts[hash].status[0] != 2);
+     contracts[hash].status[0] += 1;
+ } else {
+     require(contracts[hash].status[0] != 3);
+     contracts[hash].status[0] += 2;
+ }
+
+
+Suggested Code
+
+Introduce a clearer, more explicit handling of status updates to avoid potential logical errors or
+misunderstandings.
+
+ // Define constants for status codes for clarity
+ uint constant STATUS_PENDING = 1;
+ uint constant STATUS_COMPLETE = 4;
+ function completeEscrow(bytes32 hash, address user) public {
+     ...
+     uint statusUpdate = user == sender ? 1 : 2;
+     require(contracts[hash].status[0] + statusUpdate <= STATUS_COMPLETE,
+ "Invalid status update");
+     contracts[hash].status[0] += statusUpdate;
+     ...
+ }
+
+
+Reason
+
+The suggested change introduces constants for status codes, enhancing code clarity and
+maintainability as recommended by SCSVS G11.1. It also ensures that the status update logic is more
+explicit, preventing the status from inadvertently exceeding the STATUS_COMPLETE value. This
+approach reduces the risk of logical errors and makes the code easier to understand and maintain,
+aligning with best practices for smart contract development.
+

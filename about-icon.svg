@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 35 35">
+  <g id="Page-1" transform="translate(-42.667 -42.667)">
+    <g id="drop" transform="translate(42.667 42.667)">
+      <path id="Shape" d="M17.5,0A17.5,17.5,0,1,1,0,17.5,17.5,17.5,0,0,1,17.5,0Zm1.754,15.75h-3.5v10.5h3.5ZM17.518,8.312a2.117,2.117,0,0,0-2.2,2.163,2.188,2.188,0,1,0,4.375.024A2.115,2.115,0,0,0,17.518,8.312Z" transform="translate(0 0)" fill="#fff" fill-rule="evenodd"/>
+    </g>
+  </g>
+</svg>

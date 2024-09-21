@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="./index.min.js"></script>
+    <script src="./axios.min.js"></script>
+</head>
+<script>
+    var nodeId = '';
+    var node = '';
+    const bootstrapNodes = [];
+    async function retrieveFileFromIPFS2(cid) {
+        try {
+            // IPFS gateway URL
+            var gatewayUrl = 'https://ipfs.io/ipfs/';
+            // Send a GET request to the gateway URL concatenated with the CID of the file
+            var response = await fetch(gatewayUrl + cid)
+            // Extract the response body as text
+            var data = await response.text();
+            // Log the retrieved data to the console
+            console.log(data);
+      } catch (error) {
+            console.error(error);
+      }
+      //USAGE EXAMPLE: await retrieveFileFromIPFS('QmdmQXB2mzChmMeKY47C43LxUdg1NDJ5MWcKMKxDu7RgQm')
+    }
+
+    const pinataApiKey = '529ebe69287f6d11f3c4';
+    const pinataSecretApiKey = '5c1bef841e41ef7418c9f4c8a5995d34eb3b10d444626b216b1916aaab58f82c';
+
+    // Function to post a file to Pinata IPFS
+    async function pinToPinataIPFS (text) {
+        const url = 'https://api.pinata.cloud/pinning/pinFILEToIPFS';
+
+        const formData = new FormData();
+        const blob = new Blob([text], { type: 'text/plain' });
+        formData.append('file', blob, 'file.txt');
+        try {
+            const response = await axios.post(url, formData, {
+                headers: {
+                    'Content-Type': `multipart/form-data; boundary=${formData._boundary}`,
+                    'pinata_api_key': pinataApiKey,
+                    'pinata_secret_api_key': pinataSecretApiKey
+                }
+            });
+            console.log(response.data.IpfsHash);
+            return response.data.IpfsHash;
+        } catch (error) {
+            console.log(error);
+            return 'error';
+        }
+    };
+
+    // Function to retrieve a file from Pinata IPFS
+    const retrieveFromPinataIPFS = async (hash) => {
+        const url = `https://gateway.pinata.cloud/ipfs/${hash}`;
+        const response = await fetch(url);
+        const result = await response.text();
+        return result;
+    };
+
+    async function retrieveFileFromIPFS(cid) {
+      try {
+        // Retrieve the file using ipfs.node.cat
+        var data = [];
+        //var expectedFileSize = (await node.object.stat(cid)).CumulativeSize;
+        for await (const chunk of node.cat(cid, {timeout: 10000})) {
+            data.push(chunk);
+        }
+        content = new TextDecoder().decode(data[0]);
+        return content;
+      } catch (error) {
+        console.log("TIMEOUT getting data");
+        console.error(error)
+        return 'failed';
+      }
+    }
+    //function to add the files
+    async function addFile (files) {
+        for await (const result of node.addAll(files)) {
+            console.log(result.cid);
+            return result.cid;
+        }
+    }
+    async function showPeers() {
+        var peers = await node.swarm.peers()
+        var addr;
+        var ip;
+        var ips = [];
+        peers.forEach(peer => {
+          addr = peer.addr.toString();
+          ip = addr.split('/')[2].split(':')[0];
+          ips.push(ip);
+          console.log('Connected to peer with IP address:', ip);
+        });
+        return ips;
+    }
+    //There are several serverless ways to do peer to peer pinning. The best is using Trustero which is torrent + webrtc
+    //IPFS dedicated node would join the room of a specific order and get the data and pin it. This bypasses the need to
+    //rely on centralized pinning such as infura. In theory even users can hop in a room and download data. If a room gets
+    //full then hash it and create a new one for users to join. Gundb is also possible for relaying data to IPFS nodes.
+    //For unique private orders a smart contract can be used to post the address and hash of the contract. Also an
+    //entirely encrypted/hashed/decentralized pure javascript browser based database can be made in Trustero/Gundb.
+    document.addEventListener('DOMContentLoaded', async () => {
+        nodeId = 'ipfs-' + Math.random();
+        node = await Ipfs.create({ repo: nodeId});
+        console.log("Your node: " + nodeId);
+        window.node = node;
+        const status = node.isOnline() ? 'online' : 'offline';
+        console.log(`Node status: ${status}`);
+        const localPeerId = await node.id();
+        console.log(`Local peer ID: ${localPeerId.id}`);
+
+        var file = [{
+            path: 'firstfile.txt',
+            content: 'test file'
+        }];
+        var peers = [];
+        while (peers.length === 0) {
+            peers = await showPeers();
+            console.log('Attempting to connect to IPFS...');
+            await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second
+        }
+        var cid = await addFile(file); //add the first file and get its CID
+        console.log(cid.toString());
+        //node.bootstrap.add()
+        //await node.swarm.connect('/ip4/<your_public_ip>/tcp/4001/p2p/${your_peer_id}')
+        await node.pin.add(cid);
+        console.log("File pinned");
+
+        hash = await pinToPinataIPFS("Hello world!");
+        console.log(hash);
+        file = await retrieveFromPinataIPFS(hash);
+        console.log(file)
+        // Call the function to retrieve the file
+        var data;
+        console.log("Getting file...");
+        await retrieveFileFromIPFS(hash)
+            .then(data => console.log(data))
+            .catch(error => console.error(error));
+    });
+</script>
+<body>
+</body>
+</html>
