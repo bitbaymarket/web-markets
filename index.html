@@ -3602,6 +3602,7 @@ body {
     let pendingTransactions = [];
     var nodeList = ["0xAcC26A4470399A27CC515C24EabEa0FF65E43409"];
     var currentTxHash = null;
+    var showMod = false;
     const statusDescriptions = {
       "0": "",
       "1": "",
@@ -5399,23 +5400,25 @@ body {
     }
 
     function isInappropriateImage(moderationResult) {
-      //console.log(JSON.stringify(moderationResult))
+      if(showMod) {
+        console.log(JSON.stringify(moderationResult))
+      }
       return (
-        (moderationResult.nudity?.sexual_activity > 0.75 || 
-        moderationResult.nudity?.sexual_display > 0.75 || 
-        moderationResult.nudity?.erotica > 0.75 || 
-        moderationResult.nudity?.very_suggestive > 0.75 || 
-        //moderationResult.nudity?.suggestive > 0.75 || 
-        //moderationResult.nudity?.mildly_suggestive > 0.75 || 
-        moderationResult.weapon?.classes?.firearm > 0.75 || 
-        moderationResult.recreational_drug?.prob > 0.75 || 
-        moderationResult.offensive?.prob > 0.75 || 
-        moderationResult.gore?.prob > 0.75 || 
-        moderationResult.scam?.prob > 0.75 || 
-        moderationResult.violence?.prob > 0.75 ||
-        moderationResult.money?.prob > 0.75 || 
-        //moderationResult.gambling?.prob > 0.75 ||
-        moderationResult.self_harm?.prob > 0.75) || 
+        (moderationResult.nudity?.sexual_activity > 0.90 || 
+        moderationResult.nudity?.sexual_display > 0.90 || 
+        moderationResult.nudity?.erotica > 0.90 || 
+        moderationResult.nudity?.very_suggestive > 0.90 || 
+        //moderationResult.nudity?.suggestive > 0.90 || 
+        //moderationResult.nudity?.mildly_suggestive > 0.90 || 
+        moderationResult.weapon?.classes?.firearm > 0.90 || 
+        moderationResult.recreational_drug?.prob > 0.90 || 
+        moderationResult.offensive?.prob > 0.90 || 
+        moderationResult.gore?.prob > 0.90 || 
+        moderationResult.scam?.prob > 0.90 || 
+        moderationResult.violence?.prob > 0.90 ||
+        moderationResult.money?.prob > 0.90 || 
+        //moderationResult.gambling?.prob > 0.90 ||
+        moderationResult.self_harm?.prob > 0.90) || 
         (moderationResult.qr?.link?.length > 0) ||
         (moderationResult.text?.link?.length > 0) ||
         (moderationResult.text?.drug?.some(drug => drug.match.toLowerCase().includes('shroom'))) ||
@@ -5431,13 +5434,15 @@ body {
     }
 
     function isInappropriateText(moderationResult) {
-      //console.log(JSON.stringify(moderationResult))
+      if(showMod) {
+        console.log(JSON.stringify(moderationResult))
+      }
       return (
-        moderationResult.moderation_classes?.sexual > .5 ||
-        moderationResult.moderation_classes?.violent > .5 ||
-        moderationResult.moderation_classes?.toxic > .5 ||
-        moderationResult.moderation_classes?.discriminatory > .7 ||
-        moderationResult.moderation_classes?.insulting > .7 ||
+        moderationResult.moderation_classes?.sexual > .90 ||
+        moderationResult.moderation_classes?.violent > .90 ||
+        moderationResult.moderation_classes?.toxic > .90 ||
+        moderationResult.moderation_classes?.discriminatory > .90 ||
+        moderationResult.moderation_classes?.insulting > .90 ||
         moderationResult.profanity?.matches.length > 0 ||
         //moderationResult.personal?.matches.length > 0 ||
         //moderationResult.link?.matches.length > 0 ||
@@ -5453,22 +5458,25 @@ body {
     }
 
     function isInappropriateImages(moderationResults) {
+      if(showMod) {
+        console.log(JSON.stringify(moderationResults))
+      }
       return moderationResults.every(moderationResult => (
-          (moderationResult.nudity?.sexual_activity > 0.75 || 
-          moderationResult.nudity?.sexual_display > 0.75 || 
-          moderationResult.nudity?.erotica > 0.75 || 
-          moderationResult.nudity?.very_suggestive > 0.75 || 
-          //moderationResult.nudity?.suggestive > 0.75 || 
-          //moderationResult.nudity?.mildly_suggestive > 0.75 || 
-          moderationResult.weapon?.classes?.firearm > 0.75 || 
-          moderationResult.recreational_drug?.prob > 0.75 || 
-          moderationResult.offensive?.prob > 0.85 || 
-          moderationResult.gore?.prob > 0.75 || 
-          moderationResult.scam?.prob > 0.75 || 
-          moderationResult.violence?.prob > 0.75 ||
-          //moderationResult.money?.prob > 0.75 || 
-          //moderationResult.gambling?.prob > 0.75 || 
-          moderationResult.self_harm?.prob > 0.75) ||
+          (moderationResult.nudity?.sexual_activity > 0.90 || 
+          moderationResult.nudity?.sexual_display > 0.90 || 
+          moderationResult.nudity?.erotica > 0.90 || 
+          moderationResult.nudity?.very_suggestive > 0.90 || 
+          //moderationResult.nudity?.suggestive > 0.90 || 
+          //moderationResult.nudity?.mildly_suggestive > 0.90 || 
+          moderationResult.weapon?.classes?.firearm > 0.90 || 
+          moderationResult.recreational_drug?.prob > 0.90 || 
+          moderationResult.offensive?.prob > 0.90 || 
+          moderationResult.gore?.prob > 0.90 || 
+          moderationResult.scam?.prob > 0.90 || 
+          moderationResult.violence?.prob > 0.90 ||
+          //moderationResult.money?.prob > 0.90 || 
+          //moderationResult.gambling?.prob > 0.90 || 
+          moderationResult.self_harm?.prob > 0.90) ||
           (moderationResult.qr?.link?.length > 0) ||
           (moderationResult.text?.link?.length > 0) ||
           (moderationResult.text?.drug?.some(drug => drug.match.toLowerCase().includes('shroom'))) ||
@@ -9808,22 +9816,25 @@ body {
                   });
                   continue;
                 }
+                if(showMod) {
+                  console.log(JSON.stringify(moderationResult))
+                }
                 const isInappropriate = 
-                (moderationResult.nudity?.sexual_activity > 0.75 || 
-                moderationResult.nudity?.sexual_display > 0.75 || 
-                moderationResult.nudity?.erotica > 0.75 || 
-                moderationResult.nudity?.very_suggestive > 0.75 || 
-                //moderationResult.nudity?.suggestive > 0.75 || 
-                //moderationResult.nudity?.mildly_suggestive > 0.75 || 
-                moderationResult.weapon?.classes?.firearm > 0.75 || 
-                moderationResult.recreational_drug?.prob > 0.75 || 
-                moderationResult.offensive?.prob > 0.85 || 
-                moderationResult.gore?.prob > 0.75 || 
-                moderationResult.scam?.prob > 0.75 || 
-                moderationResult.violence?.prob > 0.75 ||
-                //moderationResult.money?.prob > 0.75 || 
-                //moderationResult.gambling?.prob > 0.75 || 
-                moderationResult.self_harm?.prob > 0.75) ||
+                (moderationResult.nudity?.sexual_activity > 0.90 || 
+                moderationResult.nudity?.sexual_display > 0.90 || 
+                moderationResult.nudity?.erotica > 0.90 || 
+                moderationResult.nudity?.very_suggestive > 0.90 || 
+                //moderationResult.nudity?.suggestive > 0.90 || 
+                //moderationResult.nudity?.mildly_suggestive > 0.90 || 
+                moderationResult.weapon?.classes?.firearm > 0.90 || 
+                moderationResult.recreational_drug?.prob > 0.90 || 
+                moderationResult.offensive?.prob > 0.90 || 
+                moderationResult.gore?.prob > 0.90 || 
+                moderationResult.scam?.prob > 0.90 || 
+                moderationResult.violence?.prob > 0.90 ||
+                //moderationResult.money?.prob > 0.90 || 
+                //moderationResult.gambling?.prob > 0.90 || 
+                moderationResult.self_harm?.prob > 0.90) ||
                 (moderationResult.qr?.link?.length > 0) ||
                 (moderationResult.text?.link?.length > 0) ||
                 (moderationResult.text?.drug?.some(drug => drug.match.toLowerCase().includes('shroom'))) ||
