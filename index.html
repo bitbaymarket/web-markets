@@ -588,6 +588,7 @@ h2 {
 }
 .input-wrapper-content {
   margin-bottom: 15px;
+  overflow-wrap: break-word;
 }
 .input-checkboxes {
   display: flex;
@@ -3599,7 +3600,7 @@ body {
     var locked = false;
     var activeActions = {};
     let pendingTransactions = [];
-    var nodeList = ["0xB967532AF84A0116CD78B2f82Cc960e9EcF415f9"];
+    var nodeList = ["0xAcC26A4470399A27CC515C24EabEa0FF65E43409"];
     var currentTxHash = null;
     const statusDescriptions = {
       "0": "",
@@ -4917,7 +4918,7 @@ body {
         html:
           '<input id="checkbox1" type="checkbox" name="registerEmail"> ' +
           '<label for="checkbox1">' + translateThis('Register email/contact information') + '</label><br>' +
-          '<input id="checkbox2" type="checkbox" name="registerPublicKey"> ' +
+          '<input id="checkbox2" type="checkbox" name="registerPublicKey" checked disabled> ' +
           '<label for="checkbox2">' + translateThis('Register public key for privacy/encryption') + '</label>',
         focusConfirm: false,
         showCancelButton: true,
@@ -5439,7 +5440,7 @@ body {
         moderationResult.moderation_classes?.insulting > .7 ||
         moderationResult.profanity?.matches.length > 0 ||
         //moderationResult.personal?.matches.length > 0 ||
-        moderationResult.link?.matches.length > 0 ||
+        //moderationResult.link?.matches.length > 0 ||
         moderationResult.drug?.matches.length > 0 ||
         moderationResult.weapon?.matches.length > 0 ||
         moderationResult.extremism?.matches.length > 0 ||
@@ -5461,11 +5462,11 @@ body {
           //moderationResult.nudity?.mildly_suggestive > 0.75 || 
           moderationResult.weapon?.classes?.firearm > 0.75 || 
           moderationResult.recreational_drug?.prob > 0.75 || 
-          moderationResult.offensive?.prob > 0.75 || 
+          moderationResult.offensive?.prob > 0.85 || 
           moderationResult.gore?.prob > 0.75 || 
           moderationResult.scam?.prob > 0.75 || 
           moderationResult.violence?.prob > 0.75 ||
-          moderationResult.money?.prob > 0.75 || 
+          //moderationResult.money?.prob > 0.75 || 
           //moderationResult.gambling?.prob > 0.75 || 
           moderationResult.self_harm?.prob > 0.75) ||
           (moderationResult.qr?.link?.length > 0) ||
@@ -5476,6 +5477,7 @@ body {
           (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('murder'))) ||
           (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('hitman'))) ||
           (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('naked'))) ||
+          (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('nude'))) ||
           (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('assassin'))) ||
           (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('counterfeit'))) ||
           (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('porn')))
@@ -9808,25 +9810,32 @@ body {
                 }
                 const isInappropriate = 
                 (moderationResult.nudity?.sexual_activity > 0.75 || 
-                  moderationResult.nudity?.sexual_display > 0.75 || 
-                  moderationResult.nudity?.erotica > 0.75 || 
-                  moderationResult.nudity?.very_suggestive > 0.75 || 
-                  moderationResult.nudity?.suggestive > 0.75 || 
-                  moderationResult.nudity?.mildly_suggestive > 0.95 || 
-                  moderationResult.weapon?.classes?.firearm > 0.75 || 
-                  moderationResult.recreational_drug?.prob > 0.75 || 
-                  moderationResult.offensive?.prob > 0.75 || 
-                  moderationResult.gore?.prob > 0.75 || 
-                  moderationResult.scam?.prob > 0.75 || 
-                  moderationResult.violence?.prob > 0.75 ||
-                  //moderationResult.money?.prob > 0.75 || 
-                  //moderationResult.gambling?.prob > 0.75 ||
-                  moderationResult.self_harm?.prob > 0.75) || 
-                  (moderationResult.text?.drug?.some(drug => drug.match.toLowerCase().includes('shroom'))) ||
-                  (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('hacking'))) ||
-                  (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('stolen credit card'))) ||
-                  (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('offer to murder'))) ||
-                  (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('naked girl')));
+                moderationResult.nudity?.sexual_display > 0.75 || 
+                moderationResult.nudity?.erotica > 0.75 || 
+                moderationResult.nudity?.very_suggestive > 0.75 || 
+                //moderationResult.nudity?.suggestive > 0.75 || 
+                //moderationResult.nudity?.mildly_suggestive > 0.75 || 
+                moderationResult.weapon?.classes?.firearm > 0.75 || 
+                moderationResult.recreational_drug?.prob > 0.75 || 
+                moderationResult.offensive?.prob > 0.85 || 
+                moderationResult.gore?.prob > 0.75 || 
+                moderationResult.scam?.prob > 0.75 || 
+                moderationResult.violence?.prob > 0.75 ||
+                //moderationResult.money?.prob > 0.75 || 
+                //moderationResult.gambling?.prob > 0.75 || 
+                moderationResult.self_harm?.prob > 0.75) ||
+                (moderationResult.qr?.link?.length > 0) ||
+                (moderationResult.text?.link?.length > 0) ||
+                (moderationResult.text?.drug?.some(drug => drug.match.toLowerCase().includes('shroom'))) ||
+                (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('hacking'))) ||
+                (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('stolen'))) ||
+                (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('murder'))) ||
+                (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('hitman'))) ||
+                (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('naked'))) ||
+                (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('nude'))) ||
+                (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('assassin'))) ||
+                (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('counterfeit'))) ||
+                (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('porn')))
                 if (isInappropriate) {
                   await Swal.fire({
                     icon: 'error',
@@ -10282,8 +10291,7 @@ body {
                   confirmButtonText: translateThis('Yes'),
                   cancelButtonText: translateThis('No'),
                 }).then((result) => {
-                      if(!result.isConfirmed) {
-                    popupContainer.remove();
+                  if(!result.isConfirmed) {
                     returnThis2 = true;
                     return;
                   }
