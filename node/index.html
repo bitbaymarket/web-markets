@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sign and Verify Requests</title>
+</head>
+<body>
+  <label for="signRequest">Sign Request:</label>
+  <input type="text" id="signRequest">
+  <button onclick="signRequest()">Sign</button>
+  <button onclick="verify()">Verify Signed</button>
+  <label for="verifyRequest">Verify Request:</label>
+  <input type="text" id="verifyRequest">
+  <button onclick="verifyRequest()">Verify</button>
+  <div id="serverData"></div>
+  <script type="text/javascript" src="./static/cryptico.min.js"></script>
+  <script type="text/javascript" src="./static/bignumber.min.js"></script>
+  <script type="text/javascript" src="./static/purify.js"></script>
+  <script type="text/javascript" src="./static/DDEABI.js"></script>
+  <script type="text/javascript" src="./static/crypto-sha256.js"></script>
+  <script type="text/javascript" src="./static/web3.min.js"></script>
+  <script type="text/javascript" src="./static/axios.min.js"></script>
+  <script type="text/javascript" src="./static/sweetalert211.min.js"></script>
+  <script>
+    var hashedPassword = Crypto.SHA256("$123myLongPasswordABC$");
+    for (var i = 1; i < 50000; i++) {
+        hashedPassword = Crypto.SHA256(hashedPassword);
+    }
+    var testUserPrivateKey = '0x' + hashedPassword;    
+    var testEncryptionKey = cryptico.generateRSAKey(Crypto.SHA256(hashedPassword), 1024);
+    var testPublicKey = cryptico.publicKeyString(testEncryptionKey);
+
+    var serverPrivateKey;
+    var serverEncryptionKey;
+    var serverPublicKey = "";
+    var initiated = true;
+    var globRes;
+    var apiUrl = "https://your-custom-url.ngrok-free.app/api"; //set to the URL of your ngrok to test remote requests
+
+    async function triggerEvent() {
+      if(window.pinataApiKey == '') {
+        document.getElementById("serverData").innerHTML = 'Configuration (static/config.js) file data not complete. Please review credentials.';
+        initiated = false;
+      }
+      if(window.pinataSecretApiKey == '') {
+        document.getElementById("serverData").innerHTML = 'Configuration (static/config.js) file data not complete. Please review credentials.';      
+        initiated = false;
+      }
+      if(window.pinataGateway == '') {
+        document.getElementById("serverData").innerHTML = 'Configuration (static/config.js) file data not complete. Please review credentials.';
+        initiated = false;
+      }
+      if(window.pinataToken == '') {
+        document.getElementById("serverData").innerHTML = 'Configuration (static/config.js) file data not complete. Please review credentials.';
+        initiated = false;
+      }
+      if(window.sightengineApiUser == '') {
+        document.getElementById("serverData").innerHTML = 'Configuration (static/config.js) file data not complete. Please review credentials.';
+        initiated = false;
+      }
+      if(window.sightengineApiSecret == '') {
+        document.getElementById("serverData").innerHTML = 'Configuration (static/config.js) file data not complete. Please review credentials.';
+        initiated = false;
+      }
+      if(window.serverPassword == '') {
+        document.getElementById("serverData").innerHTML = 'Configuration (static/config.js) file data not complete. Please review credentials.';
+        initiated = false;
+      }
+      if(initiated) {
+        hashedPassword = Crypto.SHA256(window.serverPassword);
+        for (var i = 1; i < 50000; i++) {
+            hashedPassword = Crypto.SHA256(hashedPassword);
+        }    
+        serverPrivateKey = '0x' + hashedPassword;
+        serverEncryptionKey = cryptico.generateRSAKey(Crypto.SHA256(hashedPassword), 1024);
+        serverPublicKey = cryptico.publicKeyString(serverEncryptionKey);
+        document.getElementById("serverData").innerHTML = 'Your public key: ' + serverPublicKey;
+      }
+      reqdb = await getItem('reqdb');
+      if(reqdb == undefined || reqdb == null) {
+        reqdb={};
+      } else {
+        reqdb = JSON.parse(reqdb);
+      }
+    }
+
+    // Poll every 1000ms to check when things finish loading
+    const intervalId = setInterval(() => {
+        if (typeof window.globalSessionKey !== 'undefined' && window.globalSessionKey !== null) {
+            // Once the variable is set, trigger the event and clear the interval
+            triggerEvent();
+            clearInterval(intervalId);
+        }
+    }, 1000);
+
+    var chainID = "11155111" //Testnet
+    var web3;
+    var showMod = false;
+    if (chainID == "137") {
+        web3 = new Web3("https://rpc.ankr.com/polygon");
+    } else {
+        web3 = new Web3("https://rpc.ankr.com/eth_sepolia");
+    }
+
+    // Function to post a file to Pinata IPFS
+    async function pinToPinataIPFS (text) {
+      const url = 'https://api.pinata.cloud/pinning/pinFILEToIPFS';
+
+      const formData = new FormData();
+      const blob = new Blob([text], { type: 'text/plain' });
+      formData.append('file', blob, 'file.txt');
+      try {
+        const response = await axios.post(url, formData, {
+          headers: {
+            'Content-Type': `multipart/form-data; boundary=${formData._boundary}`,
+            'pinata_api_key': window.pinataApiKey,
+            'pinata_secret_api_key': window.pinataSecretApiKey
+          }
+        });
+        // console.log(response.data.IpfsHash);
+        return DOMPurify.sanitize(response.data.IpfsHash);
+      } catch (error) {
+        console.error("Error:", error);
+        return 'error';
+      }
+    };
+
+    function getItem(item) {
+        return fetch('/api', {  // Ensure to return the fetch promise
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ action: 'get', item, key: window.globalSessionKey }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok'); // Handle HTTP errors
+            }
+            return response.json(); // Parse the JSON data
+        })
+        .then(data => {
+            return data.value; // Return the value from the parsed JSON
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            return undefined; // Return undefined in case of error
+        });
+    }
+
+    // Function to set an item on the server
+    function setItem(item, value) {
+        fetch('/api', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ action: 'set', item, value, key:window.globalSessionKey }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Item set:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+
+    function hashObject(obj) {
+      return Crypto.SHA256(Object.keys(obj).sort().map(key => Crypto.SHA256(key + obj[key])).join('')).toString();
+    }    
+    
+    async function signRequest() {
+      var request = {};
+      request.address = await web3.eth.accounts.privateKeyToAccount(testUserPrivateKey).address;
+      request.chain = chainID;
+      const requestToSign = '{"message": "' + document.getElementById("signRequest").value + '"}';
+      console.log("Signing request:", requestToSign);
+      request.hash = hashObject(requestToSign);
+      request.publicKey = testPublicKey;
+      const timestamp = new Date().getTime();
+      const padding = Crypto.SHA256(timestamp).substring(0, 16); //Pad to avoid chosen cipher attack
+      var finalMessage = cryptico.encrypt(requestToSign + "#*#*#" + timestamp + padding, serverPublicKey, testEncryptionKey).cipher;
+      request.message = finalMessage;
+      console.log(JSON.stringify(request))
+      document.getElementById("serverData").innerHTML = 'Your public key: ' + serverPublicKey + '<br><br>Result: ' +  JSON.stringify(request);
+      globRes = request;
+      return request;
+    }
+
+    var reqdb={}; //This is in format of hash:result for moderation
+
+    function dehexlify(hexStr) {
+        let str = '';
+        for (let i = 0; i < hexStr.length; i += 2) {
+            str += String.fromCharCode(parseInt(hexStr.substr(i, 2), 16));
+        }
+        return str;
+    }
+
+    function hexlify(str) {
+        let hexStr = '';
+        for (let i = 0; i < str.length; i++) {
+            hexStr += str.charCodeAt(i).toString(16).padStart(2, '0'); // Convert each character to hex
+        }
+        return hexStr;
+    }    
+    async function verify() {
+        const requestData = {
+            action: "verify",
+            item: "",
+            value: globRes,  // Keep this as an object
+            key: ""
+        };
+        
+        try {
+            const response = await axios.post(apiUrl, requestData, {
+                headers: { 'ngrok-skip-browser-warning':true, 'Content-Type': 'application/json'}
+            });
+            if (response.data.result) {
+                Swal.fire('Verification Result:' + DOMPurify.sanitize(JSON.stringify(response.data.result)));
+            } else if (response.data.error) {
+                Swal.fire('Error:' + response.data.error);
+            }
+            return DOMPurify.sanitize(JSON.stringify(response.data.result)); // Sanitizing response content
+        } catch (error) {
+            Swal.fire(error.message);
+            return 'error';
+        }
+    }
+    async function verifyRequest(request = '') {
+        if (typeof window.globalSessionKey == 'undefined' || window.globalSessionKey == null) {
+          return {'error':'Server not ready'};
+        }
+        if (request.publicKey == '') {
+          return {'error':'No public key set or the order requested has not been checked yet'};
+        }
+        const requestToVerify = document.getElementById("verifyRequest").value;
+        if(request=='') {
+          request = JSON.parse(requestToVerify);          
+        } else {
+          request = JSON.parse(DOMPurify.sanitize(dehexlify(request)));
+        }
+        var DDEcontract;
+        var tokens;
+        if (request.hash in reqdb) {
+          return reqdb[request.hash];
+        }
+        if (request.chain == "137") {
+            web3 = new Web3("https://rpc.ankr.com/polygon");
+            DDEcontract = new web3.eth.Contract(DDEabi, "0x5669Ac4951cCDE4e2bEdE1fc96681F15E3F015D1");
+            tokens = [
+              {
+                address: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+                token: "POL",
+                image: "matic.png",
+                decimals: "18"
+              },
+              {
+                address: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+                token: "DAI",
+                image: "dai.png",
+                decimals: "18"
+              }
+            ];
+        } else {
+            web3 = new Web3("https://rpc.ankr.com/eth_sepolia");
+            DDEcontract = new web3.eth.Contract(DDEabi, "0xc1620929B151ecB45beB7093AfFb1F9A359656d9");
+            tokens = [
+              {
+                address: "0xA66857Da8d75BE2363968a3B01BfE1f417B28202",
+                token: "ETH",
+                image: "eth.png",
+                decimals: "18"
+              }
+            ]
+        }
+        if(true) {
+          const datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(request.address, 3).call());
+          if(datalen == 0) {
+            return {'false':'user has not registred public key'};
+          }
+          const registeredData = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(request.address, datalen-1).call()));
+          if("publickey" in registeredData) {
+            if(registeredData['publickey'] != request.publicKey) {
+              return {'false':'public key mismatch'};
+            }
+          } else {
+            return {'false':'user has not registred public key'};
+          }
+        }
+        var timenow = parseInt(new Date().getTime()/1000);
+        var userData = await getItem(request.address + ':userdata');
+        if(userData == undefined || userData == null) {
+          userData = {'requests':{'0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270':0,'0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063':0,'0xA66857Da8d75BE2363968a3B01BfE1f417B28202':0}, 'startTime':timenow, 'minBalance':{'0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270':0,'0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063':0,'0xA66857Da8d75BE2363968a3B01BfE1f417B28202':0}};
+        } else {
+          userData = JSON.parse(userData);
+        }
+        if(!('IPFSRequests' in userData)) {
+          userData.IPFSRequests = 0;
+        }
+        if(!('totalRequests' in userData)) {
+          userData.totalRequests = 0;
+        }
+        var baseBalance;
+        await web3.eth.getBalance(request.address, function(err, result1) {
+          if (err) {
+            console.log(err);
+            return;
+          } else {
+            baseBalance = DOMPurify.sanitize(result1);
+          }
+        });
+        if(request.chain == "137") {
+          var token = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
+          await DDEcontract.methods.userBalance(request.address, token).call().then(function (liquid1) {
+            var baseBalance2 = DOMPurify.sanitize(liquid1);
+            baseBalance = web3.utils.toBN(baseBalance).add(web3.utils.toBN(baseBalance2));
+            if(web3.utils.toBN(baseBalance).gt(web3.utils.toBN(userData.minBalance[token]))) {
+              userData.minBalance[token] = baseBalance.toString();
+            } else {
+              if(timenow > userData.startTime + 604800) {
+                userData.minBalance[token] = baseBalance.toString();
+              }
+            }
+          });
+          token = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
+          await DDEcontract.methods.userBalance(request.address, token).call().then(function (liquid1) {
+            baseBalance = DOMPurify.sanitize(liquid1);
+            if(web3.utils.toBN(baseBalance).gt(web3.utils.toBN(userData.minBalance[token]))) {
+              userData.minBalance[token] = baseBalance.toString();
+            } else {
+              if(timenow > userData.startTime + 604800) {
+                userData.minBalance[token] = baseBalance.toString();
+              }
+            }
+          });
+        } else {
+          var token = "0xA66857Da8d75BE2363968a3B01BfE1f417B28202";
+          await DDEcontract.methods.userBalance(request.address, token).call().then(function (liquid1) {
+            var baseBalance2 = DOMPurify.sanitize(liquid1);
+            baseBalance = web3.utils.toBN(baseBalance).add(web3.utils.toBN(baseBalance2));
+            if(web3.utils.toBN(baseBalance).gt(web3.utils.toBN(userData.minBalance[token]))) {
+              userData.minBalance[token] = baseBalance.toString();
+            } else {
+              if(timenow > userData.startTime + 604800) {
+                userData.minBalance[token] = baseBalance.toString();
+              }
+            }
+          });   
+        }
+        if(timenow > userData.startTime + 604800) {
+          userData.requests = {'0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270':0,'0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063':0,'0xA66857Da8d75BE2363968a3B01BfE1f417B28202':0}
+          userData.IPFSRequests = 0;
+          userData.totalRequests = 0;
+          userData.startTime = timenow;
+        }
+        if(userData.totalRequests > window.maximumTotalRequests) {
+          return {'false':'Too many total requests, try again later'};
+        }
+        userData.totalRequests+=1;
+        if(request.chain == "137") {
+          var token = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
+          if(web3.utils.toBN(userData.requests[token]).gte(web3.utils.toBN(userData.minBalance[token]))) {
+            token = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
+            if(web3.utils.toBN(userData.requests[token]).gte(web3.utils.toBN(userData.minBalance[token]))) {
+              return {'false':'Too many requests based on activity level, try again later'};
+            }
+            userData.requests[token]=(web3.utils.toBN(userData.requests[token]).add(web3.utils.toBN(window.cost))).toString();
+          } else {
+            userData.requests[token]=(web3.utils.toBN(userData.requests[token]).add(web3.utils.toBN(window.cost))).toString();
+          }
+        } else {
+          var token = "0xA66857Da8d75BE2363968a3B01BfE1f417B28202";
+          if(web3.utils.toBN(userData.requests[token]).gte(web3.utils.toBN(userData.minBalance[token]))) {
+            return {'false':'Too many requests based on activity level, try again later'};
+          }
+          userData.requests[token]=(web3.utils.toBN(userData.requests[token]).add(web3.utils.toBN(window.cost))).toString();
+        }
+        console.log("Verifying request:", request.hash);
+        try {
+          var decrypted = cryptico.decrypt(request.message, serverEncryptionKey);
+          var message = decrypted.plaintext;
+          var padding = message.split("#*#*#")[1];
+          var message = message.split("#*#*#")[0];
+          if(padding.length < 25) {
+            throw new Error("incorrect padding");
+          }
+          if(!(decrypted.signature == "verified")) {
+            throw new Error("signature verification failed");
+          }
+        } catch (e) {
+          console.log(e);
+          return {'false':'Failed to decrypt or verify message'};
+        }
+        var orderData;
+        try {
+          message = JSON.parse(message);
+          orderData = {
+            message: DOMPurify.sanitize(message?.message),
+            contact: DOMPurify.sanitize(message?.contact),
+            image: Array.isArray(message?.image) ? message.image.map(img => DOMPurify.sanitize(img)) : (message?.image ? [DOMPurify.sanitize(message.image)] : []),
+            title: DOMPurify.sanitize(message?.title),
+            location: DOMPurify.sanitize(message?.location)
+          };
+        } catch (e) {
+          return {'false':'Invalid JSON'};
+        }
+        if('ipfs' in request) {
+          if(userData.IPFSRequests > window.maximumIPFSRequests) {
+            return {'false':'Too many IPFS post requests, try again later'};
+          }
+        }
+        setItem(request.address + ':userdata',JSON.stringify(userData));
+        var isGood = false;
+        if(window.sightengineApiUser != '') {
+          isGood = await validateOrderData(orderData);
+        } else {
+          isGood = 'error';
+          console.log("Need to supply API key");
+        }
+        if(isGood.toString().toLowerCase().includes("error")) {
+          const results = {'false': 'Error checking AI'};
+          return results;
+        }
+        if(isGood.toString() != 'true') {
+          const results = {'false': 'Order failed AI test', 'result': isGood};
+          reqdb[request.hash] = results;
+          setItem('reqdb:'+request.hash,JSON.stringify(results));
+          return results;
+        } else {
+          if('ipfs' in request) {
+            userData.IPFSRequests += 1;
+            var ipfshash = await pinToPinataIPFS(message);
+            console.log(ipfshash)
+            if(ipfshash == "error") {
+              return {'false': "error posting to ipfs"};
+            }
+            setItem(request.address + ':userdata',JSON.stringify(userData));
+            const results = {'true': 'Order passed AI test','ipfs':ipfshash};
+            reqdb[request.hash] = results
+            setItem('reqdb:'+request.hash,JSON.stringify(results));
+            return results;
+          } else {
+            const results = {'true': 'Order passed AI test'};
+            reqdb[request.hash] = results;
+            setItem('reqdb:'+request.hash,JSON.stringify(results));
+            return results;
+          }
+        }
+    }
+
+    async function validateOrderData(orderData) {
+      const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
+      let imagesResult = true;
+      let textResult = true;
+
+      try {
+        if (orderData.image && orderData.image.length > 0) {
+          const images = orderData.image
+            .map((img, index) => {
+              const mime = img.match(/data:(.*);base64,/)[1];
+              if (validImageTypes.includes(mime)) {
+                return dataURLtoFile(img, `image${index}.${mime.split('/')[1]}`);
+              }
+              return null;
+            })
+            .filter(img => img !== null);
+
+          const imageModerationResult = await moderateImage(images);
+          if (imageModerationResult === null) {
+            throw new Error("The result is null.")
+          }
+          const sanitizedImageModerationResult = JSON.parse(DOMPurify.sanitize(JSON.stringify(imageModerationResult)));
+
+          if ('data' in sanitizedImageModerationResult) {
+            if (Array.isArray(sanitizedImageModerationResult.data)) {
+              imagesResult = !isInappropriateImages(sanitizedImageModerationResult.data);
+            } else {
+              imagesResult = !isInappropriateImage(sanitizedImageModerationResult.data);
+            }
+          } else {
+            if (Array.isArray(sanitizedImageModerationResult)) {
+              imagesResult = !isInappropriateImages(sanitizedImageModerationResult);
+            } else {
+              imagesResult = !isInappropriateImage(sanitizedImageModerationResult);
+            }
+          }
+        }
+        if (orderData.title || orderData.message || orderData.location || orderData.contact) {
+          const textModerationResult = await moderateText(`${orderData.title} ${orderData.message} ${orderData.location} ${orderData.contact}`);
+          if (textModerationResult === null) {
+            throw new Error("The result is null.")
+          }
+          const sanitizedTextModerationResult = JSON.parse(DOMPurify.sanitize(JSON.stringify(textModerationResult)));
+          textResult = !isInappropriateText(sanitizedTextModerationResult);
+        }
+        if(imagesResult && textResult) {
+          return true;
+        } else {
+          return [imagesResult, textResult];
+        }
+      } catch (error) {
+        console.error("Error during moderation:", error);
+        return 'error checking AI';
+      }
+    }
+
+    function dataURLtoFile(dataurl, filename) {
+      var arr = dataurl.split(','),
+          mime = arr[0].match(/:(.*?);/)[1],
+          bstr = atob(arr[arr.length - 1]), 
+          n = bstr.length, 
+          u8arr = new Uint8Array(n);
+      while(n--){
+          u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new File([u8arr], filename, {type:mime});
+    }
+
+    async function moderateImage(files) {
+      const url = 'https://api.sightengine.com/1.0/check.json';
+      const formData = new FormData();
+      if (Array.isArray(files)) {
+        files.forEach(file => formData.append('media[]', file));
+      } else {
+        formData.append('media', files);
+      }
+      formData.append('models', 'nudity-2.1,weapon,alcohol,recreational_drug,medical,properties,type,quality,celebrities,offensive,faces,scam,text-content,face-attributes,gore-2.0,text,qr-content,tobacco,genai,violence,self-harm,money,gambling');
+      formData.append('api_user', window.sightengineApiUser);
+      formData.append('api_secret', window.sightengineApiSecret);
+
+      try {
+        const response = await axios.post(url, formData, {
+          headers: formData.getHeaders ? formData.getHeaders() : { 'Content-Type': 'multipart/form-data' }
+        });
+        return response.data;
+      } catch (error) {
+        console.error("Error moderating image:", error);
+        return null;
+      }
+    }
+
+    async function moderateText(text) {
+      const url = 'https://api.sightengine.com/1.0/text/check.json';
+      const formData = new FormData();
+      formData.append('text', text);
+      formData.append('lang', 'en');
+      formData.append('categories', 'profanity,personal,link,drug,weapon,spam,content-trade,money-transaction,extremism,violence,self-harm,medical');
+      formData.append('models', 'general');
+      formData.append('mode', 'rules,ml');
+      formData.append('api_user', window.sightengineApiUser);
+      formData.append('api_secret', window.sightengineApiSecret);
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+        return result;
+      } catch (error) {
+        console.error("Error moderating text:", error);
+        return null;
+      }
+    }
+
+    function isInappropriateImage(moderationResult) {
+      if(showMod) {
+        console.log(JSON.stringify(moderationResult))
+      }
+      return (
+        (moderationResult.nudity?.sexual_activity > 0.90 || 
+        moderationResult.nudity?.sexual_display > 0.90 || 
+        moderationResult.nudity?.erotica > 0.90 || 
+        moderationResult.nudity?.very_suggestive > 0.90 || 
+        //moderationResult.nudity?.suggestive > 0.90 || 
+        //moderationResult.nudity?.mildly_suggestive > 0.90 || 
+        moderationResult.weapon?.classes?.firearm > 0.90 || 
+        moderationResult.recreational_drug?.prob > 0.90 || 
+        moderationResult.offensive?.prob > 0.90 || 
+        moderationResult.gore?.prob > 0.90 || 
+        moderationResult.scam?.prob > 0.90 || 
+        moderationResult.violence?.prob > 0.90 ||
+        moderationResult.money?.prob > 0.90 || 
+        //moderationResult.gambling?.prob > 0.90 ||
+        moderationResult.self_harm?.prob > 0.90) || 
+        (moderationResult.qr?.link?.length > 0) ||
+        (moderationResult.text?.link?.length > 0) ||
+        (moderationResult.text?.drug?.some(drug => drug.match.toLowerCase().includes('shroom'))) ||
+        (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('hacking'))) ||
+        (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('stolen'))) ||
+        (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('murder'))) ||
+        (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('hitman'))) ||
+        (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('naked'))) ||
+        (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('assassin'))) ||
+        (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('counterfeit'))) ||
+        (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('porn')))
+      );
+    }
+
+    function isInappropriateText(moderationResult) {
+      if(showMod) {
+        console.log(JSON.stringify(moderationResult))
+      }
+      return (
+        moderationResult.moderation_classes?.sexual > .90 ||
+        moderationResult.moderation_classes?.violent > .90 ||
+        moderationResult.moderation_classes?.toxic > .90 ||
+        moderationResult.moderation_classes?.discriminatory > .90 ||
+        moderationResult.moderation_classes?.insulting > .90 ||
+        moderationResult.profanity?.matches.length > 0 ||
+        //moderationResult.personal?.matches.length > 0 ||
+        //moderationResult.link?.matches.length > 0 ||
+        moderationResult.drug?.matches.length > 0 ||
+        moderationResult.weapon?.matches.length > 0 ||
+        moderationResult.extremism?.matches.length > 0 ||
+        moderationResult.self_harm?.matches.length > 0 ||
+        moderationResult.violence?.matches.length > 0// ||
+        //moderationResult['content-trade']?.matches.length > 0 ||
+        //moderationResult['money-transaction']?.matches.length > 0 ||
+        //moderationResult.spam?.matches.length > 0
+      );
+    }
+
+    function isInappropriateImages(moderationResults) {
+      if(showMod) {
+        console.log(JSON.stringify(moderationResults))
+      }
+      return moderationResults.every(moderationResult => (
+          (moderationResult.nudity?.sexual_activity > 0.90 || 
+          moderationResult.nudity?.sexual_display > 0.90 || 
+          moderationResult.nudity?.erotica > 0.90 || 
+          moderationResult.nudity?.very_suggestive > 0.90 || 
+          //moderationResult.nudity?.suggestive > 0.90 || 
+          //moderationResult.nudity?.mildly_suggestive > 0.90 || 
+          moderationResult.weapon?.classes?.firearm > 0.90 || 
+          moderationResult.recreational_drug?.prob > 0.90 || 
+          moderationResult.offensive?.prob > 0.90 || 
+          moderationResult.gore?.prob > 0.90 || 
+          moderationResult.scam?.prob > 0.90 || 
+          moderationResult.violence?.prob > 0.90 ||
+          //moderationResult.money?.prob > 0.90 || 
+          //moderationResult.gambling?.prob > 0.90 || 
+          moderationResult.self_harm?.prob > 0.90) ||
+          (moderationResult.qr?.link?.length > 0) ||
+          (moderationResult.text?.link?.length > 0) ||
+          (moderationResult.text?.drug?.some(drug => drug.match.toLowerCase().includes('shroom'))) ||
+          (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('hacking'))) ||
+          (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('stolen'))) ||
+          (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('murder'))) ||
+          (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('hitman'))) ||
+          (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('naked'))) ||
+          (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('nude'))) ||
+          (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('assassin'))) ||
+          (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('counterfeit'))) ||
+          (moderationResult.text?.spam?.some(spam => spam.match.toLowerCase().includes('porn')))
+        ));
+    }
+  </script>
+</body>
+</html>

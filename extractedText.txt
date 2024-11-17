@@ -524,3 +524,28 @@
   "Images should not contain links, QR codes, sex, violence, fraud, suggestive images or text, drugs, weapons, etc.": true,
   "You are a node. You will automatically check new offers with AI and post the results to the blockchain. Please always ensure you have sufficient funds to post your updates to the markets.": true
 }
+{
+  "59":{"#en": "Network/API options"},
+  "39":{"#en": "Detect nodes automatically"}
+}
+{
+  "All of the code is open source under the 'Coinleft Public License for BitBay' which is a license that allows users free use of the software without granting them commercial rights to create a competing project by copying the code. If such an act was to be taken it must be negotiated with the BitBay community which would result in an airdrop or profit share to its users. This helps BitBay maintain it's competitive advantage in the industry while letting users fully validate the code itself. The code has also been audited multiple times and those reports are published on Github. Users and companies should continue to audit it proving it's safety.": true,
+  "Detect nodes automatically": true,
+  "Supply my own API keys": true,
+  "Register API Keys": true,
+  "You already have API keys saved would you like to remove them and make new ones? If not you will stay with the current keys.": true,
+  "Success": true,
+  "Error": true,
+  "API keys saved": true,
+  "Please fill out all fields": true,
+  "Are affiliates assigned by default?": true,
+  "The choice of which affiliate to be used is up to the user and may be changed at any time to any valid affiliate. Users who do not choose an affiliate will pick one at random from the community of nodes and top affiliates. Any highly active and trusted user can reach out to become a node and help run the markets. Some nodes may choose to not be an affiliate if they wish to moderate and post data for free. Everything is about freedom of choice among all users.": true,
+  "Who run the nodes and how can I become a node?": true,
+  "Any user can become a node to assist in checking offers with artificial intelligence and they also assist by posting order data to IPFS. These node users should also be affiliates so they may get compensated for handling the traffic. The code to become a node is open source and hosted on the official Github. Please contact the community on social media for more information.": true,
+  "How can nodes prevent DDOS and bots?": true,
+  "Fortunately, every user has a public key for encryption which can be used to verify their requests like an API key. Nodes will have different rate limits based on the amount of funds deposited and requests allowed per week. This prevents spam because it validates every genuine user.": true,
+  "In order to interact with nodes and users it is requested that you register a separate encryption key so requests can be validated and secured. Also at this time it is highly recommended to register contact information such as an email address so users may contact you when involved in a contract. Would you like to do that now?": true,
+  "How would you like to connect to validate orders using AI?": true,
+  "Enter your 'Gateway public key' which is shown in your browser when you load your local server.": true,
+  "Key cannot be blank": true
+}

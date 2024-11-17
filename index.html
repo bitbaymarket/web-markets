@@ -1,3 +1,4 @@
+<!-- License-Identifier: Coinleft Public License for BitBay -->
 <!DOCTYPE html>
 <script type="text/javascript" src="./purify.js"></script>
 <script type="text/javascript" src="./DDEABI.js"></script>
@@ -16,15 +17,15 @@
 <link rel="stylesheet" href="./simple-scrollbar.css">
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script type="text/javascript" src="./translate.js"></script>
-  <script type="text/javascript" src="./faq.js"></script>
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/x-icon" href="./favicon.ico">
-  <title t-id="1">BitBay Decentralized Markets</title>
-  <style>
-    ::-webkit-scrollbar {
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="text/javascript" src="./translate.js"></script>
+<script type="text/javascript" src="./faq.js"></script>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/x-icon" href="./favicon.ico">
+<title t-id="1">BitBay Decentralized Markets</title>  
+<style>
+::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
@@ -34,7 +35,426 @@
 * {
   box-sizing: border-box;
 }
+.swal2-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1.8em; }
+
+.swal2-title {
+  position: relative;
+  max-width: 100%;
+  margin: 0 0 0.4em;
+  padding: 0;
+  color: #595959;
+  font-size: 1.875em;
+  font-weight: 600;
+  text-align: center;
+  text-transform: none;
+  word-wrap: break-word; }
+
+.swal2-actions {
+  display: flex;
+  z-index: 1;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 1.25em auto 0;
+  padding: 0; }
+  .swal2-actions:not(.swal2-loading) .swal2-styled[disabled] {
+    opacity: .4; }
+  .swal2-actions:not(.swal2-loading) .swal2-styled:hover {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)); }
+  .swal2-actions:not(.swal2-loading) .swal2-styled:active {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)); }
+
+.swal2-loader {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.2em;
+  height: 2.2em;
+  margin: 0 1.875em;
+  -webkit-animation: swal2-rotate-loading 1.5s linear 0s infinite normal;
+          animation: swal2-rotate-loading 1.5s linear 0s infinite normal;
+  border-width: 0.25em;
+  border-style: solid;
+  border-radius: 100%;
+  border-color: #2778c4 transparent #2778c4 transparent; }
+
+.swal2-styled {
+  margin: 0.3125em;
+  padding: 0.625em 1.1em;
+  box-shadow: none;
+  font-weight: 500; }
+  .swal2-styled:not([disabled]) {
+    cursor: pointer; }
+  .swal2-styled.swal2-confirm {
+    border: 0;
+    border-radius: 0;
+    background: initial;
+    background-color: #2778c4;
+    color: #fff;
+    font-size: 1em; }
+  .swal2-styled.swal2-deny {
+    border: 0;
+    border-radius: 0.25em;
+    background: initial;
+    background-color: #d14529;
+    color: #fff;
+    font-size: 1em; }
+  .swal2-styled.swal2-cancel {
+    border: 0;
+    border-radius: 0;
+    background: initial;
+    background-color: #757575;
+    color: #fff;
+    font-size: 1em; }
+  .swal2-styled:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(100, 150, 200, 0.5); }
+  .swal2-styled::-moz-focus-inner {
+    border: 0; }
+
+.swal2-footer {
+  justify-content: center;
+  margin: 1.25em 0 0;
+  padding: 1em 0 0;
+  border-top: 1px solid #eee;
+  color: #545454;
+  font-size: 1em; }
+
+.swal2-timer-progress-bar-container {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 0.25em;
+  overflow: hidden;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0; }
+
+.swal2-timer-progress-bar {
+  width: 100%;
+  height: 0.25em;
+  background: rgba(0, 0, 0, 0.2); }
+
+.swal2-image {
+  max-width: 100%;
+  margin: 1.25em auto; }
+
+.swal2-close {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.2em;
+  height: 1.2em;
+  padding: 0;
+  overflow: hidden;
+  transition: initial;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: #cccccc;
+  font-family: serif;
+  font-size: 2.5em;
+  line-height: 1.2;
+  cursor: pointer; }
+  .swal2-close:hover {
+    transform: none;
+    background: transparent;
+    color: #f27474; }
+  .swal2-close:focus {
+    outline: none;
+    box-shadow: inset 0 0 0 3px rgba(100, 150, 200, 0.5); }
+  .swal2-close::-moz-focus-inner {
+    border: 0; }
+
+.swal2-content {
+  z-index: 1;
+  justify-content: center;
+  margin: 0;
+  padding: 0 1.6em;
+  color: #545454;
+  font-size: 1.125em;
+  font-weight: normal;
+  line-height: normal;
+  text-align: center;
+  word-wrap: break-word; }
+
+.swal2-input,
+.swal2-file,
+.swal2-textarea,
+.swal2-select,
+.swal2-radio,
+.swal2-checkbox {
+  margin: 1em auto; }
+
+.swal2-input,
+.swal2-file,
+.swal2-textarea {
+  box-sizing: border-box;
+  width: 100%;
+  transition: initial;
+  border: 1px solid #d9d9d9;
+  border-radius: 0;
+  background: inherit;
+  box-shadow: none;
+  color: inherit;
+  font-size: 1.125em; }
+  .swal2-input.swal2-inputerror,
+  .swal2-file.swal2-inputerror,
+  .swal2-textarea.swal2-inputerror {
+    border-color: #f27474 !important;
+    box-shadow: 0 0 2px #f27474 !important; }
+  .swal2-input:focus,
+  .swal2-file:focus,
+  .swal2-textarea:focus {
+    border: 1px solid #b4dbed;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(100, 150, 200, 0.5); }
+  .swal2-input::-moz-placeholder, .swal2-file::-moz-placeholder, .swal2-textarea::-moz-placeholder {
+    color: #7e7e7e; }
+  .swal2-input:-ms-input-placeholder, .swal2-file:-ms-input-placeholder, .swal2-textarea:-ms-input-placeholder {
+    color: #7e7e7e; }
+  .swal2-input::placeholder,
+  .swal2-file::placeholder,
+  .swal2-textarea::placeholder {
+    color: #7e7e7e; }
+
+.swal2-range {
+  margin: 1em auto;
+  background: #fff; }
+  .swal2-range input {
+    width: 80%; }
+  .swal2-range output {
+    width: 20%;
+    color: inherit;
+    font-weight: 600;
+    text-align: center; }
+  .swal2-range input,
+  .swal2-range output {
+    height: 2.625em;
+    padding: 0;
+    font-size: 1.125em;
+    line-height: 2.625em; }
+
+.swal2-input {
+  height: 2.625em;
+  padding: 0 0.75em; }
+  .swal2-input[type='number'] {
+    max-width: 10em; }
+
+.swal2-file {
+  background: inherit;
+  font-size: 1.125em; }
+
+.swal2-textarea {
+  height: 6.75em;
+  padding: 0.75em; }
+
+.swal2-select {
+  min-width: 50%;
+  max-width: 100%;
+  padding: .375em .625em;
+  background: inherit;
+  color: inherit;
+  font-size: 1.125em; }
+
+.swal2-radio,
+.swal2-checkbox {
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: inherit; }
+  .swal2-radio label,
+  .swal2-checkbox label {
+    margin: 0 .6em;
+    font-size: 1.125em; }
+  .swal2-radio input,
+  .swal2-checkbox input {
+    margin: 0 .4em; }
+
+.swal2-input-label {
+  display: flex;
+  justify-content: center;
+  margin: 1em auto; }
+
+.swal2-validation-message {
+  align-items: center;
+  justify-content: center;
+  margin: 0 -2.7em;
+  padding: 0.625em;
+  overflow: hidden;
+  background: #f0f0f0;
+  color: #666666;
+  font-size: 1em;
+  font-weight: 300; }
+  .swal2-validation-message::before {
+    content: '!';
+    display: inline-block;
+    width: 1.5em;
+    min-width: 1.5em;
+    height: 1.5em;
+    margin: 0 .625em;
+    border-radius: 50%;
+    background-color: #f27474;
+    color: #fff;
+    font-weight: 600;
+    line-height: 1.5em;
+    text-align: center; }
+
+.swal2-icon {
+  position: relative;
+  box-sizing: content-box;
+  justify-content: center;
+  width: 5em;
+  height: 5em;
+  margin: 1.25em auto 1.875em;
+  border: 0.25em solid transparent;
+  border-radius: 50%;
+  border-color: #000;
+  font-family: inherit;
+  line-height: 5em;
+  cursor: default;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none; }
+  .swal2-icon .swal2-icon-content {
+    display: flex;
+    align-items: center;
+    font-size: 3.75em; }
+  .swal2-icon.swal2-error {
+    border-color: #f27474;
+    color: #f27474; }
+    .swal2-icon.swal2-error .swal2-x-mark {
+      position: relative;
+      flex-grow: 1; }
+    .swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+      display: block;
+      position: absolute;
+      top: 2.3125em;
+      width: 2.9375em;
+      height: .3125em;
+      border-radius: .125em;
+      background-color: #f27474; }
+      .swal2-icon.swal2-error [class^='swal2-x-mark-line'][class$='left'] {
+        left: 1.0625em;
+        transform: rotate(45deg); }
+      .swal2-icon.swal2-error [class^='swal2-x-mark-line'][class$='right'] {
+        right: 1em;
+        transform: rotate(-45deg); }
+  .swal2-icon.swal2-warning {
+    border-color: #facea8;
+    color: #f8bb86; }
+  .swal2-icon.swal2-info {
+    border-color: #9de0f6;
+    color: #3fc3ee; }
+  .swal2-icon.swal2-question {
+    border-color: #c9dae1;
+    color: #87adbd; }
+  .swal2-icon.swal2-success {
+    border-color: #a5dc86;
+    color: #a5dc86; }
+    .swal2-icon.swal2-success [class^='swal2-success-circular-line'] {
+      position: absolute;
+      width: 3.75em;
+      height: 7.5em;
+      transform: rotate(45deg);
+      border-radius: 50%; }
+      .swal2-icon.swal2-success [class^='swal2-success-circular-line'][class$='left'] {
+        top: -.4375em;
+        left: -2.0635em;
+        transform: rotate(-45deg);
+        transform-origin: 3.75em 3.75em;
+        border-radius: 7.5em 0 0 7.5em; }
+      .swal2-icon.swal2-success [class^='swal2-success-circular-line'][class$='right'] {
+        top: -.6875em;
+        left: 1.875em;
+        transform: rotate(-45deg);
+        transform-origin: 0 3.75em;
+        border-radius: 0 7.5em 7.5em 0; }
+    .swal2-icon.swal2-success .swal2-success-ring {
+      position: absolute;
+      z-index: 2;
+      top: -.25em;
+      left: -.25em;
+      box-sizing: content-box;
+      width: 100%;
+      height: 100%;
+      border: 0.25em solid rgba(165, 220, 134, 0.3);
+      border-radius: 50%; }
+    .swal2-icon.swal2-success .swal2-success-fix {
+      position: absolute;
+      z-index: 1;
+      top: .5em;
+      left: 1.625em;
+      width: .4375em;
+      height: 5.625em;
+      transform: rotate(-45deg); }
+    .swal2-icon.swal2-success [class^='swal2-success-line'] {
+      display: block;
+      position: absolute;
+      z-index: 2;
+      height: .3125em;
+      border-radius: .125em;
+      background-color: #a5dc86; }
+      .swal2-icon.swal2-success [class^='swal2-success-line'][class$='tip'] {
+        top: 2.875em;
+        left: .8125em;
+        width: 1.5625em;
+        transform: rotate(45deg); }
+      .swal2-icon.swal2-success [class^='swal2-success-line'][class$='long'] {
+        top: 2.375em;
+        right: .5em;
+        width: 2.9375em;
+        transform: rotate(-45deg); }
+
+.swal2-progress-steps {
+  flex-wrap: wrap;
+  align-items: center;
+  max-width: 100%;
+  margin: 0 0 1.25em;
+  padding: 0;
+  background: inherit;
+  font-weight: 600; }
+  .swal2-progress-steps li {
+    display: inline-block;
+    position: relative; }
+  .swal2-progress-steps .swal2-progress-step {
+    z-index: 20;
+    flex-shrink: 0;
+    width: 2em;
+    height: 2em;
+    border-radius: 2em;
+    background: #2778c4;
+    color: #fff;
+    line-height: 2em;
+    text-align: center; }
+    .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step {
+      background: #2778c4; }
+      .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step ~ .swal2-progress-step {
+        background: #add8e6;
+        color: #fff; }
+      .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step ~ .swal2-progress-step-line {
+        background: #add8e6; }
+  .swal2-progress-steps .swal2-progress-step-line {
+    z-index: 10;
+    flex-shrink: 0;
+    width: 2.5em;
+    height: .4em;
+    margin: 0 -1px;
+    background: #2778c4; }
+
+/* Custom Swal */
 .swal2-popup {
+  position: fixed;
   background-color: #ededed; /* Background color */
   color: #000000; /* Text color */
   border: 2px solid #3d0064; /* Border color */
@@ -43,7 +463,19 @@
   font-family: 'Courier New', monospace; /* Custom font */
   font-weight: normal;
   z-index: 1000;
+  transform: none;
+  transition: none;
+  animation: none;
+  padding: 1.25em;
+  width: 32em;
+  box-sizing: border-box;
+  flex-direction: column;
+  justify-content: center;
 }
+.swal2-popup:focus {
+  outline: none; }
+.swal2-popup.swal2-loading {
+  overflow-y: hidden; }
 .swal2-title {
   color: #3d0064; /* Title text color */
 }
@@ -517,7 +949,7 @@ h2 {
   justify-content: center;
   align-items: center;
 }
-.popup, .popup2, .withdraw-swal-wrapper {
+.popup, .popup2 {
   position: relative;
   background-color: white;
   padding: 30px;
@@ -535,7 +967,13 @@ h2 {
   font-weight: bold;
   cursor: pointer;
 }
-
+.withdraw-swal-wrapper {
+  background-color: white;
+  padding: 30px;
+  max-width: calc(600px - 30px);
+  width: 100%;
+  border-radius: 6px;
+}
 .vertical-spacer {
   display: inline-block;
   height: 2px;
@@ -660,7 +1098,6 @@ h2 {
   min-width: 100px;
   padding: 0 12px;
   cursor: pointer;
-  transition: all ease-in-out 0.6s;
   font-size: 16px;
   font-weight: bold;
 }
@@ -2750,9 +3187,9 @@ body {
       </div>
       <div class="account-form-wrapper">
         <div class="account-input-box">
-          <label>User Default Ipfs Pinata Gateaway</label>
+          <label t-id="59">Network/API options</label>
           <select id="connectMethod">
-            <option value="0" t-id="39">Use default IPFS Pinata Gateway</option>
+            <option value="0" t-id="39">Detect nodes automatically</option>
           </select>
         </div>
       </div>
@@ -2824,6 +3261,26 @@ body {
     </div>
   </div>
   <script>
+    function centerPopup() {
+        const popup = Swal.getPopup();
+        const rect = popup.getBoundingClientRect();
+        const top = (window.innerHeight - rect.height) / 2 + window.scrollY;
+        const left = (window.innerWidth - rect.width) / 2 + window.scrollX;
+        popup.style.top = `${top}px`;
+        popup.style.left = `${left}px`;
+    }
+    Swal = Swal.mixin({
+        showClass: {
+            popup: '' // Disable show animation
+        },
+        hideClass: {
+            popup: '' // Disable hide animation
+        },
+        didRender: () => {
+            // Call the center function when the popup opens
+            setTimeout(centerPopup, 5);
+        }
+    });
     var lastTouchY = 0;
     var preventPullToRefresh = false;
     window.document.body.addEventListener("touchstart", function(e){
@@ -2844,7 +3301,7 @@ body {
                 return;
             }
         }
-    }, false);
+    }, { passive: false });
 
     function setActionActive(actionCode, isActive) {
       activeActions[Crypto.SHA256(actionCode)] = isActive;
@@ -3428,13 +3885,13 @@ body {
     }
 
     // Function to get file from IndexedDB
-    async function getFile(hash) {
+    async function getFile(hash, update=0) {
       return new Promise(function (resolve, reject) {
         if(hash=='') {
           resolve(['']);
         }
         // Check if the file hash is in loadedFiles
-        if (!(hash in loadedFiles)) {
+        if (!(hash in loadedFiles) || update == 1) {
           // If not, fetch it from IndexedDB
           var transaction = db.transaction(['files'], 'readonly');
           var objectStore = transaction.objectStore('files');
@@ -3532,8 +3989,13 @@ body {
     showMain('markets');
     var web3 = [];
     var DDEcontract = "";
-    //var DDEaddy = "0xc1620929B151ecB45beB7093AfFb1F9A359656d9"; //Sepolia testnet is default market view
-    var DDEaddy = "0x5669Ac4951cCDE4e2bEdE1fc96681F15E3F015D1" //Polygon is default market view
+    var testNetView = false;
+    var DDEaddy;
+    if(testNetView) {
+      DDEaddy = "0xc1620929B151ecB45beB7093AfFb1F9A359656d9"; //Sepolia testnet is default market view
+    } else {
+      DDEaddy = "0x213DB7D60F33f3D1Ca9e13F298Ac6578d5Fc20fc" //Polygon is default market view
+    }
     var myaccounts = "";
     var userpubkey = "";
     var userprivkey = "";
@@ -3549,38 +4011,50 @@ body {
     var currentMarketsLength = 0;
     var gasPrice = "";
     var CurrentTimeStamp = new Date().getTime();
-    //var tokens = [
-    //  {
-    //    address: "0xA66857Da8d75BE2363968a3B01BfE1f417B28202",
-    //    token: "ETH",
-    //    image: "eth.png",
-    //    decimals: "18"
-    //  },
-    //  {
-    //    address: "0xD7567f0841Aae04833C8c004e8685cBF9F1a6b11",
-    //    token: "WALRUS",
-    //    image: "walrus.png",
-    //    decimals: "8"
-    //  }
-    //];
-    var tokens = [
-      {
-        address: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
-        token: "POL",
-        image: "matic.png",
-        decimals: "18"
-      },
-      {
-        address: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
-        token: "DAI",
-        image: "dai.png",
-        decimals: "18"
-      }
-    ];
-    //var tokennames = {"0xA66857Da8d75BE2363968a3B01BfE1f417B28202":"ETH","0xD7567f0841Aae04833C8c004e8685cBF9F1a6b11":"WALRUS"}
-    var tokennames = {"0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270":"POL","0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063":"DAI"}
-    //web3 = new Web3("https://rpc.ankr.com/eth_sepolia");
-    web3 = new Web3("https://rpc.ankr.com/polygon");
+    var tokens;
+    if(testNetView) {
+      tokens = [
+        {
+          address: "0xA66857Da8d75BE2363968a3B01BfE1f417B28202",
+          token: "ETH",
+          image: "eth.png",
+          decimals: "18"
+        },
+        {
+          address: "0xD7567f0841Aae04833C8c004e8685cBF9F1a6b11",
+          token: "WALRUS",
+          image: "walrus.png",
+          decimals: "8"
+        }
+      ];
+    } else {
+      tokens = [
+        {
+          address: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+          token: "POL",
+          image: "matic.png",
+          decimals: "18"
+        },
+        {
+          address: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+          token: "DAI",
+          image: "dai.png",
+          decimals: "18"
+        }
+      ];
+    }
+    var tokennames;
+    if(testNetView) {
+      tokennames = {"0xA66857Da8d75BE2363968a3B01BfE1f417B28202":"ETH","0xD7567f0841Aae04833C8c004e8685cBF9F1a6b11":"WALRUS"}
+    } else {
+      tokennames = {"0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270":"POL","0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063":"DAI"}
+    }
+    var web3;
+    if(testNetView) {
+      web3 = new Web3("https://rpc.ankr.com/eth_sepolia");
+    } else {
+      web3 = new Web3("https://rpc.ankr.com/polygon");
+    }
     var referral = "0x0000000000000000000000000000000000000000";
     var baseFee = 0;
     var myFavorites = [];
@@ -3593,6 +4067,7 @@ body {
     //web3[1] = new Web3("https://bsc-dataseed.binance.org");
     //web3[2] = new Web3("https://api-goerli.etherscan.io/");
     var isConnected = false;
+    var isRegistered = 0;
     var showOrder = false;
     var body = document.body;
     var isMobile = window.innerWidth <= 992;
@@ -3600,7 +4075,8 @@ body {
     var locked = false;
     var activeActions = {};
     let pendingTransactions = [];
-    var nodeList = ["0xAcC26A4470399A27CC515C24EabEa0FF65E43409"];
+    var nodeList = ["0xAcC26A4470399A27CC515C24EabEa0FF65E43409", "0xB967532AF84A0116CD78B2f82Cc960e9EcF415f9"];
+    var gatewayList = [{"pub":"zoukWEeLvakRN9DoJmlNFnhSXkBlkLjPXBzX/GbgzbreIdqqxc2AaBDt4aPfxvsM3/DaucrVQmX38bhCtxIQkBBoAfchmoU++DJfprCwDhr50qZVq2H/S/9VCcmsTC2/vBwN9JzWQeuMjkgbEK5BZKIB+wCrMvDqtOElNhRUpKk=","address":"0xAcC26A4470399A27CC515C24EabEa0FF65E43409","isAffiliate":true,"url":"https://popular-asp-native.ngrok-free.app/api"},{"pub":"5Nux9SZrTXrgSBbs+RkDBUmddhzbXOFtCt3+PgkmfX/iOs0aXDmaBb+EBhLaRpngMczRg569EoyS+2xpkoYbQ7hJoEW8u0djkcPnq0HLzxz9hUAAJP9uDriez6kn7lFb6cRDpVO9R9sxKZoC4YjD+9AikowXwJJLujOMvB11MYc=","address":"0xB967532AF84A0116CD78B2f82Cc960e9EcF415f9","isAffiliate":false,"url":"https://crack-popular-jay.ngrok-free.app/api"}]
     var currentTxHash = null;
     var showMod = false;
     const statusDescriptions = {
@@ -3682,7 +4158,7 @@ body {
     function defaultvars() {
       DDEcontract = "";
       myaccounts = "";
-      DDEaddy = "0x5669Ac4951cCDE4e2bEdE1fc96681F15E3F015D1";
+      DDEaddy = "0x213DB7D60F33f3D1Ca9e13F298Ac6578d5Fc20fc";
       balances = {};
       baseBalance = 0;
       gasPrice = "";
@@ -3705,6 +4181,7 @@ body {
       myFavorites = [];
       newkey = 0;
       activeActions = {};
+      isRegistered = 0;
     }
 
     async function login(clear = 0) {
@@ -3962,7 +4439,7 @@ body {
         });
         netname = "Polygon";
         netname2 = "POL";
-        DDEaddy = "0x5669Ac4951cCDE4e2bEdE1fc96681F15E3F015D1";
+        DDEaddy = "0x213DB7D60F33f3D1Ca9e13F298Ac6578d5Fc20fc";
         gasOptions[0] = {
           gasLimit: 1500000,
           gasPrice: null,
@@ -4222,6 +4699,7 @@ body {
             datatext += "<bdo>" + translateThis("Registered contact information:") + "</bdo> " + contact2['mycontact'];
           }
           if("publickey" in contact2) {
+            isRegistered = 2;
             if(datatext != '') {
               datatext += '<br>';
             }
@@ -4237,9 +4715,11 @@ body {
               document.getElementById('publicemail').innerHTML = datatext2 + "<bdo>" + translateThis("Public key(for encryption):") + "</bdo> " + contact2['publickey'];
             });
           } else {
+            isRegistered = 1;
             document.getElementById('publicemail').innerHTML = datatext;
           }
         } else {
+          isRegistered = 1; //Registration prompt will trigger on contracts
           document.getElementById('publicemail').innerHTML = "";
         }
       } catch(e) {
@@ -4403,26 +4883,112 @@ body {
     }
 
     const selectAPI = document.getElementById('connectMethod');
+    var mySelectedAPI = "a";    
 
-    selectAPI.addEventListener('blur', async function(event) {
-      await saveAPI();
-    });
-
-    async function saveAPI() {
+    async function saveAPI(setAPI = '') {
       const myCurrentChainId = DOMPurify.sanitize(await web3.eth.net.getId());
-      localStorage.setItem(myaccounts + DDEaddy + myCurrentChainId + ":api", document.getElementById('connectMethod').value);
+      var mySelectedAPI = '';
+      if(setAPI == 'a' || setAPI == 'b') {
+        mySelectedAPI = setAPI;
+      }
+      if(mySelectedAPI == '') {
+        mySelectedAPI = document.getElementById('connectMethod').value;
+      }
+      localStorage.setItem(myaccounts + DDEaddy + myCurrentChainId + ":api", mySelectedAPI);
+      if(mySelectedAPI == "b") {
+        var APIKEYS = localStorage.getItem(myaccounts + DDEaddy + myCurrentChainId + ":apiKeys") || "none";
+        var newkeys = true;
+        if(APIKEYS != "none") {
+          if(setAPI == 'a' || setAPI == 'b') {
+            newkeys = false;
+          } else {
+            await Swal.fire({
+              title: translateThis('Register API Keys'),
+              text: translateThis('You already have API keys saved would you like to remove them and make new ones? If not you will stay with the current keys.'),
+              icon: 'question',
+              showCancelButton: true,
+              confirmButtonText: translateThis('Yes'),
+              cancelButtonText: translateThis('No'),
+            }).then(async (result) => {
+              if (!result.isConfirmed) {
+                newkeys = false;
+              }
+            });
+          }
+        }        
+        if(newkeys) {
+          const { value: formValues } = await Swal.fire({
+            title: translateThis('Register API Keys'),
+            html:
+              '<input id="sightengineApiUser" class="swal2-input" placeholder="Sightengine API User">' +
+              '<input id="sightengineApiSecret" class="swal2-input" placeholder="Sightengine API Secret">' +
+              '<input id="pinataApiKey" class="swal2-input" placeholder="Pinata API Key">' +
+              '<input id="pinataSecretApiKey" class="swal2-input" placeholder="Pinata Secret API Key">' +
+              '<input id="pinataGateway" class="swal2-input" placeholder="Pinata Gateway">' +
+              '<input id="pinataToken" class="swal2-input" placeholder="Pinata Token">',
+            focusConfirm: false,
+            preConfirm: () => {
+              return {
+                sightengineApiUser: document.getElementById('sightengineApiUser').value,
+                sightengineApiSecret: document.getElementById('sightengineApiSecret').value,
+                pinataApiKey: document.getElementById('pinataApiKey').value,
+                pinataSecretApiKey: document.getElementById('pinataSecretApiKey').value,
+                pinataGateway: document.getElementById('pinataGateway').value,
+                pinataToken: document.getElementById('pinataToken').value,
+              };
+            },
+            showCancelButton: true,
+            confirmButtonText: translateThis('Save'),
+            cancelButtonText: translateThis('Cancel'),
+          });
+
+          if (formValues) {
+            // Check if all values are filled
+            const allFieldsFilled = Object.values(formValues).every(value => value.trim() !== '');
+
+            if (allFieldsFilled) {
+              // Set the global variables if no field is blank
+              ({ 
+                sightengineApiUser, 
+                sightengineApiSecret, 
+                pinataApiKey, 
+                pinataSecretApiKey, 
+                pinataGateway, 
+                pinataToken 
+              } = formValues);
+              APIKEYS = {sightengineApiUser, sightengineApiSecret, pinataApiKey, pinataSecretApiKey, pinataGateway, pinataToken};
+              localStorage.setItem(myaccounts + DDEaddy + myCurrentChainId + ":apiKeys", JSON.stringify(APIKEYS));
+              Swal.fire('Success', 'API keys saved', 'success');
+            } else {
+              Swal.fire('Error', 'Please fill out all fields', 'error');
+              localStorage.setItem(myaccounts + DDEaddy + myCurrentChainId + ":api", "a");
+              localStorage.setItem(myaccounts + DDEaddy + myCurrentChainId + ":apiKeys", "none");
+            }
+          } else {
+            localStorage.setItem(myaccounts + DDEaddy + myCurrentChainId + ":api", "a");
+            localStorage.setItem(myaccounts + DDEaddy + myCurrentChainId + ":apiKeys", "none");
+          }
+        }
+      }
       await getUserAPI(myCurrentChainId);
     }
 
+    selectAPI.addEventListener('change', saveAPI);
+
     async function getUserAPI(mychainid) {
-      mylen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 4).call());
+      mylen = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 4).call()));
+      selectAPI.removeEventListener('change', saveAPI);
       const mySelectElement = document.getElementById('connectMethod');
 
       mySelectElement.innerHTML = '';
       const option1 = document.createElement('option');
       option1.value = 'a';
-      option1.text = translateThis('Use default IPFS Pinata Gateway');
+      option1.text = translateThis('Detect nodes automatically');
+      const option2 = document.createElement('option');
+      option2.value = 'b';
+      option2.text = translateThis('Supply my own API keys');
       mySelectElement.add(option1);
+      mySelectElement.add(option2);
 
       // Add additional elements with values based on the size of mylen
       for (let i = 0; i < mylen; i++) {
@@ -4432,16 +4998,15 @@ body {
         mySelectElement.add(option);
       }
 
-      var selectedAPI = "0";
+      var selectedAPI = "a";
       const cached = localStorage.getItem(myaccounts + DDEaddy + mychainid + ":api");
       if (cached) {
         const index = Array.from(mySelectElement.options).findIndex(option => option.value === cached.toString());
         mySelectElement.selectedIndex = index;
         selectedAPI = cached.toString();
-        if (selectedAPI == 'a') {
-          selectedAPI = "0";
-        }
+        mySelectedAPI = selectedAPI;
       }
+      selectAPI.addEventListener('change', saveAPI);
       await getAPI(selectedAPI);
     }
 
@@ -4908,10 +5473,13 @@ body {
       });
     }
 
-    async function registerData(contactInfo) {
-      if (accountprivkey !== "" && nodeList.includes(myaccounts)) {
-        Swal.fire(translateThis("This function is currently not available for a node."));
-        return;
+    async function registerData(contactInfo, overwriteLastEntry = 0) {
+      if (accountprivkey !== "" && nodeList.includes(myaccounts) && overwriteLastEntry == 0) {
+        datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 3).call());
+        if(datalen != "0") {
+          Swal.fire(translateThis("This function is currently not available for a node."));
+          return;
+        }
       }
       myemail = contactInfo || document.getElementById('myContactInfo').value;
       const { value: formValues } = await Swal.fire({
@@ -5194,9 +5762,9 @@ body {
         }
       }
       // Get the text from Pinata IPFS using the IPFS hash
-      text = await retrieveFromPinataIPFS(ipfsHash);
+      text = await retrieveFromIPFS(ipfsHash);
       if(text == "error") {
-        text = await retrieveFromIPFS(ipfsHash);
+        text = await retrieveFromPinataIPFS(ipfsHash);
         if(text == "error") {
           return "error";
         }
@@ -5213,8 +5781,8 @@ body {
 
     var pinataApiKey = '';
     var pinataSecretApiKey = '';
-    var pinataGateway = 'https://azure-faithful-anteater-219.mypinata.cloud/ipfs/';
-    var pinataToken = 'vgbqHzLAN_A5OI0suZED_RyzKacw5SfNjq25y45oB_CMVoOa1T4IfNrDJOkGysCP';
+    var pinataGateway = '';
+    var pinataToken = '';
     // Function to post a file to Pinata IPFS
     async function pinToPinataIPFS (text) {
       const url = 'https://api.pinata.cloud/pinning/pinFILEToIPFS';
@@ -5302,7 +5870,7 @@ body {
     const retrieveFromPinataIPFS = async (hash) => {
       var url = pinataGateway + hash;
       if(pinataGateway != "https://gateway.pinata.cloud/ipfs/") {
-          if(pinataToken == '') {
+        if(pinataToken == '') {
           url = "https://gateway.pinata.cloud/ipfs/" + hash;
         } else {
           url += "?pinataGatewayToken=" + pinataToken;
@@ -5348,9 +5916,98 @@ body {
       moderatedHashes[hash] = result;
       localStorage.setItem('moderatedHashes', JSON.stringify(moderatedHashes));
     }
+    
+    function hashObject(obj) {
+      return Crypto.SHA256(Object.keys(obj).sort().map(key => Crypto.SHA256(key + obj[key])).join('')).toString();
+    }
 
-    var sightengineApiUser = '1043766005';
-    var sightengineApiSecret = 'mnwcdJCHsE7EZbz2fcNJdn9KxXYkWmem';
+    var sightengineApiUser = '';
+    var sightengineApiSecret = '';
+    var currentGateway = 0;
+    async function moderationGateway(orderData, hash = '', ipfs = '') {
+      var request = {};
+      request.address = myaccounts;
+      request.chain = DOMPurify.sanitize(await web3.eth.net.getId());
+      if(hash == '') {
+        request.hash = hashObject(JSON.stringify(orderData));
+      } else {
+        request.hash = hash;
+      }
+      request.publicKey = userpubkey;
+      const timestamp = new Date().getTime();
+      const padding = Crypto.SHA256(timestamp).substring(0, 16); //Pad to avoid chosen cipher attack
+      var gatewayPub = gatewayList[currentGateway]['pub'];
+      if(window.globalPublicKey) {
+        gatewayPub = window.globalPublicKey;
+      }
+      var finalMessage = cryptico.encrypt(JSON.stringify(orderData) + "#*#*#" + timestamp + padding, gatewayPub, userprivkey).cipher;
+      request.message = finalMessage;
+      if(ipfs != '') {
+        request.ipfs = true;
+      }
+      if(window.globalPublicKey) {
+        return localVerify(request);
+      }
+      const requestData = {
+          action: "verify",
+          item: "",
+          value: request,  // Keep this as an object
+          key: ""
+      };
+      var maxtries = 3;
+      var checkedThis = {};
+      if(maxtries>gatewayList.length) {
+        maxtries = gatewayList.length;
+      }
+      var errorMessage = "Error parsing response";
+      for(var x=0; x<maxtries; x++) {
+        try {
+          if(x.toString() in checkedThis) {
+            continue;
+          }
+          checkedThis[x.toString()] = 1;
+          const response = await axios.post(gatewayList[currentGateway]['url'], requestData, {
+              headers: { 'ngrok-skip-browser-warning':true, 'Content-Type': 'application/json'}
+          });
+          try {
+            if (response.data.result) {
+              return DOMPurify.sanitize(JSON.stringify(response.data.result));
+            } else if (response.data.error) {
+              currentGateway+=1;
+              if(currentGateway >= gatewayList.length) {
+                currentGateway = 0;
+              }
+              if(x+1<maxtries) {
+                continue;
+              }
+              errorMessage = response.data.error;
+              return DOMPurify.sanitize(JSON.stringify({"error": response.data.error}));
+            }
+            throw new Error("error");
+          } catch {
+            currentGateway+=1;
+            if(currentGateway >= gatewayList.length) {
+              currentGateway = 0;
+            }
+            if(x+1<maxtries) {
+              continue
+            }
+            return '{"error": "Error parsing response"}';
+          }
+        } catch (error) {
+          currentGateway+=1;
+          if(currentGateway >= gatewayList.length) {
+            currentGateway = 0;
+          }
+          if(x+1<maxtries) {
+            continue
+          }
+          errorMessage = error.message;
+          return JSON.stringify({"error": error.message});
+        }
+      }
+      return JSON.stringify({"error": errorMessage});
+    }
 
     async function moderateImage(files) {
       const url = 'https://api.sightengine.com/1.0/check.json';
@@ -5494,56 +6151,179 @@ body {
 
     async function checkIfNode() {
       if (accountprivkey !== "" && nodeList.includes(myaccounts)) {
-        Swal.fire("You are a node. You will automatically check new offers with AI and post the results to the blockchain. Please always ensure you have sufficient funds to post your updates to the markets.");
+        await Swal.fire("You are a node. You will automatically check new offers with AI and post the results to the blockchain. Please always ensure you have sufficient funds to post your updates to the markets.");
+        await Swal.fire({
+          title: translateThis('Login/connect'),
+          text: translateThis('How would you like to connect to validate orders using AI?'),
+          showCancelButton: true,
+          confirmButtonText: 'http://localhost:9000/api',
+          cancelButtonText: 'Sightengine API keys',
+          icon: 'question',
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            await Swal.fire({
+              title: translateThis("Login/connect"),
+              html:
+                '<p>' + translateThis("Enter your 'Gateway public key' which is shown in your browser when you load your local server.") + '</p>' +
+                '<input id="gateway-key" class="swal2-input" placeholder="Gateway Public Key">',
+              showCancelButton: true,
+              confirmButtonText: 'Submit',
+              preConfirm: () => {
+                const gatewayKey = document.getElementById('gateway-key').value;
+                if (!gatewayKey) {
+                  Swal.showValidationMessage('Key cannot be blank');
+                  return false;
+                }
+                return { gatewayKey };
+              }
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.globalPublicKey = result.value.gatewayKey;
+              }
+            });
+          } else {
+            for (let i = 0; i < selectAPI.options.length; i++) {
+              if (selectAPI.options[i].value === 'b') {
+                selectAPI.removeEventListener('change', saveAPI);
+                selectAPI.selectedIndex = i;
+                selectAPI.addEventListener('change', saveAPI);
+                break;
+              }
+            }
+            await saveAPI('b');
+          }
+        });
         startMonitoringProcess();
       }
     }
-
+    // Function to set an item on the server
+    async function localVerify(value) {
+      fetch('http://localhost:9000/api', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({action: 'verify', item: '', value, key: ''}),
+      })
+      .then(response => {
+        if (response.data.result) {
+          return DOMPurify.sanitize(JSON.stringify(response.data.result));
+        } else if (response.data.error) {
+          throw new Error(response.data.error);
+        } else {
+          throw new Error("Error with local verification");
+        }
+      })
+      .catch((error) => {
+          return DOMPurify.sanitize(JSON.stringify({"error": error.message}));
+      });
+    }
+    var skippedHashes = {}
     async function startMonitoringProcess() {
       try {
         let checkedHashes = JSON.parse(localStorage.getItem("checkedHashes"+DDEaddy)) || await getCheckedHashesFromBlockchain(myaccounts);
         if('error' in checkedHashes) {
           throw new Error("There was an error loading hashes from ipfs/blockchain, try again later.")
         }
-        var myresults =  await getOpenOrders(checkedHashes);
-        if (Array.isArray(myresults) && myresults.length === 0) {
-          throw new Error("The result is an empty array.");
+        if(!('lastIndex' in checkedHashes) || checkedHashes['lastIndex'] == null) {
+          checkedHashes['lastIndex'] = 0;
         }
-        checkedHashes = myresults[1];
-        const openOrders = myresults[0];
-        const newHashes = openOrders.filter(order => !checkedHashes.hasOwnProperty(order));
-        for (const hash of newHashes) {
-          if(hash !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
-            const orderData = await getOrderData(hash);
-            const isGood = await validateOrderData(orderData);
-            checkedHashes[hash] = isGood;
+        if(!('skip' in checkedHashes)) {
+          checkedHashes['skip'] = {};
+        }
+        if(!('batch' in checkedHashes)) {
+          checkedHashes['batch'] = [];
+        }
+        var openOrders =  await getOpenOrders(checkedHashes['lastIndex'],checkedHashes['skip']);
+        if (Array.isArray(openOrders) && openOrders.length > 0) {
+          const newHashes = openOrders.filter(order => !checkedHashes.hasOwnProperty(order[0]));
+          var changed = 0;
+          for (const hash of newHashes) {
+            if(hash[0] !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+              const orderData = await getOrderData(hash[0]);
+              if(orderData['message'] == 'error' || orderData == null) {
+                if(orderData == null) {
+                  continue;
+                }
+                if(!(hash[0] in skippedHashes)) {
+                  skippedHashes[hash[0]] = 0;
+                } else {
+                  skippedHashes[hash[0]] += 1;
+                }
+                if(skippedHashes[hash[0]] == 5) {
+                  checkedHashes['skip'][hash[1].toString()] = 1;
+                }
+              } else {
+                var isGood = await validateOrderData(orderData, hash[0]);
+                if(isGood.toString().toLowerCase().includes("order passed ai test") || isGood.toString().toLowerCase().includes("order failed ai test") || isGood.toString().toLowerCase() == 'true' || isGood.toString().toLowerCase() == 'false') {
+                  if(isGood.toString().toLowerCase().includes("order passed ai test")) {
+                    checkedHashes[hash[0]] = true;
+                  } else if (isGood.toString().toLowerCase().includes("order failed ai test")) {
+                    checkedHashes[hash[0]] = false;
+                  } else {
+                    checkedHashes[hash[0]] = isGood;
+                  }
+                  checkedHashes['skip'][hash[1].toString()] = 1;
+                  changed = 1;
+                } else {
+                  console.log(isGood.toString());
+                }
+              }
+            } else {
+              checkedHashes['skip'][hash[1].toString()] = 1;
+            }
           }
-        }
-        if (newHashes.length > 0) {
-          localStorage.setItem("checkedHashes"+DDEaddy, JSON.stringify(checkedHashes));
-          const ipfsLink = await createIPFSLink(checkedHashes);
-          await postIPFSLinkToBlockchain(ipfsLink);
+          var endIndex = checkedHashes['lastIndex']+200;
+          for (var i = checkedHashes['lastIndex']; i < endIndex; i++) {
+            if(i.toString() in checkedHashes['skip']) {
+              checkedHashes['lastIndex'] = i + 1;
+            } else {
+              break;
+            }
+          }
+          if (changed == 1) {
+            if(Object.keys(checkedHashes).length > 10000) {
+              const mylen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 3).call());
+              if (!checkedHashes['batch'].includes(mylen)) {
+                checkedHashes['batch'].push(mylen)
+              }
+            }
+            localStorage.setItem("checkedHashes"+DDEaddy, JSON.stringify(checkedHashes));            
+            const ipfsLink = await createIPFSLink(checkedHashes);
+            var res = false;
+            if('ipfs' in ipfsLink) {
+              res = await postIPFSLinkToBlockchain(ipfsLink);
+            }
+            if(res) {
+              if(Object.keys(checkedHashes).length > 10000) {
+                const keysToKeep = {'batch':checkedHashes['batch'], 'lastIndex':checkedHashes['lastIndex'], 'skip':{}};
+                localStorage.setItem("checkedHashes"+DDEaddy, JSON.stringify(keysToKeep)); 
+              }
+            }
+          }
         }
       } catch (error) {
         console.error("Error in startMonitoringProcess:", error);
       } finally {
-        setTimeout(() => startMonitoringProcess(), 300000); // Repeat every 5 minutes
+        setTimeout(() => startMonitoringProcess(), 900000); // Repeat every 15 minutes
       }
     }
 
-    async function getCheckedHashesFromBlockchain(userAddress, DDEcontract5 = '') {
+    async function getCheckedHashesFromBlockchain(userAddress, DDEcontract5 = '', mylen = '') {
       try {
         if(DDEcontract5 == '') {
             DDEcontract5 = DDEcontract;
         }
-        const mylen = DOMPurify.sanitize(await DDEcontract5.methods.getArrayLength(userAddress, 3).call());
+        if(mylen=='') {
+          mylen = parseInt(DOMPurify.sanitize(await DDEcontract5.methods.getArrayLength(userAddress, 3).call()));
+        }
         if(mylen > 0) {
           const lastEntry = JSON.parse(DOMPurify.sanitize(await DDEcontract5.methods.userdata(userAddress, mylen - 1).call()));
           if (lastEntry?.ipfsLink) {
-            const ipfsHash = lastEntry.ipfsLink;
-            var ipfsData = await retrieveFromPinataIPFS(ipfsHash);
+            const ipfsHash = lastEntry.ipfsLink.ipfs;
+            var ipfsData = await retrieveFromIPFS(ipfsHash);
             if(ipfsData == "error") {
-              ipfsData = await retrieveFromIPFS(ipfsHash);
+              ipfsData = await retrieveFromPinataIPFS(ipfsHash);
               if(ipfsData == "error") {
                 return {'error':true};
               }
@@ -5558,21 +6338,27 @@ body {
       }
     }
 
-    async function getOpenOrders(checkedHash) {
+    async function getOpenOrders(lastIndex, skip) {
       try {
-        if(!('lastIndex' in checkedHash)) {
-          checkedHash['lastIndex'] = 0;
+        if(lastIndex == null) {
+          lastIndex = 0;
         }
         const totalOrders = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength("0x0000000000000000000000000000000000000000",1).call()));
-        const orders = [];
-        if(totalOrders > checkedHash['lastIndex']) {        
-          for (let i = 0; i < totalOrders; i++) {
-            const orderHash = DOMPurify.sanitize(await DDEcontract.methods.privateOffers("0x0000000000000000000000000000000000000000",i).call());
-            orders.push(orderHash);            
+        var orders = [];
+        const maxcount = 100;
+        var currentCount = 0;
+        for (let i = lastIndex; i < totalOrders; i++) {
+          if(i.toString() in skip) {
+            continue;
           }
+          if(currentCount==maxcount) {
+            break;
+          }
+          const orderHash = DOMPurify.sanitize(await DDEcontract.methods.privateOffers("0x0000000000000000000000000000000000000000",i).call());
+          orders.push([orderHash,i]);
+          currentCount+=1;
         }
-        checkedHash['lastIndex'] = totalOrders;
-        return [orders,checkedHash];
+        return orders;
       } catch (error) {
         console.error("Error in getOpenOrders:", error);
         return [];
@@ -5582,13 +6368,24 @@ body {
     async function getOrderData(hash) {
       try {
         const jsondata = await getOrderHash(hash);
-        const orderData = {
-          message: DOMPurify.sanitize(jsondata?.message),
-          contact: DOMPurify.sanitize(jsondata?.contact),
-          image: DOMPurify.sanitize(jsondata?.image) ? await getFile(DOMPurify.sanitize(jsondata.image)) : null,
-          title: DOMPurify.sanitize(jsondata?.title),
-          location: DOMPurify.sanitize(jsondata?.location)
-        };
+        var orderData;
+        if(jsondata['message'] == 'error') {
+          orderData = {
+            message: 'error',
+            contact: '',
+            image: [''],
+            title: '',
+            location: ''
+          };
+        } else {
+          orderData = {
+            message: DOMPurify.sanitize(jsondata?.message),
+            contact: DOMPurify.sanitize(jsondata?.contact),
+            image: DOMPurify.sanitize(jsondata?.image) ? await getFile(DOMPurify.sanitize(jsondata.image)) : null,
+            title: DOMPurify.sanitize(jsondata?.title),
+            location: DOMPurify.sanitize(jsondata?.location)
+          };
+        }
         return orderData;
       } catch (error) {
         console.error("Error in getOrderData:", error);
@@ -5596,7 +6393,10 @@ body {
       }
     }
 
-    async function validateOrderData(orderData) {
+    async function validateOrderData(orderData, thehash = '', ipfs = '') {
+      if(sightengineApiUser == '') {
+        return await moderationGateway(orderData, thehash, ipfs);
+      }
       const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
       let isGood = false;
       let imagesResult = true;
@@ -5645,7 +6445,7 @@ body {
         isGood = imagesResult && textResult;
       } catch (error) {
         console.error("Error during moderation:", error);
-        isGood = false;
+        isGood = "error";
       }
 
       return isGood;
@@ -5665,11 +6465,21 @@ body {
 
     async function createIPFSLink(checkedHashes) {
       const jsonString = JSON.stringify(checkedHashes);
-      const ipfsHash = JSON.parse(DOMPurify.sanitize(JSON.stringify(await pinToPinataIPFS(jsonString))));
+      var ipfsHash;
+      if(sightengineApiUser == '') {
+        const isGood = await validateOrderData(checkedHashes, '', true);
+        if(isGood.toString().toLowerCase().includes("order passed ai test") || isGood.toString().toLowerCase().includes("order failed ai test")) {
+          ipfsHash = JSON.parse(isGood)['ipfs'];
+        } else {
+          throw new Error('Failed to pin data to IPFS');
+        }
+      } else {
+        ipfsHash = await pinToPinataIPFS(jsonString);
+      }
       if (ipfsHash === 'error') {
         throw new Error('Failed to pin data to IPFS');
       }
-      return ipfsHash;
+      return {'ipfs': ipfsHash};
     }
 
     async function postIPFSLinkToBlockchain(ipfsLink) {
@@ -5684,8 +6494,10 @@ body {
         }
         await DDEcontract.methods.adduserdata(JSON.stringify(myuserdata)).send({ "from": myaccounts, ...gasOptions[gasSetting] });
         console.log("IPFS link posted to blockchain:", ipfsLink);
+        return true;
       } catch (error) {
         console.error("Error posting IPFS link to blockchain:", error);
+        return false;
       }
     }
 
@@ -5733,7 +6545,30 @@ body {
     //the graphics card to moderate, they can call a list of volunteer services who run AI WebGPT to filter it(and maybe recommend tags)
     //for them based on their criteria. One way to enforce a search protocol is have those who post to markets do so from a separate contract.
     //This way they can also be the ones required to remove the search tags and the contract manages everything.
-    var tempCurator = "0x25A2c592DDD5F930a9CB271b9AC3e72bbBc3d351";
+    var tempCurators = ["0x25A2c592DDD5F930a9CB271b9AC3e72bbBc3d351"];
+    var batches = [];
+    var isLocked = 0;
+    async function downloadBatches(checkedHashes, userAddress, DDEcontract5) {
+      var isLocked = 1;
+      for(let x = 0; x < checkedHashes['batch'].length; x++) {
+        if(!('downloaded' in checkedHashes)) {
+          checkedHashes['downloaded'] = {};
+        }
+        if(!(checkedHashes['batch'][x] in checkedHashes['downloaded'])) {
+          checkedHashes2 = await getCheckedHashesFromBlockchain(userAddress, DDEcontract5, checkedHashes['batch'][x]);
+          if(!('error' in checkedHashes2) && Object.keys(checkedHashes2).length > 0) {
+            for (const [key, value] of Object.entries(checkedHashes2)) {
+              if (!(key in checkedHashes)) {
+                checkedHashes[key] = value;
+              }
+            }
+            checkedHashes['downloaded'][checkedHashes['batch'][x]] = 1;
+            await storeFile('checkedHashes'+DDEaddy, JSON.stringify(checkedHashes));
+          }
+        }
+      }
+      isLocked = 0;
+    }
     async function loadMarkets(low = 0, high = 1, searchText = '') {
         var DDEcontract3 = DDEcontract;
         if(DDEcontract == '') {
@@ -5741,17 +6576,47 @@ body {
         }
         var mlength = 0;
         var lastNodeAddress = nodeList[nodeList.length - 1];
-        let checkedHashes = await getCheckedHashesFromBlockchain(lastNodeAddress, DDEcontract3);
-        localStorage.setItem('checkedHashes'+DDEaddy, JSON.stringify(checkedHashes));
+        let checkedHashes;
+        try{
+          checkedHashes = JSON.parse(await getFile('checkedHashes'+DDEaddy, 1));
+        } catch {
+          checkedHashes = {};
+        }
+        if(checkedHashes == ['']) {
+          checkedHashes = {};
+        }
+        let checkedHashes2 = await getCheckedHashesFromBlockchain(lastNodeAddress, DDEcontract3);
+        if(!('error' in checkedHashes2)) {
+          for (const [key, value] of Object.entries(checkedHashes2)) {
+            if (!(key in checkedHashes)) {
+              checkedHashes[key] = value;
+            }
+          }
+          if('batch' in checkedHashes2) {
+            checkedHashes['batch'] = checkedHashes2['batch'];
+          }
+          if('lastIndex' in checkedHashes2) {
+            checkedHashes['lastIndex'] = checkedHashes2['lastIndex'];
+          }
+          if('skip' in checkedHashes2) {
+            checkedHashes['skip'] = checkedHashes2['skip'];
+          }
+          if(isLocked == 0) {
+            await storeFile('checkedHashes'+DDEaddy, JSON.stringify(checkedHashes));
+          }
+          if('batch' in checkedHashes) {
+            downloadBatches(checkedHashes, lastNodeAddress, DDEcontract3);
+          }
+        }
         let myhashes = JSON.parse(localStorage.getItem('myhashes'+DDEaddy)) || {};
         await DDEcontract3.methods.marketslength().call().then(async function (result) {
             currentMarketsLength = DOMPurify.sanitize(result);
             mlength = parseInt(DOMPurify.sanitize(result));
         });
-        var listlen = DOMPurify.sanitize(await DDEcontract3.methods.getArrayLength(tempCurator,3).call());
+        var listlen = DOMPurify.sanitize(await DDEcontract3.methods.getArrayLength(tempCurators[0],3).call());
         var udata = {};
         if(listlen > 0) {
-          var udata2 = JSON.parse(DOMPurify.sanitize(await DDEcontract3.methods.userdata(tempCurator, listlen-1).call()));
+          var udata2 = JSON.parse(DOMPurify.sanitize(await DDEcontract3.methods.userdata(tempCurators[0], listlen-1).call()));
           if(typeof udata2 === 'object' && 'users' in udata2) {
             for(var uinx = 0; uinx < udata2['users'].length; uinx++) {
               udata[udata2['users'][uinx]] = 1;
@@ -5802,6 +6667,10 @@ body {
                   mlen -= 1;
                 } else {
                   jsondata = await getOrderHash(hash);
+                  if(jsondata.message == 'error') {
+                    mlen -= 1;
+                    continue;
+                  }
                   if (checkedHashes[hash] === undefined && myhashes[hash] === undefined) {
                     const orderData = {
                       message: jsondata?.message,
@@ -5811,7 +6680,17 @@ body {
                       location: jsondata?.location
                     };
 
-                    const isGood = await validateOrderData(orderData);
+                    var isGood = await validateOrderData(orderData, hash);
+                    if(isGood.toString().toLowerCase().includes("order passed ai test") || isGood.toString().toLowerCase().includes("order failed ai test") || isGood.toString().toLowerCase() == 'true' || isGood.toString().toLowerCase() == 'false') {
+                      if(isGood.toString().toLowerCase().includes("order passed ai test")) {
+                        isGood = true;
+                      } else if (isGood.toString().toLowerCase().includes("order failed ai test")) {
+                        isGood = false;
+                      }
+                    } else {
+                      mlen -= 1;
+                      continue;
+                    }
                     myhashes[hash] = isGood;
                     localStorage.setItem('myhashes'+DDEaddy, JSON.stringify(myhashes));
 
@@ -5912,6 +6791,10 @@ body {
                     added = 1;
                   } else {
                     jsondata = await getOrderHash(hash);
+                    if(jsondata.message == 'error') {
+                      truetot -= 1;
+                      continue;
+                    }
                     if (checkedHashes[hash] === undefined && myhashes[hash] === undefined) {
                       const orderData = {
                         message: jsondata?.message,
@@ -5921,7 +6804,17 @@ body {
                         location: jsondata?.location
                       };
 
-                      const isGood = await validateOrderData(orderData);
+                      var isGood = await validateOrderData(orderData, hash);
+                      if(isGood.toString().toLowerCase().includes("order passed ai test") || isGood.toString().toLowerCase().includes("order failed ai test") || isGood.toString().toLowerCase() == 'true' || isGood.toString().toLowerCase() == 'false') {
+                        if(isGood.toString().toLowerCase().includes("order passed ai test")) {
+                          isGood = true;
+                        } else if (isGood.toString().toLowerCase().includes("order failed ai test")) {
+                          isGood = false;
+                        }
+                      } else {
+                        truetot -= 1;
+                        continue;
+                      }
                       myhashes[hash] = isGood;
                       localStorage.setItem('myhashes'+DDEaddy, JSON.stringify(myhashes));
 
@@ -5995,6 +6888,9 @@ body {
               if (offerID == 0) {
               } else {
                 jsondata = await getOrderHash(hash);
+                if(jsondata.message == 'error') {
+                  throw new Error('a');
+                }
                 if(udata.hasOwnProperty(jsondata.sender) || udata.hasOwnProperty(jsondata.recipient)) {
                   throw new Error('a');
                 }
@@ -6088,6 +6984,10 @@ body {
                                 jsondata = marketOffers[hash];
                               } else {
                                 jsondata = await getOrderHash(hash);
+                                if(jsondata.message == 'error') {
+                                  longestKey -= 1;
+                                  return;
+                                }
                                 if (checkedHashes[hash] === undefined && myhashes[hash] === undefined) {
                                   const orderData = {
                                     message: jsondata?.message,
@@ -6097,7 +6997,17 @@ body {
                                     location: jsondata?.location
                                   };
 
-                                  const isGood = await validateOrderData(orderData);
+                                  var isGood = await validateOrderData(orderData, hash);
+                                  if(isGood.toString().toLowerCase().includes("order passed ai test") || isGood.toString().toLowerCase().includes("order failed ai test") || isGood.toString().toLowerCase() == 'true' || isGood.toString().toLowerCase() == 'false') {
+                                    if(isGood.toString().toLowerCase().includes("order passed ai test")) {
+                                      isGood = true;
+                                    } else if (isGood.toString().toLowerCase().includes("order failed ai test")) {
+                                      isGood = false;
+                                    }
+                                  } else {
+                                    longestKey -= 1;
+                                    return;
+                                  }
                                   myhashes[hash] = isGood;
                                   localStorage.setItem('myhashes'+DDEaddy, JSON.stringify(myhashes));
 
@@ -6181,6 +7091,10 @@ body {
                           return;
                         }
                         jsondata = await getOrderHash(hash);
+                        if(jsondata.message == 'error') {
+                          trueLength -= 1;
+                          return;
+                        }
                         if (checkedHashes[hash] === undefined && myhashes[hash] === undefined) {
                           const orderData = {
                               message: jsondata?.message,
@@ -6190,7 +7104,17 @@ body {
                               location: jsondata?.location
                           };
 
-                          const isGood = await validateOrderData(orderData);
+                          var isGood = await validateOrderData(orderData, hash);
+                          if(isGood.toString().toLowerCase().includes("order passed ai test") || isGood.toString().toLowerCase().includes("order failed ai test") || isGood.toString().toLowerCase() == 'true' || isGood.toString().toLowerCase() == 'false') {
+                            if(isGood.toString().toLowerCase().includes("order passed ai test")) {
+                              isGood = true;
+                            } else if (isGood.toString().toLowerCase().includes("order failed ai test")) {
+                              isGood = false;
+                            }
+                          } else {
+                            trueLength -= 1;
+                            return;
+                          }
                           myhashes[hash] = isGood;
                           localStorage.setItem('myhashes'+DDEaddy, JSON.stringify(myhashes));
 
@@ -6201,7 +7125,7 @@ body {
                           }
                         }
                         if(udata.hasOwnProperty(jsondata.sender) || udata.hasOwnProperty(jsondata.recipient)) {
-                          trueLength -= 1;                          
+                          trueLength -= 1;
                           return;
                         }
                         if(parseInt(jsondata.timelimit[1]) != 0) {
@@ -6216,7 +7140,7 @@ body {
                               marketOffers[hash] = jsondata;
                               marketOffers[hash]['searchTerms'] = searchThis;
                             } else {
-                              trueLength -= 1;                              
+                              trueLength -= 1;
                               return;
                             }
                         } else {
@@ -6293,7 +7217,6 @@ body {
               } else {
                 if(DOMPurify.sanitize(data.sender) == myaccounts) {
                   var message = cryptico.decrypt(testdata['sender'].cipher, userprivkey).plaintext;
-                  console.log(message)
                   var padding = message.split("#*#*#")[1];
                   if(padding.length > 30) {
                     text = message.split("#*#*#")[0];
@@ -6413,7 +7336,7 @@ body {
       var notify = 0;
       var myhash = '';
       try {
-        mylen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 0).call());
+        mylen = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 0).call()));
       } catch(error) {
         console.log(error);
       }
@@ -6444,10 +7367,10 @@ body {
           const counterpartyLabel = counterpartyAddress === "0x0000000000000000000000000000000000000000" ? translateThis("Market Offer") : counterpartyAddress;
           if(offerData.status[0] == 0 || offerData.status[0] == 2) {
             notenough = 0;
-            if(myaccounts==offerData.sender && ((web3.utils.toBN(offerData.amount).add(web3.utils.toBN(offerData.depositSender))).mul(web3.utils.toBN(offerData.quantity[1]))).gt(web3.utils.toBN(balances[offerData.token].amount))) {
+            if(myaccounts==offerData.sender && ((web3.utils.toBN(offerData.amount).add(web3.utils.toBN(offerData.depositSender))).mul(web3.utils.toBN(offerData.quantity[0]))).gt(web3.utils.toBN(balances[offerData.token].amount))) {
               notenough = 1;
             }
-            if(myaccounts==offerData.recipient && (web3.utils.toBN(offerData.depositRecipient).mul(web3.utils.toBN(offerData.quantity[1]))).gt(web3.utils.toBN(balances[offerData.token].amount))) {
+            if(myaccounts==offerData.recipient && (web3.utils.toBN(offerData.depositRecipient).mul(web3.utils.toBN(offerData.quantity[0]))).gt(web3.utils.toBN(balances[offerData.token].amount))) {
               notenough = 1;
             }
             if(parseInt(new Date().getTime()/1000) > lastNotified2 + 300 && notenough == 1) {
@@ -6518,8 +7441,9 @@ body {
       list2.classList.add("offers-list-box");
       readMessages = JSON.parse(localStorage.getItem(myaccounts + DDEaddy + ":readmessages2")) || {};
       try {
-        mylen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 1).call());
+        mylen = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 1).call()));
       } catch(error) {
+        mylen = 0
         console.log(error);
       }
       for (i = 0; i < mylen; i++) {
@@ -6730,8 +7654,9 @@ body {
       list3.classList.add('offers-list-box');
       readMessages = JSON.parse(localStorage.getItem(myaccounts + DDEaddy + ":readmessages3")) || {};
       try {
-        mylen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 2).call());
+        mylen = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 2).call()));
       } catch(error) {
+        mylen = 0;
         console.log(error);
       }
       for (i = 0; i < mylen; i++) {
@@ -8062,11 +8987,13 @@ body {
           quantityButton.innerHTML = translateThis('Update Quantity');
           quantityButton.onclick = async () => {await updateQuantity(listing); popupContainer.remove();};
           buttonContainer.appendChild(quantityButton);
-          const feeButton = document.createElement('button');
-          feeButton.classList.add("btn-gray");
-          feeButton.innerHTML = translateThis('Edit referral fee');
-          feeButton.onclick = async () => {await updateFee(listing); popupContainer.remove();};
-          buttonContainer.appendChild(feeButton);
+          if(parseInt(listing.status[0]) == 0 || parseInt(listing.status[0]) == 2 || parseInt(listing.status[0]) == 4) {
+            const feeButton = document.createElement('button');
+            feeButton.classList.add("btn-gray");
+            feeButton.innerHTML = translateThis('Edit referral fee');
+            feeButton.onclick = async () => {await updateFee(listing); popupContainer.remove();};
+            buttonContainer.appendChild(feeButton);
+          }
         }
         const cancelButton = document.createElement('button');
         cancelButton.classList.add("btn-gray");
@@ -9433,94 +10360,26 @@ body {
         await Swal.fire({title: translateThis("Please Login/connect your wallet to create a contract."), icon: 'warning'});
         return;
       }
-      var DDEcontract4 = new web3.eth.Contract(DDEabi, DDEaddy);
-          // Fetch user data to check if encryption key and contact info are registered
-      const datalen = DOMPurify.sanitize(await DDEcontract4.methods.getArrayLength(myaccounts, 3).call());
-      const dontShowAgain = localStorage.getItem('dontShowRegistrationNotification') === 'true';
-      if (datalen > 0 && !dontShowAgain) {
-        const contact2 = JSON.parse(DOMPurify.sanitize(await DDEcontract4.methods.userdata(myaccounts, datalen - 1).call()));
-        if (!contact2.mycontact || !contact2.publickey) {
-          const response = await Swal.fire({
-                title: translateThis("Registration Recommended"),
-                text: translateThis("We recommend registering your contact information and encryption key before creating a contract. Would you like to register now?"),
-                icon: 'info',
-                confirmButtonText: translateThis('Yes'),
-                showCancelButton: true,
-                cancelButtonText: translateThis('No'),
-                footer: '<label><input type="checkbox" id="dontShowAgain"> ' + translateThis("Don't show this again") + '</label>',
-            });
-
-            const dontShowAgainCheckbox = document.getElementById('dontShowAgain');
-            if (dontShowAgainCheckbox && dontShowAgainCheckbox.checked) {
-                localStorage.setItem('dontShowRegistrationNotification', 'true');
-            }
-
-            if (response.isConfirmed) {
-              await Swal.fire({
-                title: translateThis('Register Contact Information and Public Key'),
-                html: `
-                    <input id="contactInfoInput" class="swal2-input" placeholder="${translateThis('Enter your email/contact information')}">
-                    <p>${translateThis('Would you like to register this public key to your account now? This is how users will know how to encrypt their offers to you.')}</p>
-                `,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: translateThis('Yes'),
-                cancelButtonText: translateThis('No'),
-                preConfirm: () => {
-                    const contactInfo = document.getElementById('contactInfoInput').value;
-                    if (!contactInfo) {
-                        Swal.showValidationMessage(translateThis('Please enter your contact information.'));
-                        return false;
-                    }
-                    return { contactInfo };
-                }
-            }).then(async (result) => {
-                if (result.isConfirmed && result.value) {
-                    await registerData(result.value.contactInfo);
-                }
-            });
-            }
-        }
-      } else if (!dontShowAgain) {
-        const response = await Swal.fire({
-            title: translateThis("Registration Recommended"),
-            text: translateThis("No user data found. We recommend registering your contact information and encryption key. Would you like to register now?"),
-            icon: 'info',
-            confirmButtonText: translateThis('Yes'),
-            showCancelButton: true,
-            cancelButtonText: translateThis('No'),
-            footer: '<label><input type="checkbox" id="dontShowAgain"> ' + translateThis("Don't show this again") + '</label>',
+      if (isRegistered == 0) {
+        await Swal.fire({
+          title:translateThis("Please wait for your account data to load."),
+          icon:'info'
         });
-
-        const dontShowAgainCheckbox = document.getElementById('dontShowAgain');
-            if (dontShowAgainCheckbox && dontShowAgainCheckbox.checked) {
-            localStorage.setItem('dontShowRegistrationNotification', 'true');
-        }
-
+        return;
+      }
+      if (isRegistered == 1) {
+        const response = await Swal.fire({
+          title: translateThis("Registration Required"),
+          text: translateThis("In order to interact with nodes and users it is requested that you register a separate encryption key so requests can be validated and secured. Also at this time it is highly recommended to register contact information such as an email address so users may contact you when involved in a contract. Would you like to do that now?"),
+          icon: 'info',
+          confirmButtonText: translateThis('Yes'),
+          showCancelButton: true,
+          cancelButtonText: translateThis('No')
+        });
         if (response.isConfirmed) {
-          await Swal.fire({
-              title: translateThis('Register Contact Information and Public Key'),
-              html: `
-                  <input id="contactInfoInput" class="swal2-input" placeholder="${translateThis('Enter your email/contact information')}">
-                  <p>${translateThis('Would you like to register this public key to your account now? This is how users will know how to encrypt their offers to you.')}</p>
-              `,
-              icon: 'question',
-              showCancelButton: true,
-              confirmButtonText: translateThis('Yes'),
-              cancelButtonText: translateThis('No'),
-              preConfirm: () => {
-                  const contactInfo = document.getElementById('contactInfoInput').value;
-                  if (!contactInfo) {
-                      Swal.showValidationMessage(translateThis('Please enter your contact information.'));
-                      return false;
-                  }
-                  return { contactInfo };
-              }
-          }).then(async (result) => {
-              if (result.isConfirmed && result.value) {
-                  await registerData(result.value.contactInfo);
-              }
-          });
+          await registerData();
+        } else {
+          return;
         }
       } 
       // showLoader();
@@ -9800,7 +10659,7 @@ body {
                   });
                   continue;
                 }
-              } else {
+              } else if(sightengineApiUser != '') {
                 const loaderPopup = document.createElement('div');
                 loaderPopup.className = 'loader-popup';
                 loaderPopup.innerHTML = loader;
@@ -10130,10 +10989,12 @@ body {
             image: image
           };
           if(contractDetails || title || location) {
-            var isGood = await validateOrderData(orderData);
-            if(!isGood) {
-              await Swal.fire(translateThis("Your title or description has been flagged as inappropriate. Please try again with a different title or description.")+" "+translateThis("Orders should not contain links, sex, violence, fraud, drugs, weapons, insults, etc."));
-              return false;
+            if(sightengineApiUser != '') {
+              var isGood = await validateOrderData(orderData);
+              if(!isGood) {
+                await Swal.fire(translateThis("Your title or description has been flagged as inappropriate. Please try again with a different title or description.")+" "+translateThis("Orders should not contain links, sex, violence, fraud, drugs, weapons, insults, etc."));
+                return false;
+              }
             }
           }
           var sender2 = (senderReceiver === "receiver" ? sender : recipient);
@@ -10234,14 +11095,44 @@ body {
             await Swal.fire(translateThis("Message exceeds maximum byte size:") + " " + maxFileSize);
             return false;
           }
-          var result = await postOfferData(message);
-          if(result == "error") {
-            await Swal.fire(translateThis("Error posting message data to IPFS."));
-            return false;
-          }
-          if(result.length > 100) {
-            await Swal.fire(translateThis("Error message length was unusually long. Please check IPFS hash result."));
-            return false;
+          var result;
+          if(sightengineApiUser != "") {
+            result = await postOfferData(message);
+            if(result == "error") {
+              await Swal.fire(translateThis("Error posting message data to IPFS."));
+              return false;
+            }
+            if(result.length > 100) {
+              await Swal.fire(translateThis("Error message length was unusually long. Please check IPFS hash result."));
+              return false;
+            }
+          } else {
+            var isGood = await validateOrderData(orderData, '', true);
+            var validated = false;
+            if(isGood.toString().toLowerCase().includes("order passed ai test") || isGood.toString().toLowerCase().includes("order failed ai test")) {
+              if(isGood.toString().toLowerCase().includes("order passed ai test")) {
+                result = JSON.parse(isGood)['ipfs'];
+                validated = true;
+              } else if (isGood.toString().toLowerCase().includes("order failed ai test")) {
+                validated = false;
+              }
+            } else {
+              await Swal.fire(translateThis('Error'), isGood, 'error');
+              return false;
+            }
+            if(!validated) {
+              if(JSON.parse(isGood)['result'][0] == false) {
+                await Swal.fire({
+                  icon: 'error',
+                  title: translateThis('Inappropriate Content Detected'),
+                  text: translateThis('The uploaded image contains inappropriate content. Please upload a different image.') + " " + translateThis("Images should not contain links, QR codes, sex, violence, fraud, suggestive images or text, drugs, weapons, etc."),
+                });
+              }
+              if(JSON.parse(isGood)['result'][1] == false) {
+                await Swal.fire(translateThis("Your title or description has been flagged as inappropriate. Please try again with a different title or description.")+" "+translateThis("Orders should not contain links, sex, violence, fraud, drugs, weapons, insults, etc."));
+              }
+              return false;
+            }            
           }
           message = result;
           // Construct data object
@@ -10261,6 +11152,18 @@ body {
           data2.message = "IPFS link: " + data2.message;
           data2.timelimit = [data2.timelimit];
           data2.rfee = baseFee;
+          if(referral == "0x0000000000000000000000000000000000000000") {
+            var rlist = [];
+            for(var xr = 0; xr < gatewayList.length(); xr ++) {
+              if(gatewayList[xr]['isAffiliate']) {
+                rlist.push(gatewayList[xr]['address'])
+              }
+            }
+            if (rlist.length > 0) {
+              var randomIndex = Math.floor(Math.random() * rlist.length);
+              referral = rlist[randomIndex];
+            }
+          }
           data2.referred = referral;
           if(Object.keys(counterdata).length !== 0) {
             data2.referred = counterdata.referred;
@@ -10586,7 +11489,33 @@ body {
           if(parseInt(balances[mylisting.token].amount2) != 0 && parseInt(balances[mylisting.token].amount) == 0) {
             depnotice = 1;
           }
-        }          
+        }
+        if(myaccounts == "") {
+          await Swal.fire({title: translateThis("Please Login/connect your wallet to create a contract."), icon: 'warning'});
+          return;
+        }
+        if (isRegistered == 0) {
+          await Swal.fire({
+            title:translateThis("Please wait for your account data to load."),
+            icon:'info'
+          });
+          return;
+        }
+        if (isRegistered == 1) {
+          const response = await Swal.fire({
+            title: translateThis("Registration Required"),
+            text: translateThis("In order to interact with nodes and users it is requested that you register a separate encryption key so requests can be validated and secured. Also at this time it is highly recommended to register contact information such as an email address so users may contact you when involved in a contract. Would you like to do that now?"),
+            icon: 'info',
+            confirmButtonText: translateThis('Yes'),
+            showCancelButton: true,
+            cancelButtonText: translateThis('No')
+          });
+          if (response.isConfirmed) {
+            await registerData();
+          } else {
+            return;
+          }
+        }
         if(depnotice == 1 && accountprivkey != "") {
           await Swal.fire({
             title: translateThis('Deposit'),
@@ -10698,6 +11627,18 @@ body {
               var result = await showListing(mylisting, 3)
               if(result == false) {
                 return;
+              }
+              if(referral == "0x0000000000000000000000000000000000000000") {
+                var rlist = [];
+                for(var xr = 0; xr < gatewayList.length(); xr ++) {
+                  if(gatewayList[xr]['isAffiliate']) {
+                    rlist.push(gatewayList[xr]['address'])
+                  }
+                }
+                if (rlist.length > 0) {
+                  var randomIndex = Math.floor(Math.random() * rlist.length);
+                  referral = rlist[randomIndex];
+                }
               }
               if (!web3.utils.isAddress(referral)) {
                 referral = "0x0000000000000000000000000000000000000000";
@@ -10844,6 +11785,18 @@ body {
           var result = await showListing(mylisting, 3)
           if(result == false) {
             return;
+          }
+          if(referral == "0x0000000000000000000000000000000000000000") {
+            var rlist = [];
+            for(var xr = 0; xr < gatewayList.length(); xr ++) {
+              if(gatewayList[xr]['isAffiliate']) {
+                rlist.push(gatewayList[xr]['address'])
+              }
+            }
+            if (rlist.length > 0) {
+              var randomIndex = Math.floor(Math.random() * rlist.length);
+              referral = rlist[randomIndex];
+            }
           }
           if (!web3.utils.isAddress(referral)) {
             referral = "0x0000000000000000000000000000000000000000";
@@ -11270,34 +12223,67 @@ body {
         setActionActive(myaccounts+"addAPI"+text, false);
       }
     }
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+      }
+      return array;
+    }
     async function getAPI(index) {
-      await DDEcontract.methods.publicdata(index).call().then(function (data) {
-        //console.log(DOMPurify.sanitize(data));
-        data=JSON.parse(DOMPurify.sanitize(CryptoJS.AES.decrypt(DOMPurify.sanitize(data), AESkey).toString(CryptoJS.enc.Utf8)));
-        if (data.length === 2) { //using public gateway
-          pinataApiKey = data[0];
-          pinataSecretApiKey = data[1];
-          pinataGateway = 'https://gateway.pinata.cloud/ipfs/';
+      if(index == 'b') {
+        const myCurrentChainId = DOMPurify.sanitize(await web3.eth.net.getId());
+        var APIKEYS;
+        try {
+          APIKEYS = JSON.parse(localStorage.getItem(myaccounts + DDEaddy + myCurrentChainId + ":apiKeys")) || 'none';
+        } catch {
+          APIKEYS = 'none';
+        }
+        if(APIKEYS == 'none') {
+          index = 'a';
         } else {
-          if (!Array.isArray(data)) {
-            data = JSON.parse(data);
+          pinataApiKey = APIKEYS['pinataApiKey'];
+          pinataSecretApiKey = APIKEYS['pinataSecretApiKey'];
+          pinataGateway = APIKEYS['pinataGateway'];
+          pinataToken = APIKEYS['pinataToken'];
+          sightengineApiUser = APIKEYS['sightengineApiUser'];
+          sightengineApiSecret = APIKEYS['sightengineApiSecret'];
+        }
+      }
+      if(index == 'a') {
+        var minter = DOMPurify.sanitize(await DDEcontract.methods.minter().call());
+        var datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(minter, 3).call());
+        if(datalen > 0) {
+          var mdata = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(minter, datalen-1).call()));
+          if('curators' in mdata) {
+            tempCurators = shuffleArray(mdata['curators']);
           }
-          if(data.length === 3) {
-            pinataApiKey = data[0];
-            pinataSecretApiKey = data[1];
-            pinataGateway = data[2];
-          } else {
-            pinataApiKey = data[0];
-            pinataSecretApiKey = data[1];
-            pinataGateway = data[2];
-            pinataToken = data[3];
-            if(data.length>4) {
-              sightengineApiUser = data[4];
-              sightengineApiSecret = data[5];
-            }
+          if('nodes' in mdata) {
+            nodeList = shuffleArray(mdata['nodes']);
+          }
+          if('gateways' in mdata) {
+            gatewayList = shuffleArray(mdata['gateways']);
           }
         }
-      });
+      }
+      if(index != 'a' && index != 'b') {
+        await DDEcontract.methods.publicdata(index).call().then(function (data) {
+          //console.log(DOMPurify.sanitize(data));
+          data=JSON.parse(DOMPurify.sanitize(CryptoJS.AES.decrypt(DOMPurify.sanitize(data), AESkey).toString(CryptoJS.enc.Utf8)));
+          if('pinata' in data) {
+            pinataApiKey = data['pinata'][0];
+            pinataSecretApiKey = data['pinata'][1];
+            pinataGateway = data['pinata'][2];
+          }
+          if('token' in data) {
+            pinataToken = data['token'];
+          }
+          if('AI' in data) {
+            sightengineApiUser = data['AI'][0];
+            sightengineApiSecret = data['AI'][1];
+          }
+        });
+      }
     }
 
     function updateOffersContainer() {
@@ -11405,9 +12391,11 @@ body {
     }
 
     //Notes:
-    //It's an interesting idea to let users post an API key for GPT so that new offers can be curated
-    //Multiple AI APIs and ability to switch mode where users and nodes verify or nodes only
-    //Having users who iterate all contracts and collect all the tags to share with other users on front end
+    //These markets are powered by the users themselves. They become affiliates by using the markets.
+    //Users choose any affiliate/user to receive their fee. If they don't choose a random pool of affiliates who also run APIs is advised.
+    //Multiple user published AI APIs and ability to switch mode where users and nodes verify or nodes only
+    //Easy ability for users to set up AI and IPFS on their home server to properly check requests before posting
+    //Having users who iterate all contracts and collect all the tags and search terms to share with other users on front end
     //A page that looks like "craigs list/classified ads" to browse all the key words and tags
     //Instructions on how to set up an IPFS node and letting the system synchronize with multiple nodes
     //Having it so users can set up blockchain nodes and let other users access/poll multiple nodes at once through API(like electrum)

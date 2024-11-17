@@ -4,14 +4,14 @@
 	"short_name": "BitBay",
 	"description": "Decentralized Markets",
 	"orientation": "portrait",
-	"start_url": "/Ethalo/",
-	"scope": "/Ethalo/",
+	"start_url": "/",
+	"scope": "/",
 	"display": "fullscreen",
     "background_color": "#808080",
     "theme_color": "#000000",
 	"icons": [
 		{
-			"src": "/Ethalo/ethalo-logo.png",
+			"src": "ethalo-logo.png",
 			"sizes": "48x48 72x72 96x96 128x128 192x192 256x256 512x512",
 			"type": "image/png"
 		}

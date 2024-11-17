@@ -7,7 +7,6 @@ interface ERC20 {
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);    
     function approve(address spender, uint256 amount) external returns (bool);
 }
-
 interface IWETH {
     function deposit() external payable;
     function transfer(address to, uint256 value) external returns (bool);
@@ -71,7 +70,7 @@ contract TwoPartyEscrow {
     receive() external payable {
         assert(msg.sender == WETH);
     }
-    //If no affiliate is set, the fee is burned with up to .1% added to encourage using the system
+    //If no affiliate is set, the fee is burned with up to .5% added to encourage using the system
     function changeAffiliate(address affiliate) public {
         require(completed[affiliate][2] >= 10); //Active users of the markets are the ones to promote it
         require(affiliate != address(0));
@@ -90,7 +89,7 @@ contract TwoPartyEscrow {
     }
     function changeFee(uint newfee) public {
         require(msg.sender == minter);
-        require(newfee >= 0 && newfee <= 100); //1% maximum
+        require(newfee >= 0 && newfee <= 500); //5% maximum
         affiliateFee = newfee;
     }
     function changeThreshold(address token, uint newfee) public {
@@ -320,7 +319,7 @@ contract TwoPartyEscrow {
                 } else {
                     recipient = msg.sender;
                 }
-            } else {                
+            } else {
                 if(sender == address(0)) {
                     newContract.status = [uint(1),uint(0)];
                     sender = msg.sender;
@@ -485,13 +484,10 @@ contract TwoPartyEscrow {
                     total = ((contracts[hash].amount) * afee) / 10000;
                     userBalance[theReferred][contracts[hash].token] += total;
                 } else {
-                    if(afee > 100) {
-                        afee = 100;
-                    }
-                    if(afee < 90) {
-                        total = ((contracts[hash].amount) * (afee + 10)) / 10000;
+                    if(afee < 450) {
+                        total = ((contracts[hash].amount) * (afee + 50)) / 10000;
                     } else {
-                        total = ((contracts[hash].amount) * 100) / 10000;
+                        total = ((contracts[hash].amount) * 500) / 10000;
                     }
                     userBalance[address(0)][contracts[hash].token] += total;
                 }
