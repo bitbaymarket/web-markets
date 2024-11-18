@@ -286,28 +286,32 @@
   margin: 1em auto; }
 
 .swal2-validation-message {
-  align-items: center;
-  justify-content: center;
-  margin: 0 -2.7em;
+  max-width: 90%;
+  margin: 0; /* Adjusted to avoid overlap issues */
   padding: 0.625em;
   overflow: hidden;
   background: #f0f0f0;
-  color: #666666;
+  color: #545454;
   font-size: 1em;
-  font-weight: 300; }
-  .swal2-validation-message::before {
-    content: '!';
-    display: inline-block;
-    width: 1.5em;
-    min-width: 1.5em;
-    height: 1.5em;
-    margin: 0 .625em;
-    border-radius: 50%;
-    background-color: #f27474;
-    color: #fff;
-    font-weight: 600;
-    line-height: 1.5em;
-    text-align: center; }
+  font-weight: 300;
+  text-align: center; /* Center content horizontally */
+  box-sizing: border-box; /* Ensure padding doesn’t cause overflow */
+}
+
+.swal2-validation-message::before {
+  max-width: 90%;
+  content: '!';
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  margin: 0 0.625em;
+  border-radius: 50%;
+  background-color: #f27474;
+  color: #fff;
+  font-weight: 600;
+  line-height: 1.5em;
+  text-align: center;
+}
 
 .swal2-icon {
   position: relative;
@@ -3234,7 +3238,7 @@ body {
                 <img src="two-party-escrow.jpg" alt="about box img"/>
               </a> 
               <p t-id="42">The markets themselves run on top of Solidity chains such as Ethereum and Polygon. Offers can range from goods, services, barter and p2p trading. Since this webpage is fully open source and runs on the client side, the user can also download this code from github and run it locally for even greater security. This protocol which was pioneered by BitHalo back in 2014 predated Ethereum and was the worlds first smart contracts. This is a web based interface for fully decentralized markets.</p>
-              <p t-id="43">For selling goods, users will definitely want to consider a drop shipping service or a service that provides discount shipping to compete with the shipping rates typically found in major companies. To do this, you should sign up for a 3rd party shipping account which should allow you to save up to 75% in shipping in some cases. Sellers may also charge buyers for shipping while in escrow and buyers should be careful to make sure the amount doesn't exceed the deposits or that they buy the shipping label themselves. Users should try to keep in communication with each other through the escrow process and it's recommended to have a backup of your keys so both parties are protected during escrow. Although these markets could be moderated through AI(such as webgpt) and community driven moderation, users are entirely responsible for the risks of what they post and for their own escrows. With that in mind, it's strongly recommended to not post content that is illegal in the country you reside. For deals that involve cash users should do their own due dilligence and their own 'know your customer' if needed. It's in everyones best interest to use double deposit escrow to get rid of deception in the world of international commerce and services. It is an advantage when users administrate contracts themselves because arbiters are unable to know the truth of a deal ruling unfairly and can collude causing great losses and they also incur a greater cost. Users are forced to work with each other to achieve a desirable outcome. Users are also the ones who host the offers using IPFS. So it's good practice to run your own IPFS node to archive the markets. It's recommended that you register your contact information to the blockchain. This makes it guaranteed that counter-parties in the contract know how to contact you for any questions about the negotiations. The code may be run locally and can also be audited by visiting the github page where the code and website are hosted. This system is ownerless and entirely free to use. However, there is a setting that can be activated for affiliates/referrals which can range from 0-1%. In order to encourage users to engage with affiliates, the fee is burned if it is not paid to an affiliate. This helps market the system by giving users a way to earn. A user of the markets is automatically an affiliate if they complete 10 deals. That allows them to use the markets for free if they choose to(as they can be their own affiliate) and it allows them to send users to the website through an affiliate link. Visiting through a link registers the affiliate to that account when a deal is accepted and let's them benefit from that referral. Also, some sellers may offer a more attractive referral fee which should allow affiliates to net more by mutual consent. For more information on how BitBay works you may visit: <a href="https://bitbay.market" target="_blank">https://bitbay.market</a></p>
+              <p t-id="43">For selling goods, users will definitely want to consider a drop shipping service or a service that provides discount shipping to compete with the shipping rates typically found in major companies. To do this, you should sign up for a 3rd party shipping account which should allow you to save up to 75% in shipping in some cases. Sellers may also charge buyers for shipping while in escrow and buyers should be careful to make sure the amount doesn't exceed the deposits or that they buy the shipping label themselves. Users should try to keep in communication with each other through the escrow process and it's recommended to have a backup of your keys so both parties are protected during escrow. Although these markets could be moderated through AI(such as webgpt) and community driven moderation, users are entirely responsible for the risks of what they post and for their own escrows. With that in mind, it's strongly recommended to not post content that is illegal in the country you reside. For deals that involve cash users should do their own due dilligence and their own 'know your customer' if needed. It's in everyones best interest to use double deposit escrow to get rid of deception in the world of international commerce and services. It is an advantage when users administrate contracts themselves because arbiters are unable to know the truth of a deal ruling unfairly and can collude causing great losses and they also incur a greater cost. Users are forced to work with each other to achieve a desirable outcome. Users are also the ones who host the offers using IPFS. So it's good practice to run your own IPFS node to archive the markets. It's recommended that you register your contact information to the blockchain. This makes it guaranteed that counter-parties in the contract know how to contact you for any questions about the negotiations. The code may be run locally and can also be audited by visiting the github page where the code and website are hosted. This system is ownerless and entirely free to use. However, there is a setting that can be activated for affiliates/referrals which can range from 0-5%. In order to encourage users to engage with affiliates, the fee is burned if it is not paid to an affiliate. This helps market the system by giving users a way to earn. A user of the markets is automatically an affiliate if they complete 10 deals. That allows them to use the markets for free if they choose to(as they can be their own affiliate) and it allows them to send users to the website through an affiliate link. Visiting through a link registers the affiliate to that account when a deal is accepted and let's them benefit from that referral. Also, some sellers may offer a more attractive referral fee which should allow affiliates to net more by mutual consent. For more information on how BitBay works you may visit: <a href="https://bitbay.market" target="_blank">https://bitbay.market</a></p>
             </div>
           </div>
           <div id="FAQ" class="abouttabcontent">
@@ -4190,7 +4194,7 @@ body {
 
         // Android device but not in MetaMask browser
         if (isAndroid && !isMetaMaskInstalled) {
-            Swal.fire({
+            await Swal.fire({
                 title: translateThis('Login using unique password'),
                 html:
                     '<select id="network" class="swal2-select">' +
@@ -4302,7 +4306,7 @@ body {
                     window.location.href = 'https://metamask.io/download.html';
                 }
             } else {
-                Swal.fire({
+                await Swal.fire({
                     title: translateThis('Login using unique password'),
                     html:
                         '<select id="network" class="swal2-select">' +
@@ -4958,9 +4962,9 @@ body {
               } = formValues);
               APIKEYS = {sightengineApiUser, sightengineApiSecret, pinataApiKey, pinataSecretApiKey, pinataGateway, pinataToken};
               localStorage.setItem(myaccounts + DDEaddy + myCurrentChainId + ":apiKeys", JSON.stringify(APIKEYS));
-              Swal.fire('Success', 'API keys saved', 'success');
+              await Swal.fire('Success', 'API keys saved', 'success');
             } else {
-              Swal.fire('Error', 'Please fill out all fields', 'error');
+              await Swal.fire('Error', 'Please fill out all fields', 'error');
               localStorage.setItem(myaccounts + DDEaddy + myCurrentChainId + ":api", "a");
               localStorage.setItem(myaccounts + DDEaddy + myCurrentChainId + ":apiKeys", "none");
             }
@@ -5231,7 +5235,7 @@ body {
               await waitForTransactionConfirmation(txHash);
             }
             hideLoader();
-            Swal.fire(translateThis("Cosigner removal successful."));
+            await Swal.fire(translateThis("Cosigner removal successful."));
           } catch (e) {
             console.log(e);
             hideLoader();
@@ -5259,7 +5263,7 @@ body {
       }).then(async (result) => {
         if (result.isConfirmed) {
           if (!web3.utils.isAddress(result.value)) {
-            Swal.fire(translateThis("Address was not valid."));
+            await Swal.fire(translateThis("Address was not valid."));
             return;
           }
           try {
@@ -5279,7 +5283,7 @@ body {
               await waitForTransactionConfirmation(txHash);
             }
             hideLoader();
-            Swal.fire(translateThis("Cosigner designation successful. Now you will be asked to authorize the cosigner for contract clearance."));
+            await Swal.fire(translateThis("Cosigner designation successful. Now you will be asked to authorize the cosigner for contract clearance."));
           } catch (e) {
             console.log(e);
             hideLoader();
@@ -5305,7 +5309,7 @@ body {
               await waitForTransactionConfirmation(txHash);
             }
             hideLoader();
-            Swal.fire(translateThis("Success!"));
+            await Swal.fire(translateThis("Success!"));
           } catch (e) {
             console.log(e);
             hideLoader();
@@ -5477,7 +5481,7 @@ body {
       if (accountprivkey !== "" && nodeList.includes(myaccounts) && overwriteLastEntry == 0) {
         datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 3).call());
         if(datalen != "0") {
-          Swal.fire(translateThis("This function is currently not available for a node."));
+          await Swal.fire(translateThis("This function is currently not available for a node."));
           return;
         }
       }
@@ -5502,12 +5506,34 @@ body {
       // Output the selected values
       if (formValues) {
         if(formValues.registerEmail) {
-          myuserdata.mycontact = myemail
+          if(myemail != "") {
+            myuserdata.mycontact = myemail
+          } else {
+            await Swal.fire({
+              title: translateThis('Contact Information (email/signal/telegram):'),
+              input: 'email',
+              inputPlaceholder: 'example@example.com',
+              showCancelButton: true,
+              confirmButtonText: 'Submit',
+              cancelButtonText: 'Cancel',
+              inputValidator: (value) => {
+                if (!value) {
+                  return translateThis('Please enter a valid email address.');
+                }
+              }
+            }).then((result) => {
+              if (result.isConfirmed) {
+                myuserdata.mycontact = result.value;
+              } else {
+                return;
+              }
+            }); 
+          }
         }
         if(formValues.registerPublicKey) {
           myuserdata.publickey = userpubkey;
           if(myuserdata.publickey == "") {
-            Swal.fire(translateThis("Public key unknown."));
+            await Swal.fire(translateThis("Public key unknown."));
             return;
           }
         }
@@ -5558,7 +5584,7 @@ body {
       });
       var arep = JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(myaccounts).call())));
       if(arep[2]<10) {
-        Swal.fire(translateThis("You have not completed 10 deals with the minimum threshold and requirements yet. Only then can you become an affiliate."));
+        await Swal.fire(translateThis("You have not completed 10 deals with the minimum threshold and requirements yet. Only then can you become an affiliate."));
         return;
       }
       // Ask the user to select a language
@@ -5621,7 +5647,7 @@ body {
         if (result.isConfirmed) {
           const affiliate = result.value;
           if (!web3.utils.isAddress(affiliate)) {
-            Swal.fire(translateThis("Address was not valid."));
+            await Swal.fire(translateThis("Address was not valid."));
             return;
           }
           var reputation = [0,0,0];
@@ -5644,7 +5670,7 @@ body {
                 await waitForTransactionConfirmation(txHash);
               }
               hideLoader();
-              Swal.fire(translateThis("Success!"));
+              await Swal.fire(translateThis("Success!"));
               referral = affiliate;
             } catch (e) {
               console.log(e);
@@ -5655,7 +5681,7 @@ body {
               setActionActive(myaccounts+"changeAffiliate"+affiliate, false);
             }
           } else {
-            Swal.fire(translateThis("This person has not completed enough qualified deals yet."));
+            await Swal.fire(translateThis("This person has not completed enough qualified deals yet."));
           }
         }
       });
@@ -5696,7 +5722,7 @@ body {
               await waitForTransactionConfirmation(txHash);
             }
             hideLoader();
-            Swal.fire(translateThis("Success!"));
+            await Swal.fire(translateThis("Success!"));
           } catch (e) {
             console.log(e);
             hideLoader();
@@ -9600,7 +9626,7 @@ body {
             senderSupportsEncryption = false;
           }          
           if (!recipientSupportsEncryption && !senderSupportsEncryption) {
-            Swal.fire({
+            await Swal.fire({
               icon: 'warning',
               title: translateThis('Encryption Not Supported by Both Parties'),
               text: translateThis('Neither you nor the recipient support encryption. Any private messages sent will be visible to anyone.'),
@@ -9613,7 +9639,7 @@ body {
               }
             });
           } else if (!recipientSupportsEncryption) {
-            Swal.fire({
+            await Swal.fire({
               icon: 'warning',
               title: translateThis('Recipient Does Not Support Encryption'),
               text: translateThis('Please be aware, the recipient does not support encryption. Any private messages sent will be visible to anyone.'),
@@ -9626,7 +9652,7 @@ body {
               }
             });
           } else if (!senderSupportsEncryption) {
-            Swal.fire({
+            await Swal.fire({
               icon: 'warning',
               title: translateThis('Your Encryption Key is Not Registered'),
               text: translateThis('Warning: your encryption key is not registered, messages you receive will be visible to everyone.'),
@@ -9767,7 +9793,7 @@ body {
           }
           hideLoader();
           setActionActive('sendMessage', false);
-          Swal.fire({
+          await Swal.fire({
             icon: 'success',
             title: translateThis('Message Sent'),
             text: translateThis('Your message has been sent successfully.'),
@@ -10366,6 +10392,51 @@ body {
           icon:'info'
         });
         return;
+      }
+
+      let readDisclaimer = localStorage.getItem('disclaimer'+DDEaddy) || 'false';
+      var scrolledToBottom = false;      
+      if(readDisclaimer == 'false') {
+        var returnThis3 = false;
+        await Swal.fire({
+          title: translateThis('Welcome'),
+          html: `<div id="swal-scroll-container" style="max-height: 200px; overflow-y: auto; text-align: left;">
+                   ${translateThis('These decentralized markets are powered by the users themselves. As a user, you are fully responsible for the content you post here, and you shall not post any content that would be considered illegal or unacceptable for public markets. By proceeding, you agree to waive any responsibility and hold harmless other users who post data to IPFS and run artificial intelligence filtering services when your order is posted. Please also consider that no filter is perfect, and users may not be aware of the content being posted to AI services or IPFS. You are welcome to use your own API keys for moderation and IPFS services; however, self-filtering through artificial intelligence is still required. Furthermore, while the BitBay website itself collects no data from users, any data you post to the blockchain is publicly visible. Any service or node running artificial intelligence will inevitably be subject to the privacy policy of the individual company involved, and no guarantees can be made, as these are separate third-party services. You acknowledge that BitBay is not a company, but a community-driven platform, and that the code is open-source and beyond the control of any single individual or developer. The developers who contribute to this platform do so in their free time, aiming to provide the world access to fraud-resistant contracts without intermediaries. It is important to note that developers do not directly profit from affiliate fees and that each user chooses who their affiliate is. Therefore, individuals who volunteer to run nodes, active users, and marketing affiliates earn from affiliate fees, and this is solely at the consent and discretion of each individual user. Therefore, no implication should be made that any specific individual profits from the platform’s use. The affiliate fee structure is designed solely to encourage and incentivize engagement from users themselves. The developers have coded the platform to the best of their ability and in good faith. However, the original developers are not responsible for any errors, misuse, or maintenance of the platform. Users are encouraged to audit the code themselves. Users who engage in contracts do so with full awareness of both the benefits and risks involved in peer-to-peer contracting. Do you understand and wish to proceed?')}
+                 </div>`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: translateThis('Yes'),
+          cancelButtonText: translateThis('No'),
+          didOpen: () => {
+            const scrollContainer = document.getElementById('swal-scroll-container');
+            const confirmButton = Swal.getConfirmButton();
+            // Add scroll event listener
+            scrollContainer.addEventListener('scroll', () => {
+              const scrollPercentage = (scrollContainer.scrollTop + scrollContainer.clientHeight) / scrollContainer.scrollHeight;
+              if (scrollPercentage >= 0.8) {
+                // Enable the confirm button when scrolled to the bottom
+                scrolledToBottom = true;
+                confirmButton.style.backgroundColor = 'green';
+              }
+            });
+          },
+          preConfirm: () => {
+            if(!scrolledToBottom) {
+              Swal.showValidationMessage(translateThis('Please scroll to read the entire message before proceeding.'));
+              return false;
+            }
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            readDisclaimer = localStorage.setItem('disclaimer'+DDEaddy, 'true');
+          } else {
+            returnThis3 = true;
+            return;
+          }
+        });
+        if(returnThis3) {
+          return;
+        }
       }
       if (isRegistered == 1) {
         const response = await Swal.fire({
@@ -11153,16 +11224,27 @@ body {
           data2.timelimit = [data2.timelimit];
           data2.rfee = baseFee;
           if(referral == "0x0000000000000000000000000000000000000000") {
-            var rlist = [];
-            for(var xr = 0; xr < gatewayList.length(); xr ++) {
-              if(gatewayList[xr]['isAffiliate']) {
-                rlist.push(gatewayList[xr]['address'])
+            await Swal.fire({
+              title: translateThis('Assign an affiliate'),
+              text: translateThis('It seems you did not visit the website through an affiliate link nor was an affiliate assigned to your account. Therefore it is recommended one is chosen at random among the nodes who post to IPFS and run AI services. This keeps them incentivized to participate in helping the markets function. If an affiliate is not chosen, the fee is burned at an increased cost. Therefore it is cheaper to assign one. These markets are run by the users themselves however every users freedom of choice is respected. Would you like to choose an affiliate from the pool of qualified nodes at random?'),
+              icon: 'question',
+              showCancelButton: true,
+              confirmButtonText: translateThis('Yes'),
+              cancelButtonText: translateThis('No'),
+            }).then((result) => {
+              if(result.isConfirmed) {
+                var rlist = [];
+                for(var xr = 0; xr < gatewayList.length(); xr ++) {
+                  if(gatewayList[xr]['isAffiliate']) {
+                    rlist.push(gatewayList[xr]['address'])
+                  }
+                }
+                if (rlist.length > 0) {
+                  var randomIndex = Math.floor(Math.random() * rlist.length);
+                  referral = rlist[randomIndex];
+                }
               }
-            }
-            if (rlist.length > 0) {
-              var randomIndex = Math.floor(Math.random() * rlist.length);
-              referral = rlist[randomIndex];
-            }
+            });
           }
           data2.referred = referral;
           if(Object.keys(counterdata).length !== 0) {
@@ -11464,6 +11546,50 @@ body {
 
     async function acceptOffer(listing) {
       try {
+        let readDisclaimer = localStorage.getItem('disclaimer'+DDEaddy) || 'false';
+        var scrolledToBottom = false;
+        if(readDisclaimer == 'false') {
+          var returnThis3 = false;
+          await Swal.fire({
+            title: translateThis('Welcome'),
+            html: `<div id="swal-scroll-container" style="max-height: 200px; overflow-y: auto; text-align: left;">
+                     ${translateThis('These decentralized markets are powered by the users themselves. As a user, you are fully responsible for the content you post here, and you shall not post any content that would be considered illegal or unacceptable for public markets. By proceeding, you agree to waive any responsibility and hold harmless other users who post data to IPFS and run artificial intelligence filtering services when your order is posted. Please also consider that no filter is perfect, and users may not be aware of the content being posted to AI services or IPFS. You are welcome to use your own API keys for moderation and IPFS services; however, self-filtering through artificial intelligence is still required. Furthermore, while the BitBay website itself collects no data from users, any data you post to the blockchain is publicly visible. Any service or node running artificial intelligence will inevitably be subject to the privacy policy of the individual company involved, and no guarantees can be made, as these are separate third-party services. You acknowledge that BitBay is not a company, but a community-driven platform, and that the code is open-source and beyond the control of any single individual or developer. The developers who contribute to this platform do so in their free time, aiming to provide the world access to fraud-resistant contracts without intermediaries. It is important to note that developers do not directly profit from affiliate fees and that each user chooses who their affiliate is. Therefore, individuals who volunteer to run nodes, active users, and marketing affiliates earn from affiliate fees, and this is solely at the consent and discretion of each individual user. Therefore, no implication should be made that any specific individual profits from the platform’s use. The affiliate fee structure is designed solely to encourage and incentivize engagement from users themselves. The developers have coded the platform to the best of their ability and in good faith. However, the original developers are not responsible for any errors, misuse, or maintenance of the platform. Users are encouraged to audit the code themselves. Users who engage in contracts do so with full awareness of both the benefits and risks involved in peer-to-peer contracting. Do you understand and wish to proceed?')}
+                   </div>`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: translateThis('Yes'),
+            cancelButtonText: translateThis('No'),
+            didOpen: () => {
+              const scrollContainer = document.getElementById('swal-scroll-container');
+              const confirmButton = Swal.getConfirmButton();
+              // Add scroll event listener
+              scrollContainer.addEventListener('scroll', () => {
+                const scrollPercentage = (scrollContainer.scrollTop + scrollContainer.clientHeight) / scrollContainer.scrollHeight;
+                if (scrollPercentage >= 0.8) {
+                  // Enable the confirm button when scrolled to the bottom
+                  scrolledToBottom = true;
+                  confirmButton.style.backgroundColor = 'green';
+                }
+              });
+            },
+            preConfirm: () => {
+              if(!scrolledToBottom) {
+                Swal.showValidationMessage(translateThis('Please scroll to read the entire message before proceeding.'));
+                return false;
+              }
+            }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              readDisclaimer = localStorage.setItem('disclaimer'+DDEaddy, 'true');
+            } else {
+              returnThis3 = true;
+              return;
+            }
+          });
+          if(returnThis3) {
+            return;
+          }
+        }
         var mylisting = JSON.parse(JSON.stringify(listing));
         var quantity = 1;
         var accepttimelimit = 0;
@@ -11629,16 +11755,27 @@ body {
                 return;
               }
               if(referral == "0x0000000000000000000000000000000000000000") {
-                var rlist = [];
-                for(var xr = 0; xr < gatewayList.length(); xr ++) {
-                  if(gatewayList[xr]['isAffiliate']) {
-                    rlist.push(gatewayList[xr]['address'])
+                await Swal.fire({
+                  title: translateThis('Assign an affiliate'),
+                  text: translateThis('It seems you did not visit the website through an affiliate link nor was an affiliate assigned to your account. Therefore it is recommended one is chosen at random among the nodes who post to IPFS and run AI services. This keeps them incentivized to participate in helping the markets function. If an affiliate is not chosen, the fee is burned at an increased cost. Therefore it is cheaper to assign one. These markets are run by the users themselves however every users freedom of choice is respected. Would you like to choose an affiliate from the pool of qualified nodes at random?'),
+                  icon: 'question',
+                  showCancelButton: true,
+                  confirmButtonText: translateThis('Yes'),
+                  cancelButtonText: translateThis('No'),
+                }).then((result) => {
+                  if(result.isConfirmed) {
+                    var rlist = [];
+                    for(var xr = 0; xr < gatewayList.length(); xr ++) {
+                      if(gatewayList[xr]['isAffiliate']) {
+                        rlist.push(gatewayList[xr]['address'])
+                      }
+                    }
+                    if (rlist.length > 0) {
+                      var randomIndex = Math.floor(Math.random() * rlist.length);
+                      referral = rlist[randomIndex];
+                    }
                   }
-                }
-                if (rlist.length > 0) {
-                  var randomIndex = Math.floor(Math.random() * rlist.length);
-                  referral = rlist[randomIndex];
-                }
+                });
               }
               if (!web3.utils.isAddress(referral)) {
                 referral = "0x0000000000000000000000000000000000000000";
@@ -11787,16 +11924,27 @@ body {
             return;
           }
           if(referral == "0x0000000000000000000000000000000000000000") {
-            var rlist = [];
-            for(var xr = 0; xr < gatewayList.length(); xr ++) {
-              if(gatewayList[xr]['isAffiliate']) {
-                rlist.push(gatewayList[xr]['address'])
+            await Swal.fire({
+              title: translateThis('Assign an affiliate'),
+              text: translateThis('It seems you did not visit the website through an affiliate link nor was an affiliate assigned to your account. Therefore it is recommended one is chosen at random among the nodes who post to IPFS and run AI services. This keeps them incentivized to participate in helping the markets function. If an affiliate is not chosen, the fee is burned at an increased cost. Therefore it is cheaper to assign one. These markets are run by the users themselves however every users freedom of choice is respected. Would you like to choose an affiliate from the pool of qualified nodes at random?'),
+              icon: 'question',
+              showCancelButton: true,
+              confirmButtonText: translateThis('Yes'),
+              cancelButtonText: translateThis('No'),
+            }).then((result) => {
+              if(result.isConfirmed) {
+                var rlist = [];
+                for(var xr = 0; xr < gatewayList.length(); xr ++) {
+                  if(gatewayList[xr]['isAffiliate']) {
+                    rlist.push(gatewayList[xr]['address'])
+                  }
+                }
+                if (rlist.length > 0) {
+                  var randomIndex = Math.floor(Math.random() * rlist.length);
+                  referral = rlist[randomIndex];
+                }
               }
-            }
-            if (rlist.length > 0) {
-              var randomIndex = Math.floor(Math.random() * rlist.length);
-              referral = rlist[randomIndex];
-            }
+            });
           }
           if (!web3.utils.isAddress(referral)) {
             referral = "0x0000000000000000000000000000000000000000";
