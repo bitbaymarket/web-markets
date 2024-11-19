@@ -402,6 +402,18 @@
             title: DOMPurify.sanitize(message?.title),
             location: DOMPurify.sanitize(message?.location)
           };
+          orderData['image'] = orderData.image.map((img, index) => {
+            try {
+              const mime = img.match(/^data:(.*);base64,/)[1];  // Match base64 data URL
+              if (['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'].includes(mime)) {
+                dataURLtoFile(img, `image${index}.${mime.split('/')[1]}`);
+                return img;
+              }
+            } catch {
+              return null;  // Return null for invalid or non-base64 images
+            }
+            return null;  // Return null for any image that doesn't match the valid mime types
+          }).filter(img => img !== null);
         } catch (e) {
           return {'false':'Invalid JSON'};
         }
@@ -430,7 +442,7 @@
         } else {
           if('ipfs' in request) {
             userData.IPFSRequests += 1;
-            var ipfshash = await pinToPinataIPFS(message);
+            var ipfshash = await pinToPinataIPFS(JSON.stringify(message));
             console.log(ipfshash)
             if(ipfshash == "error") {
               return {'false': "error posting to ipfs"};
