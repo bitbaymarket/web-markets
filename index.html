@@ -12,6 +12,7 @@
 <script type="text/javascript" src="./web3.min.js"></script>
 <script type="text/javascript" src="./jdenticon.min.js"></script>
 <script type="text/javascript" src="./simple-scrollbar.min.js"></script>
+<script type="text/javascript" src="zxcvbn.js"></script>
 <script src="lottie-player.js"></script>
 <link rel="stylesheet" href="./open-sans.css">
 <link rel="stylesheet" href="./simple-scrollbar.css">
@@ -504,7 +505,10 @@
   background-color: #ededed; /* Set your desired background color */
   border: 2px solid #3d0064;
 }
-
+.scrollable-swal-popup {
+  max-height: 80vh; /* Prevents the modal from overflowing vertically */
+  overflow-y: auto; /* Enables scrolling within the modal */
+}
 /* Customize the appearance of the scrollbar thumb (handle) */
 .simple-scrollbar .ss-scroll::-webkit-scrollbar-thumb {
   background-color: #555;
@@ -4206,31 +4210,97 @@ body {
         if (isAndroid && !isMetaMaskInstalled) {
             await Swal.fire({
                 title: translateThis('Login using unique password'),
-                html:
-                    '<select id="network" class="swal2-select">' +
-                    '<option value="0" selected>Polygon</option>' +
-                    '<option value="1">Sepolia Testnet</option>' +
-                    '</select>' +
-                    '<input type="password" id="password" class="swal2-input" placeholder="' + translateThis('Enter Password') + '">' +
-                    '<input type="password" id="confirmPassword" class="swal2-input" placeholder="' + translateThis('Confirm Password') + '">',
+                html:`
+                    <select id="network" class="swal2-select">
+                        <option value="0" selected>Polygon</option>
+                        <option value="1">Sepolia Testnet</option>
+                    </select>
+                    <input type="password" id="password" class="swal2-input" placeholder="${translateThis('Enter Password')}">
+                    <input type="password" id="confirmPassword" class="swal2-input" placeholder="${translateThis('Confirm Password')}">
+                    <div id="passwordStrength" style="margin-top: 10px; height: 10px; background-color: #e0e0e0; border-radius: 5px; overflow: hidden;">
+                        <div id="strengthBar" style="height: 100%; width: 0%; background-color: red; transition: width 0.3s;"></div>
+                    </div>
+                    <p id="crackingTime" style="margin-top: 5px; font-size: 12px; color: gray;">${translateThis('Strength and cracking time will appear here. For a strong password try combining unpredictable phrases from a couple books.')}</p>
+                    <div style="margin-top: 15px;">
+                        <input type="checkbox" id="disclaimerCheck">
+                        <span id="infoIcon" style="cursor: pointer; margin-left: 5px;">
+                        <label for="disclaimerCheck" id="disclaimerLabel">
+                            ${translateThis('I have read the disclaimer')}
+                        </label>
+                        🔍</span>
+                    </div>
+                `,
                 focusConfirm: false,
                 showCancelButton: true,
                 confirmButtonText: translateThis('Confirm'),
                 cancelButtonText: translateThis('Cancel'),
+                didOpen: () => {
+                    const passwordInput = document.getElementById('password');
+                    const strengthBar = document.getElementById('strengthBar');
+                    const crackingTimeText = document.getElementById('crackingTime');
+                    const infoIcon = document.getElementById('infoIcon');
+
+                    // Add password strength logic
+                    passwordInput.addEventListener('input', () => {
+                        const password = passwordInput.value;
+                        const result = zxcvbn(password);
+
+                        // Calculate cracking time in seconds
+                        const crackingTimeSeconds = result.crack_times_seconds.offline_fast_hashing_1e10_per_second;
+                        const maxThreshold = 100 * 365.25 * 24 * 60 * 60; // 100 years in seconds
+
+                        // Update strength bar
+                        const fillPercentage = Math.min((crackingTimeSeconds / maxThreshold) * 100, 100); // Cap at 100%
+                        const strengthColors = ['#ff4e42', '#ff8f59', '#ffd55f', '#a4dd6a', '#6bcb73']; // Red to green gradient
+                        const colorIndex = Math.floor((fillPercentage / 100) * (strengthColors.length - 1));
+                        strengthBar.style.width = `${fillPercentage}%`;
+                        strengthBar.style.backgroundColor = strengthColors[colorIndex];
+
+                        // Update cracking time feedback
+                        if (crackingTimeSeconds > maxThreshold) {
+                            crackingTimeText.textContent = translateThis('Your password is very strong. Time to crack exceeds 100 years.');
+                            crackingTimeText.strength = 1;
+                        } else {
+                            crackingTimeText.textContent = `${translateThis('Time to crack:')} ${result.crack_times_display.offline_fast_hashing_1e10_per_second}`;
+                            if(crackingTimeText.strength != 2) {
+                              crackingTimeText.strength = 0;
+                            }
+                        }
+                    });
+
+                    // Add info tooltip logic
+                    infoIcon.addEventListener('click', () => {
+                        Swal.showValidationMessage(
+                            translateThis('Make sure you have securely stored and backed up your login information. This system does not allow password recovery, and losing your credentials will make it impossible to access your account. For increased security, consider downloading and running the website locally. If you choose to access the markets through this web address, always verify that you are using the official website.'));
+                    });
+                },
+                customClass: {
+                  popup: "scrollable-swal-popup"
+                },
                 preConfirm: () => {
                     const network = document.getElementById('network').value;
                     const password = document.getElementById('password').value;
                     const confirmPassword = document.getElementById('confirmPassword').value;
-
+                    const disclaimerCheck = document.getElementById('disclaimerCheck').checked;
+                    const crackingTimeText = document.getElementById('crackingTime');
+                    if (!disclaimerCheck) {
+                        Swal.showValidationMessage(translateThis('You must agree to the disclaimer before proceeding.'));
+                        return false;
+                    }
                     if (password !== confirmPassword) {
                         Swal.showValidationMessage(translateThis('Passwords do not match'));
+                        return false;
+                    }
+                    if (crackingTimeText.strength == 0) {
+                        crackingTimeText.strength = 2;
+                        Swal.showValidationMessage(translateThis('Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.'));
                         return false;
                     }
 
                     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{16,}$/;
 
                     if (!password.match(passwordRegex)) {
-                        Swal.showValidationMessage(translateThis('Password must be 16 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one special character.'));
+                        Swal.showValidationMessage(translateThis('Password must be 16 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one special character. Some useful methods to remember a long password is to choose an uncommon phrase from a specific page of a book and replace some of the letters with numbers.'));
                         return false;
                     }
 
@@ -4318,31 +4388,97 @@ body {
             } else {
                 await Swal.fire({
                     title: translateThis('Login using unique password'),
-                    html:
-                        '<select id="network" class="swal2-select">' +
-                        '<option value="0" selected>Polygon</option>' +
-                        '<option value="1">Sepolia Testnet</option>' +
-                        '</select>' +
-                        '<input type="password" id="password" class="swal2-input" placeholder="'+translateThis('Enter Password')+'">' +
-                        '<input type="password" id="confirmPassword" class="swal2-input" placeholder="'+translateThis('Confirm Password')+'">',
+                    html:`
+                        <select id="network" class="swal2-select">
+                            <option value="0" selected>Polygon</option>
+                            <option value="1">Sepolia Testnet</option>
+                        </select>
+                        <input type="password" id="password" class="swal2-input" placeholder="${translateThis('Enter Password')}">
+                        <input type="password" id="confirmPassword" class="swal2-input" placeholder="${translateThis('Confirm Password')}">
+                        <div id="passwordStrength" style="margin-top: 10px; height: 10px; background-color: #e0e0e0; border-radius: 5px; overflow: hidden;">
+                            <div id="strengthBar" style="height: 100%; width: 0%; background-color: red; transition: width 0.3s;"></div>
+                        </div>
+                        <p id="crackingTime" style="margin-top: 5px; font-size: 12px; color: gray;">${translateThis('Strength and cracking time will appear here. For a strong password try combining unpredictable phrases from a couple books.')}</p>
+                        <div style="margin-top: 15px;">
+                            <input type="checkbox" id="disclaimerCheck">
+                            <span id="infoIcon" style="cursor: pointer; margin-left: 5px;">
+                            <label for="disclaimerCheck" id="disclaimerLabel">
+                                ${translateThis('I have read the disclaimer')}
+                            </label>
+                            🔍</span>
+                        </div>
+                    `,
                     focusConfirm: false,
                     showCancelButton: true,
                     confirmButtonText: translateThis('Confirm'),
                     cancelButtonText: translateThis('Cancel'),
+                    didOpen: () => {
+                        const passwordInput = document.getElementById('password');
+                        const strengthBar = document.getElementById('strengthBar');
+                        const crackingTimeText = document.getElementById('crackingTime');
+                        const infoIcon = document.getElementById('infoIcon');
+
+                        // Add password strength logic
+                        passwordInput.addEventListener('input', () => {
+                            const password = passwordInput.value;
+                            const result = zxcvbn(password);
+
+                            // Calculate cracking time in seconds
+                            const crackingTimeSeconds = result.crack_times_seconds.offline_fast_hashing_1e10_per_second;
+                            const maxThreshold = 100 * 365.25 * 24 * 60 * 60; // 100 years in seconds
+
+                            // Update strength bar
+                            const fillPercentage = Math.min((crackingTimeSeconds / maxThreshold) * 100, 100); // Cap at 100%
+                            const strengthColors = ['#ff4e42', '#ff8f59', '#ffd55f', '#a4dd6a', '#6bcb73']; // Red to green gradient
+                            const colorIndex = Math.floor((fillPercentage / 100) * (strengthColors.length - 1));
+                            strengthBar.style.width = `${fillPercentage}%`;
+                            strengthBar.style.backgroundColor = strengthColors[colorIndex];
+
+                            // Update cracking time feedback
+                            if (crackingTimeSeconds > maxThreshold) {
+                                crackingTimeText.textContent = translateThis('Your password is very strong. Time to crack exceeds 100 years.');
+                                crackingTimeText.strength = 1;
+                            } else {
+                                crackingTimeText.textContent = `${translateThis('Time to crack:')} ${result.crack_times_display.offline_fast_hashing_1e10_per_second}`;
+                                if(crackingTimeText.strength != 2) {
+                                  crackingTimeText.strength = 0;
+                                }
+                            }
+                        });
+
+                        // Add info tooltip logic
+                        infoIcon.addEventListener('click', () => {
+                            Swal.showValidationMessage(
+                                translateThis('Make sure you have securely stored and backed up your login information. This system does not allow password recovery, and losing your credentials will make it impossible to access your account. For increased security, consider downloading and running the website locally. If you choose to access the markets through this web address, always verify that you are using the official website.'));
+                        });
+                    },
+                    customClass: {
+                      popup: "scrollable-swal-popup"
+                    },
                     preConfirm: () => {
                         const network = document.getElementById('network').value;
                         const password = document.getElementById('password').value;
                         const confirmPassword = document.getElementById('confirmPassword').value;
-                        
+                        const disclaimerCheck = document.getElementById('disclaimerCheck').checked;
+                        const crackingTimeText = document.getElementById('crackingTime');
+                        if (!disclaimerCheck) {
+                            Swal.showValidationMessage(translateThis('You must agree to the disclaimer before proceeding.'));
+                            return false;
+                        }
                         if (password !== confirmPassword) {
                             Swal.showValidationMessage(translateThis('Passwords do not match'));
+                            return false;
+                        }
+                        if (crackingTimeText.strength == 0) {
+                            crackingTimeText.strength = 2;
+                            Swal.showValidationMessage(translateThis('Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.'));
                             return false;
                         }
 
                         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{16,}$/;
 
                         if (!password.match(passwordRegex)) {
-                            Swal.showValidationMessage(translateThis('Password must be 16 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one special character.'));
+                            Swal.showValidationMessage(translateThis('Password must be 16 characters long and contain at least one lowercase letter, one uppercase letter, one number, and one special character. Some useful methods to remember a long password is to choose an uncommon phrase from a specific page of a book and replace some of the letters with numbers.'));
                             return false;
                         }
 
