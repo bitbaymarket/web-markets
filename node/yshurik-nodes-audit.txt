@@ -1,0 +1,25 @@
+# Web Markets Node audit report
+
+## Scope
+
+Given report with recommendations for project: https://github.com/bitbaymarket/web-markets, revision: [b8923916ac790a397b85b3e3b2410cf18079fbe0](https://github.com/bitbaymarket/web-markets/tree/b8923916ac790a397b85b3e3b2410cf18079fbe0) of Nov 21, 2024
+
+## Summary
+
+There are no security flaws or vulnerabilities, but there are several recommendations which can improve the robustness and security of the system.
+
+## Ngrok usage concerns
+
+ * Ngrok URLs are publicly accessible - anyone who discovers the URL can attempt to access your API. Recommendation - consider at least to limit the scope by analyzing "origin" on the node side - so not to serve users from different host than https://app.bitbay.market/.
+ * Traffic is coming via Ngrok servers, the usual recommendation is to encrypt traffic coming via their infrastructure so it is not disclosed for analysis.
+ * Signing of the responses - to make the confidence that server can be replaced to malicious one. Public key can be defined on client side (app.bitbay.market). If there are many servers, then main key can be used to sign only nodes pubkeys+expiration or so.
+ * The api server starts on `0.0.0.0`. It is recommended to start only on ngrok subnet.
+ * Ngrok api requests rate limit is recommended - ref: https://ngrok.com/docs/traffic-policy/actions/rate-limit/
+
+## Python code (api serving) concerns
+
+ * Logging to be added - currently no way to see the requests history details, no way to analyses past incidents as access logs. As alternative at least enable logging/tracing in Ngrok to keep the information.
+ * Add CSP, CSRF and other security headers to server responses.
+ * Errors can leak the nodes internal information. Example: line 129: `return jsonify({"error": str(e)}), 500` - here exception info is serialized json and sent to client which is not recommended. Instead return only error codes 1,2,3... but log/print the exception details on the node side only.
+ * Usage of `random.random()` - modern code recommendation to use `secrets` python library (ref https://docs.python.org/3/library/secrets.html)
+ * Usual recommendation to use better hashing algos as bcrypt, PBKDF2 which are designed for such purpose (by design is slow) than specific number of repeating sha256
