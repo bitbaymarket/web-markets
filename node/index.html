@@ -36,6 +36,7 @@
     var initiated = true;
     var globRes;
     var apiUrl = "https://your-custom-url.ngrok-free.app/api"; //set to the URL of your ngrok to test remote requests
+    window.maximumTotalRequestsALL = 100000;
 
     async function triggerEvent() {
       if(window.pinataApiKey == '') {
@@ -302,6 +303,7 @@
         if(!('totalRequests' in userData)) {
           userData.totalRequests = 0;
         }
+        var totalRequestsALL = parseInt(localStorage.getItem('totalRequestsALL') || 0);
         var baseBalance;
         await web3.eth.getBalance(request.address, function(err, result1) {
           if (err) {
@@ -353,11 +355,17 @@
           userData.requests = {'0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270':0,'0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063':0,'0xA66857Da8d75BE2363968a3B01BfE1f417B28202':0}
           userData.IPFSRequests = 0;
           userData.totalRequests = 0;
+          totalRequestsALL = 0;
+          localStorage.setItem('totalRequestsALL', 0);
           userData.startTime = timenow;
+        }
+        if(totalRequestsALL > window.maximumTotalRequestsALL) {
+          return {'false':'Too many total requests for server, try again later'};
         }
         if(userData.totalRequests > window.maximumTotalRequests) {
           return {'false':'Too many total requests, try again later'};
         }
+        totalRequestsALL+=1;
         userData.totalRequests+=1;
         if(request.chain == "137") {
           var token = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
@@ -424,6 +432,7 @@
           }
         }
         setItem(request.address + ':userdata',JSON.stringify(userData));
+        localStorage.setItem('totalRequestsALL', totalRequestsALL);
         var isGood = false;
         if(window.sightengineApiUser != '') {
           isGood = await validateOrderData(orderData);

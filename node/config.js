@@ -8,4 +8,5 @@ window.sightengineApiSecret = '';
 window.cost = "10000000000000000" //100 requests per week per coin deposited for now
 window.maximumIPFSRequests = 1000; //1000 maximum requests per week
 window.maximumTotalRequests = 1000; //1000 maximum requests per week
+window.maximumTotalRequestsALL = 100000; //100000 maximum requests per week for all users combined
 window.serverPassword = "" //This password should be 16 digits long minimum and hard to guess
