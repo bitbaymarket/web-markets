@@ -98,9 +98,9 @@
     var web3;
     var showMod = false;
     if (chainID == "137") {
-        web3 = new Web3("https://rpc.ankr.com/polygon");
+        web3 = new Web3("https://1rpc.io/matic");
     } else {
-        web3 = new Web3("https://rpc.ankr.com/eth_sepolia");
+        web3 = new Web3("https://eth-sepolia.public.blastapi.io");
     }
 
     // Function to post a file to Pinata IPFS
@@ -248,7 +248,7 @@
           return reqdb[request.hash];
         }
         if (request.chain == "137") {
-            web3 = new Web3("https://rpc.ankr.com/polygon");
+            web3 = new Web3("https://1rpc.io/matic");
             DDEcontract = new web3.eth.Contract(DDEabi, "0x213DB7D60F33f3D1Ca9e13F298Ac6578d5Fc20fc");
             tokens = [
               {
@@ -265,7 +265,7 @@
               }
             ];
         } else {
-            web3 = new Web3("https://rpc.ankr.com/eth_sepolia");
+            web3 = new Web3("https://eth-sepolia.public.blastapi.io");
             DDEcontract = new web3.eth.Contract(DDEabi, "0xc1620929B151ecB45beB7093AfFb1F9A359656d9");
             tokens = [
               {

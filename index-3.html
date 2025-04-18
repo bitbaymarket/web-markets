@@ -3579,8 +3579,8 @@ body {
     ];
     //var tokennames = {"0xA66857Da8d75BE2363968a3B01BfE1f417B28202":"ETH","0xD7567f0841Aae04833C8c004e8685cBF9F1a6b11":"WALRUS"}
     var tokennames = {"0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270":"POL","0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063":"DAI"}
-    //web3 = new Web3("https://rpc.ankr.com/eth_sepolia");
-    web3 = new Web3("https://rpc.ankr.com/polygon");
+    //web3 = new Web3("https://eth-sepolia.public.blastapi.io");
+    web3 = new Web3("https://1rpc.io/matic");
     var referral = "0x0000000000000000000000000000000000000000";
     var baseFee = 0;
     var myFavorites = [];
@@ -3760,9 +3760,9 @@ body {
                     document.getElementById("myPasswordInput").value = Crypto.SHA256("default");
                     document.getElementById("myPasswordInput").disabled = true;
                     if (parseInt(network) === 0) {
-                        web3 = new Web3("https://rpc.ankr.com/polygon");
+                        web3 = new Web3("https://1rpc.io/matic");
                     } else {
-                        web3 = new Web3("https://rpc.ankr.com/eth_sepolia");
+                        web3 = new Web3("https://eth-sepolia.public.blastapi.io");
                     }
                     const account = await web3.eth.accounts.privateKeyToAccount(accountprivkey);
                     const wallet = web3.eth.accounts.wallet;
@@ -3873,9 +3873,9 @@ body {
                         document.getElementById("myPasswordInput").value = Crypto.SHA256("default");
                         document.getElementById("myPasswordInput").disabled = true;
                         if(parseInt(network) == 0) {
-                            web3 = new Web3("https://rpc.ankr.com/polygon");
+                            web3 = new Web3("https://1rpc.io/matic");
                         } else {
-                            web3 = new Web3("https://rpc.ankr.com/eth_sepolia");
+                            web3 = new Web3("https://eth-sepolia.public.blastapi.io");
                         }
                         const account = await web3.eth.accounts.privateKeyToAccount(accountprivkey);
                         const wallet = web3.eth.accounts.wallet;
