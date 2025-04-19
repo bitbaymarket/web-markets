@@ -98,7 +98,7 @@
     var web3;
     var showMod = false;
     if (chainID == "137") {
-        web3 = new Web3("https://1rpc.io/matic");
+        web3 = new Web3("https://polygon-mainnet.public.blastapi.io");
     } else {
         web3 = new Web3("https://eth-sepolia.public.blastapi.io");
     }
@@ -248,7 +248,7 @@
           return reqdb[request.hash];
         }
         if (request.chain == "137") {
-            web3 = new Web3("https://1rpc.io/matic");
+            web3 = new Web3("https://polygon-mainnet.public.blastapi.io");
             DDEcontract = new web3.eth.Contract(DDEabi, "0x213DB7D60F33f3D1Ca9e13F298Ac6578d5Fc20fc");
             tokens = [
               {

@@ -3296,7 +3296,7 @@ body {
                     document.getElementById("myPasswordInput").value = Crypto.SHA256("default");
                     document.getElementById("myPasswordInput").disabled = true;
                     if (parseInt(network) === 0) {
-                        web3 = new Web3("https://1rpc.io/eth");
+                        web3 = new Web3("https://eth-mainnet.public.blastapi.io");
                     } else {
                         web3 = new Web3("https://eth-sepolia.public.blastapi.io");
                     }
@@ -3398,7 +3398,7 @@ body {
                         document.getElementById("myPasswordInput").value = Crypto.SHA256("default");
                         document.getElementById("myPasswordInput").disabled = true;
                         if(parseInt(network) == 0) {
-                            web3 = new Web3("https://1rpc.io/eth");
+                            web3 = new Web3("https://eth-mainnet.public.blastapi.io");
                         } else {
                             web3 = new Web3("https://eth-sepolia.public.blastapi.io");
                         }
