@@ -94,50 +94,53 @@ def serve_index():
 
 @app.route('/api', methods=['POST'])
 def handle_post():
-    global nonce;
-    global reqdb;
-    data = request.get_json()
-    action = data.get('action')
-    item = data.get('item')
-    value = data.get('value')
-    key = data.get('key')    
-    if action == 'get':
-        value = handle_local_storage('get', item, key=key)
-        response = {"action": "get", "item": item, "value": value}
-    elif action == 'set':
-        success = handle_local_storage('set', item, value, key=key)
-        response = {"action": "set", "item": item, "success": success}
-    elif action == 'verify':
-        try:
-            print("Incoming request: " + str(time.time()))
-            json_data = json.dumps(value)
-            json_data2 = json.loads(json_data)
-            if 'hash' in json_data2 and json_data2['hash'] in reqdb:
-                return jsonify({"result": json.loads(reqdb[value['hash']])});
-            if 'publicKey' in json_data2 and json_data2['publicKey'] == '':
-                return jsonify({"error": "No public key set or the order requested has not been checked yet"}), 500
-            hex_data = '"'+binascii.hexlify(json_data.encode('utf-8')).decode('utf-8')+'"'
-            with nonce_lock:
-                current_nonce = nonce
-                nonce += 1
-                if(nonce >= totalThreads):
-                    nonce = 0
-            result = driver[current_nonce].execute_script(f"return verifyRequest({hex_data});")
-            return jsonify({"result": result})
-        except Exception as e:
-            traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
-    else:
-        response = {"error": "Invalid action"}
-
-    return jsonify(response)
+    try:        
+        global nonce;
+        global reqdb;
+        data = request.get_json()
+        action = data.get('action')
+        item = data.get('item')
+        value = data.get('value')
+        key = data.get('key')
+        if action == 'get':
+            value = handle_local_storage('get', item, key=key)
+            response = {"action": "get", "item": item, "value": value}
+        elif action == 'set':
+            success = handle_local_storage('set', item, value, key=key)
+            response = {"action": "set", "item": item, "success": success}
+        elif action == 'verify':
+            try:
+                print("Incoming request: " + str(time.time()))
+                json_data = json.dumps(value)
+                json_data2 = json.loads(json_data)
+                if 'hash' in json_data2 and json_data2['hash'] in reqdb:
+                    return jsonify({"result": json.loads(reqdb[value['hash']])});
+                if 'publicKey' in json_data2 and json_data2['publicKey'] == '':
+                    return jsonify({"error": "No public key set or the order requested has not been checked yet"}), 500
+                hex_data = '"'+binascii.hexlify(json_data.encode('utf-8')).decode('utf-8')+'"'
+                with nonce_lock:
+                    current_nonce = nonce
+                    nonce += 1
+                    if(nonce >= totalThreads):
+                        nonce = 0
+                result = driver[current_nonce].execute_script(f"return verifyRequest({hex_data});")
+                return jsonify({"result": result})
+            except Exception as e:
+                traceback.print_exc()
+                return jsonify({"error": str(e)}), 500
+        else:
+            response = {"error": "Invalid action"}
+        return jsonify(response)
+    except:
+        traceback.print_exc()
+        return jsonify({"error": "Failed"})
 
 with open("config.js", 'r') as file:
     for line in file:
         totalThreads = int(line.strip().split("totalThreads = ")[1])
         break
 # Function to start the Flask app in a separate thread
-def run_flask():    
+def run_flask():
     serve(app, host='0.0.0.0', port=9000, threads=totalThreads)
     #app.run(port=9000, debug=False, use_reloader=False)
 flask_thread = threading.Thread(target=run_flask)
