@@ -4071,7 +4071,9 @@ body {
     if(testNetView) {
       web3 = new Web3("https://eth-sepolia.public.blastapi.io");
     } else {
-      web3 = new Web3("https://polygon-mainnet.public.blastapi.io");
+      web3 = new Web3("https://polygon-rpc.com");
+      //web3 = new Web3("https://polygon-bor-rpc.publicnode.com");      
+      //web3 = new Web3("https://polygon-mainnet.public.blastapi.io");
     }
     var referral = "0x0000000000000000000000000000000000000000";
     var baseFee = 0;
@@ -4321,7 +4323,9 @@ body {
                     document.getElementById("myPasswordInput").value = Crypto.SHA256("default");
                     document.getElementById("myPasswordInput").disabled = true;
                     if (parseInt(network) === 0) {
-                        web3 = new Web3("https://polygon-mainnet.public.blastapi.io");
+                        web3 = new Web3("https://polygon-rpc.com");
+                        //web3 = new Web3("https://polygon-bor-rpc.publicnode.com");
+                        //web3 = new Web3("https://polygon-mainnet.public.blastapi.io");
                     } else {
                         web3 = new Web3("https://eth-sepolia.public.blastapi.io");
                     }
@@ -4500,7 +4504,9 @@ body {
                         document.getElementById("myPasswordInput").value = Crypto.SHA256("default");
                         document.getElementById("myPasswordInput").disabled = true;
                         if(parseInt(network) == 0) {
-                            web3 = new Web3("https://polygon-mainnet.public.blastapi.io");
+                            web3 = new Web3("https://polygon-rpc.com");
+                            //web3 = new Web3("https://polygon-bor-rpc.publicnode.com");
+                            //web3 = new Web3("https://polygon-mainnet.public.blastapi.io");
                         } else {
                             web3 = new Web3("https://eth-sepolia.public.blastapi.io");
                         }
