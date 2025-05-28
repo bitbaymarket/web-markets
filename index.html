@@ -6382,29 +6382,51 @@ body {
     }
     // Function to set an item on the server
     async function localVerify(value) {
-      fetch('http://localhost:9000/api', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({action: 'verify', item: '', value, key: ''}),
-      })
-      .then(response => {
-        if (response.data.result) {
-          return DOMPurify.sanitize(JSON.stringify(response.data.result));
-        } else if (response.data.error) {
-          throw new Error(response.data.error);
-        } else {
-          throw new Error("Error with local verification");
+        try {
+            const response = await fetch('http://localhost:9000/api', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'verify', item: '', value, key: '' }),
+            });
+            const data = await response.json();
+            if (data.result) {
+                return DOMPurify.sanitize(JSON.stringify(data.result));
+            } else if (data.error) {
+                throw new Error(data.error);
+            } else {
+                throw new Error("Error with local verification");
+            }
+        } catch (error) {
+            console.log("Caught error:", error);
+            return DOMPurify.sanitize(JSON.stringify({ error: error.message }));
         }
-      })
-      .catch((error) => {
-          return DOMPurify.sanitize(JSON.stringify({"error": error.message}));
-      });
     }
+    var notifyOnce = false;
     var skippedHashes = {}
     async function startMonitoringProcess() {
       try {
+        if(userpubkey == "") {
+          throw new Error("User public key not loaded");
+        }
+        if(!('base' in balances)) {
+          throw new Error("Balances not loaded");
+        }
+        if(web3.utils.toBN(balances['base'].amount).lt(web3.utils.toBN("100000000000000000"))) {
+          if(!notifyOnce) {
+            await Swal.fire({text:"Balance too low to begin monitoring process. Please bring balance over 0.1 coins."});
+            notifyOnce = true;
+          }
+          throw new Error("Balance too low to monitor the chain.")
+        }
+        if(isRegistered != 2) {
+          if(!notifyOnce) {
+            await Swal.fire({text:"Please register your public key to begin the monitoring process."});
+            notifyOnce = true;
+          }
+          throw new Error("User public key not registered");
+        }
         let checkedHashes = JSON.parse(localStorage.getItem("checkedHashes"+DDEaddy)) || await getCheckedHashesFromBlockchain(myaccounts);
         if('error' in checkedHashes) {
           throw new Error("There was an error loading hashes from ipfs/blockchain, try again later.")
@@ -6668,14 +6690,7 @@ body {
 
     async function postIPFSLinkToBlockchain(ipfsLink) {
       try {
-        const myuserdata = { ipfsLink };
-        const gasEstimate = 150000;
-        const hasEnoughFunds = await checkAndSetGasSettings(gasEstimate, gasEstimate, tokens[0].address);
-        if (!hasEnoughFunds) {
-          // Store the IPFS link for later use if the user has low balance
-          localStorage.setItem("pendingIPFSLink", ipfsLink);
-          return;
-        }
+        const myuserdata = { ipfsLink, "publickey": userpubkey };
         await DDEcontract.methods.adduserdata(JSON.stringify(myuserdata)).send({ "from": myaccounts, ...gasOptions[gasSetting] });
         console.log("IPFS link posted to blockchain:", ipfsLink);
         return true;
@@ -6683,16 +6698,6 @@ body {
         console.error("Error posting IPFS link to blockchain:", error);
         return false;
       }
-    }
-
-    async function checkAndSetGasSettings(gasEstimate, value, tokenAddress) {
-      var mybase = web3.utils.toBN(balances['base'].amount);
-      var glimit = web3.utils.toBN(gasOptions[gasSetting].gasLimit).mul(web3.utils.toBN(gasPrice));
-      if (mybase.lt(glimit)) {
-        console.error("Not enough funds to cover the minimum gas limit.");
-        return false;
-      }
-      return true;
     }
 
     async function checkMarketUpdate() {

@@ -360,10 +360,14 @@
           userData.startTime = timenow;
         }
         if(totalRequestsALL > window.maximumTotalRequestsALL) {
-          return {'false':'Too many total requests for server, try again later'};
+          if(request.publicKey != serverPublicKey) {
+            return {'false':'Too many total requests for server, try again later'};
+          }
         }
         if(userData.totalRequests > window.maximumTotalRequests) {
-          return {'false':'Too many total requests, try again later'};
+          if(request.publicKey != serverPublicKey) {
+            return {'false':'Too many total requests, try again later'};
+          }
         }
         totalRequestsALL+=1;
         userData.totalRequests+=1;
@@ -372,7 +376,9 @@
           if(web3.utils.toBN(userData.requests[token]).gte(web3.utils.toBN(userData.minBalance[token]))) {
             token = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
             if(web3.utils.toBN(userData.requests[token]).gte(web3.utils.toBN(userData.minBalance[token]))) {
-              return {'false':'Too many requests based on activity level, try again later'};
+              if(request.publicKey != serverPublicKey) {
+                return {'false':'Too many requests based on activity level, try again later'};
+              }
             }
             userData.requests[token]=(web3.utils.toBN(userData.requests[token]).add(web3.utils.toBN(window.cost))).toString();
           } else {
@@ -381,7 +387,9 @@
         } else {
           var token = "0xA66857Da8d75BE2363968a3B01BfE1f417B28202";
           if(web3.utils.toBN(userData.requests[token]).gte(web3.utils.toBN(userData.minBalance[token]))) {
-            return {'false':'Too many requests based on activity level, try again later'};
+            if(request.publicKey != serverPublicKey) {
+              return {'false':'Too many requests based on activity level, try again later'};
+            }
           }
           userData.requests[token]=(web3.utils.toBN(userData.requests[token]).add(web3.utils.toBN(window.cost))).toString();
         }
@@ -396,6 +404,9 @@
           }
           if(!(decrypted.signature == "verified")) {
             throw new Error("signature verification failed");
+          }
+          if(decrypted.publicKeyString != request.publicKey) {
+            throw new Error("signature public key mismatch");
           }
         } catch (e) {
           console.log(e);
@@ -428,7 +439,9 @@
         }
         if('ipfs' in request) {
           if(userData.IPFSRequests > window.maximumIPFSRequests) {
-            return {'false':'Too many IPFS post requests, try again later'};
+            if(request.publicKey != serverPublicKey) {
+              return {'false':'Too many IPFS post requests, try again later'};
+            }
           }
         }
         setItem(request.address + ':userdata',JSON.stringify(userData));
