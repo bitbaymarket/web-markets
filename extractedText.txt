@@ -562,5 +562,6 @@
   "Make sure you have securely stored and backed up your login information. This system does not allow password recovery, and losing your credentials will make it impossible to access your account. For increased security, consider downloading and running the website locally. If you choose to access the markets through this web address, always verify that you are using the official website.": true,
   "Time to crack:": true,
   "Your password is very strong. Time to crack exceeds 100 years.": true,
-  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": true
+  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": true,
+  "Non-standard ASCII is not yet supported. Please modify entered text.": true
 }

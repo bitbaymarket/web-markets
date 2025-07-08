@@ -5703,6 +5703,13 @@ body {
         await Swal.fire(translateThis("Email is blank, try again"));
         return;
       }
+      if('mycontact' in myuserdata) {
+        if(!isStandardASCII(myuserdata['mycontact'])) {
+          //Eventually should build in foreign language support when nodes start using custom AI models.
+          await Swal.fire(translateThis("Non-standard ASCII is not yet supported. Please modify entered text."));
+          return;
+        }
+      }
       try {
         setActionActive(myaccounts+"register"+JSON.stringify(myuserdata), true);
         if(accountprivkey != "") {
@@ -6735,6 +6742,8 @@ body {
     //for them based on their criteria. One way to enforce a search protocol is have those who post to markets do so from a separate contract.
     //This way they can also be the ones required to remove the search tags and the contract manages everything.
     var tempCurators = ["0x25A2c592DDD5F930a9CB271b9AC3e72bbBc3d351"];
+    //A basic list of orders to filter for old orders or when users lose contact with the markets
+    var filteredOrders = {"0x6e4eaa11b30c217203d4c2bede00a37df845f2246176ed50feb73c00f983a27a":1,"0x9715805edb03428e2b8c25d604f7a31af5283f9ac1eba4f4c3d604e473c7064a":1,"0xef27781e16f31ed07c35d147a573cf8259bff78026702ba35c499f7686a8b999":1}
     var batches = [];
     var isLocked = 0;
     async function downloadBatches(checkedHashes, userAddress, DDEcontract5) {
@@ -6842,6 +6851,10 @@ body {
               }
               try {
                 const hash = searchText[myinx];
+                if(hash in filteredOrders) {
+                  mlen -= 1;
+                  continue;
+                }
                 if(checkedHashes[hash] === false) {
                   mlen -= 1;
                   continue;
@@ -6965,6 +6978,10 @@ body {
                 }                
                 try {
                   const hash = DOMPurify.sanitize(await DDEcontract3.methods.openOffers(userAddress, myinx).call());
+                  if(hash in filteredOrders) {
+                    truetot -= 1;
+                    continue;
+                  }
                   if(checkedHashes[hash] === false) {
                     truetot -= 1;
                     continue;
@@ -7064,6 +7081,10 @@ body {
             return;
           } else if(searchText.includes("offer:")){
             const hash = searchText.split("offer:")[1].trim();
+            if(hash in filteredOrders) {
+              // longestKey -= 1;
+              return;
+            }
             if(checkedHashes[hash] === false) {
               // longestKey -= 1;
               return;
@@ -7146,6 +7167,10 @@ body {
                       try {
                           await DDEcontract3.methods.hashtag(keyword.toLowerCase(), keywordIndex).call().then(async function (hash) {
                               hash = DOMPurify.sanitize(hash);
+                              if(hash in filteredOrders) {
+                                longestKey -= 1;
+                                return;
+                              }
                               if(hash == "0x0000000000000000000000000000000000000000000000000000000000000000") {
                                 longestKey -= 1;
                                 return;
@@ -7271,6 +7296,10 @@ body {
                 try {
                     await DDEcontract3.methods.markets(index).call().then(async function (hash) {
                         hash = DOMPurify.sanitize(hash);
+                        if(hash in filteredOrders) {
+                          trueLength -= 1;
+                          return;
+                        }
                         if(checkedHashes[hash] === false) {
                           trueLength -= 1;
                           return;
@@ -9880,7 +9909,6 @@ body {
 
 
     async function handleSendMessage(hash, senderAddress, recipient, encrypt = false, recipientPublicKey = null) {
-      
       const loaderPopup = document.createElement('div');
       loaderPopup.className = 'loader-popup';
       loaderPopup.innerHTML = loader;
@@ -9901,6 +9929,11 @@ body {
 
       sendButton.onclick = async () => {
         const message = input.value;
+        if(!isStandardASCII(message)) {
+          //Eventually should build in foreign language support when nodes start using custom AI models.
+          await Swal.fire(translateThis("Non-standard ASCII is not yet supported. Please modify entered text."));
+          return;
+        }
         let finalMessage = message;
         var sendResult;
 
@@ -9989,9 +10022,12 @@ body {
           messagesContainer.remove();
           console.error('Failed to send message:', error);
         } finally {
-          hideLoader();
           setActionActive(myaccounts+"sendMessage"+finalMessage, false);
-          messagesContainer.remove();
+          try {
+            hideLoader();
+            messagesContainer.remove();
+          } catch {
+          }
         }
       }
     }
@@ -10339,7 +10375,6 @@ body {
             hideLoader();
             await showError(error);
           } finally {
-            popupContainer.remove();
             setActionActive(myaccounts+"deposit"+tokenAddress+value, false);
           }
         }
@@ -10559,6 +10594,10 @@ body {
       return canvas.toDataURL(file.type, 0.8); // Reduce quality to reduce size
     }
 
+    function isStandardASCII(text) {
+      return /^[\x20-\x7E]*$/.test(text);
+    }
+
     async function createContract(publicoffer = true, counterdata = {}) {
       if(myaccounts == "") {
         await Swal.fire({title: translateThis("Please Login/connect your wallet to create a contract."), icon: 'warning'});
@@ -10573,7 +10612,7 @@ body {
       }
 
       let readDisclaimer = localStorage.getItem('disclaimer'+DDEaddy) || 'false';
-      var scrolledToBottom = false;      
+      var scrolledToBottom = false;
       if(readDisclaimer == 'false') {
         var returnThis3 = false;
         await Swal.fire({
@@ -11197,6 +11236,13 @@ body {
             title: title,
             location: location
           });
+
+          if(!isStandardASCII(contractDetails) || !isStandardASCII(contactinfo) || !isStandardASCII(title) || !isStandardASCII(location) || !isStandardASCII(location) || !isStandardASCII(JSON.stringify(myterms))) {
+            //Eventually should build in foreign language support when nodes start using custom AI models.
+            await Swal.fire(translateThis("Non-standard ASCII is not yet supported. Please modify entered text."));
+            return false;
+          }
+
           if (contactinfo != '') {
             document.getElementById("myContactInfo").value = contactinfo;
             await saveContactInfo(contactinfo);

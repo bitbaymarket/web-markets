@@ -564,7 +564,8 @@ languages['ar']={
   "Make sure you have securely stored and backed up your login information. This system does not allow password recovery, and losing your credentials will make it impossible to access your account. For increased security, consider downloading and running the website locally. If you choose to access the markets through this web address, always verify that you are using the official website.": "تأكد من تخزين معلومات تسجيل الدخول الخاصة بك بشكل آمن وعمل نسخ احتياطية لها. لا يسمح هذا النظام باستعادة كلمات المرور، وفقدان بيانات الاعتماد الخاصة بك سيجعل من المستحيل الوصول إلى حسابك. لزيادة الأمان، فكر في تنزيل الموقع وتشغيله محليًا. إذا اخترت الوصول إلى الأسواق عبر هذا العنوان الإلكتروني، فتأكد دائمًا من أنك تستخدم الموقع الرسمي.",
   "Time to crack:": "الوقت اللازم للكسر:",
   "Your password is very strong. Time to crack exceeds 100 years.": "كلمة المرور الخاصة بك قوية جدًا. يتجاوز الوقت اللازم للكسر 100 عام.",
-  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "كلمة المرور الخاصة بك ضعيفة. يرجى مراعاة المخاطر المرتبطة بكلمات المرور الضعيفة. إذا كنت لا تزال ترغب في المتابعة، يمكنك محاولة النقر على تأكيد مرة أخرى."
+  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "كلمة المرور الخاصة بك ضعيفة. يرجى مراعاة المخاطر المرتبطة بكلمات المرور الضعيفة. إذا كنت لا تزال ترغب في المتابعة، يمكنك محاولة النقر على تأكيد مرة أخرى.",
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "م دعم ASCII غير القياسي بعد. يرجى تعديل النص المُدخل."
 };
 
 
@@ -1132,7 +1133,8 @@ languages['ch']={
   "Make sure you have securely stored and backed up your login information. This system does not allow password recovery, and losing your credentials will make it impossible to access your account. For increased security, consider downloading and running the website locally. If you choose to access the markets through this web address, always verify that you are using the official website.": "请确保已安全存储并备份您的登录信息。此系统不允许密码恢复，丢失凭据将导致无法访问您的账户。为了提高安全性，请考虑下载并在本地运行该网站。如果您选择通过此网址访问市场，请务必确认您使用的是官方网站。",
   "Time to crack:": "破解所需时间：",
   "Your password is very strong. Time to crack exceeds 100 years.": "您的密码非常强。破解时间超过100年。",
-  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "您的密码较弱。请考虑使用弱密码的相关风险。如果您仍想继续，可以尝试再次点击确认。"
+  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "您的密码较弱。请考虑使用弱密码的相关风险。如果您仍想继续，可以尝试再次点击确认。",
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "尚不支持非标准 ASCII。请修改输入的文本。"
 };
 
 languages['en']={
@@ -1761,7 +1763,8 @@ languages['fr']={
   "Make sure you have securely stored and backed up your login information. This system does not allow password recovery, and losing your credentials will make it impossible to access your account. For increased security, consider downloading and running the website locally. If you choose to access the markets through this web address, always verify that you are using the official website.": "Assurez-vous d'avoir stocké et sauvegardé vos informations de connexion de manière sécurisée. Ce système ne permet pas la récupération de mot de passe, et la perte de vos identifiants rendra impossible l'accès à votre compte. Pour une sécurité accrue, envisagez de télécharger et d'exécuter le site web localement. Si vous choisissez d'accéder aux marchés via cette adresse web, vérifiez toujours que vous utilisez le site officiel.",
   "Time to crack:": "Temps pour déchiffrer :",
   "Your password is very strong. Time to crack exceeds 100 years.": "Votre mot de passe est très fort. Le temps pour le déchiffrer dépasse 100 ans.",
-  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Votre mot de passe est faible. Veuillez considérer les risques associés aux mots de passe faibles. Si vous souhaitez toujours continuer, vous pouvez essayer de cliquer à nouveau sur confirmer."
+  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Votre mot de passe est faible. Veuillez considérer les risques associés aux mots de passe faibles. Si vous souhaitez toujours continuer, vous pouvez essayer de cliquer à nouveau sur confirmer.",
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "L'ASCII non standard n'est pas encore pris en charge. Veuillez modifier le texte saisi."
 };
 
 languages['ge']={
@@ -2327,7 +2330,8 @@ languages['ge']={
   "Make sure you have securely stored and backed up your login information. This system does not allow password recovery, and losing your credentials will make it impossible to access your account. For increased security, consider downloading and running the website locally. If you choose to access the markets through this web address, always verify that you are using the official website.": "Stellen Sie sicher, dass Sie Ihre Anmeldeinformationen sicher gespeichert und gesichert haben. Dieses System erlaubt keine Wiederherstellung des Passworts, und der Verlust Ihrer Zugangsdaten macht den Zugriff auf Ihr Konto unmöglich. Für erhöhte Sicherheit sollten Sie in Betracht ziehen, die Website herunterzuladen und lokal auszuführen. Wenn Sie sich über diese Webadresse mit den Märkten verbinden, überprüfen Sie immer, ob Sie die offizielle Website nutzen.",
   "Time to crack:": "Zeit zum Knacken:",
   "Your password is very strong. Time to crack exceeds 100 years.": "Ihr Passwort ist sehr stark. Die Zeit zum Knacken beträgt mehr als 100 Jahre.",
-  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Ihr Passwort ist schwach. Bitte bedenken Sie die Risiken, die mit schwachen Passwörtern verbunden sind. Wenn Sie trotzdem fortfahren möchten, können Sie erneut auf Bestätigen klicken."
+  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Ihr Passwort ist schwach. Bitte bedenken Sie die Risiken, die mit schwachen Passwörtern verbunden sind. Wenn Sie trotzdem fortfahren möchten, können Sie erneut auf Bestätigen klicken.",
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "Nicht-standardmäßiges ASCII wird noch nicht unterstützt. Bitte ändern Sie den eingegebenen Text."
 };
 
 languages['it']={
@@ -2894,7 +2898,8 @@ languages['it']={
   "Make sure you have securely stored and backed up your login information. This system does not allow password recovery, and losing your credentials will make it impossible to access your account. For increased security, consider downloading and running the website locally. If you choose to access the markets through this web address, always verify that you are using the official website.": "Assicurati di aver archiviato e salvato in modo sicuro le tue informazioni di accesso. Questo sistema non consente il recupero della password e la perdita delle credenziali renderà impossibile accedere al tuo account. Per maggiore sicurezza, considera di scaricare ed eseguire il sito web in locale. Se scegli di accedere ai mercati tramite questo indirizzo web, verifica sempre di utilizzare il sito ufficiale.",
   "Time to crack:": "Tempo per violare:",
   "Your password is very strong. Time to crack exceeds 100 years.": "La tua password è molto sicura. Il tempo per violarla supera i 100 anni.",
-  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "La tua password è debole. Considera i rischi associati a password deboli. Se desideri comunque procedere, puoi provare a fare nuovamente clic su conferma."
+  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "La tua password è debole. Considera i rischi associati a password deboli. Se desideri comunque procedere, puoi provare a fare nuovamente clic su conferma.",
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "ASCII non standard non è ancora supportato. Si prega di modificare il testo inserito."
 };
 
 languages['ja']={
@@ -3461,7 +3466,8 @@ languages['ja']={
   "Make sure you have securely stored and backed up your login information. This system does not allow password recovery, and losing your credentials will make it impossible to access your account. For increased security, consider downloading and running the website locally. If you choose to access the markets through this web address, always verify that you are using the official website.": "ログイン情報が安全に保存され、バックアップされていることを確認してください。このシステムではパスワードの復旧はできず、認証情報を失うとアカウントにアクセスできなくなります。セキュリティを高めるために、ウェブサイトをローカルでダウンロードして実行することを検討してください。このウェブアドレスを通じて市場にアクセスする場合は、常に公式ウェブサイトを使用していることを確認してください。",
   "Time to crack:": "解読時間：",
   "Your password is very strong. Time to crack exceeds 100 years.": "あなたのパスワードは非常に強力です。解読時間は100年以上です。",
-  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "あなたのパスワードは弱いです。弱いパスワードのリスクを考慮してください。それでも進む場合は、再度確認をクリックしてください。"
+  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "あなたのパスワードは弱いです。弱いパスワードのリスクを考慮してください。それでも進む場合は、再度確認をクリックしてください。",
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "非標準のASCIIはまだサポートされていません。入力されたテキストを修正してください。"
 };
 
 languages['ko']={
@@ -4028,7 +4034,8 @@ languages['ko']={
   "Make sure you have securely stored and backed up your login information. This system does not allow password recovery, and losing your credentials will make it impossible to access your account. For increased security, consider downloading and running the website locally. If you choose to access the markets through this web address, always verify that you are using the official website.": "로그인 정보를 안전하게 저장하고 백업했는지 확인하세요. 이 시스템은 비밀번호 복구를 허용하지 않으며, 자격 증명을 잃으면 계정에 접근할 수 없습니다. 보안을 강화하려면 웹사이트를 로컬로 다운로드하여 실행하는 것을 고려하세요. 이 웹 주소를 통해 시장에 접근할 경우 항상 공식 웹사이트를 사용하고 있는지 확인하세요.",
   "Time to crack:": "해킹 시간:",
   "Your password is very strong. Time to crack exceeds 100 years.": "비밀번호는 매우 강력합니다. 해킹 시간은 100년을 초과합니다.",
-  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "비밀번호가 약합니다. 약한 비밀번호에 관련된 위험을 고려하세요. 그래도 계속 진행하려면 확인을 다시 클릭해 보세요."
+  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "비밀번호가 약합니다. 약한 비밀번호에 관련된 위험을 고려하세요. 그래도 계속 진행하려면 확인을 다시 클릭해 보세요.",
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "비표준 ASCII는 아직 지원되지 않습니다. 입력한 텍스트를 수정해 주세요."
 };
 
 languages['po']={
@@ -4595,7 +4602,8 @@ languages['po']={
   "Make sure you have securely stored and backed up your login information. This system does not allow password recovery, and losing your credentials will make it impossible to access your account. For increased security, consider downloading and running the website locally. If you choose to access the markets through this web address, always verify that you are using the official website.": "Certifique-se de ter armazenado e feito backup de suas informações de login de forma segura. Este sistema não permite a recuperação de senhas, e perder suas credenciais tornará impossível acessar sua conta. Para maior segurança, considere baixar e executar o site localmente. Se optar por acessar os mercados por meio deste endereço da web, sempre verifique se está usando o site oficial.",
   "Time to crack:": "Tempo para quebrar:",
   "Your password is very strong. Time to crack exceeds 100 years.": "Sua senha é muito forte. O tempo para quebrá-la excede 100 anos.",
-  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Sua senha é fraca. Considere os riscos envolvidos com senhas fracas. Se ainda quiser continuar, tente clicar em confirmar novamente."
+  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Sua senha é fraca. Considere os riscos envolvidos com senhas fracas. Se ainda quiser continuar, tente clicar em confirmar novamente.",
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "ASCII não padrão ainda não é suportado. Por favor, modifique o texto inserido."
 };
 
 languages['ru'] = {
@@ -5162,7 +5170,8 @@ languages['ru'] = {
   "Make sure you have securely stored and backed up your login information. This system does not allow password recovery, and losing your credentials will make it impossible to access your account. For increased security, consider downloading and running the website locally. If you choose to access the markets through this web address, always verify that you are using the official website.": "Убедитесь, что вы надежно сохранили и сделали резервные копии своих данных для входа. Эта система не позволяет восстанавливать пароли, и потеря ваших учетных данных сделает невозможным доступ к вашей учетной записи. Для повышения безопасности подумайте о том, чтобы скачать и запустить сайт локально. Если вы решите получить доступ к рынкам через этот веб-адрес, всегда проверяйте, что вы используете официальный сайт.",
   "Time to crack:": "Время на взлом:",
   "Your password is very strong. Time to crack exceeds 100 years.": "Ваш пароль очень надежный. Время на его взлом превышает 100 лет.",
-  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Ваш пароль слабый. Пожалуйста, учитывайте риски, связанные с использованием слабых паролей. Если вы все равно хотите продолжить, попробуйте нажать кнопку подтверждения еще раз."
+  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Ваш пароль слабый. Пожалуйста, учитывайте риски, связанные с использованием слабых паролей. Если вы все равно хотите продолжить, попробуйте нажать кнопку подтверждения еще раз.",
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "Нестандартный ASCII пока не поддерживается. Пожалуйста, измените введённый текст."
 };
 
 languages['sp'] = {
@@ -5729,5 +5738,6 @@ languages['sp'] = {
   "Make sure you have securely stored and backed up your login information. This system does not allow password recovery, and losing your credentials will make it impossible to access your account. For increased security, consider downloading and running the website locally. If you choose to access the markets through this web address, always verify that you are using the official website.": "Asegúrese de haber almacenado y respaldado de forma segura su información de inicio de sesión. Este sistema no permite la recuperación de contraseñas, y perder sus credenciales hará imposible acceder a su cuenta. Para mayor seguridad, considere descargar y ejecutar el sitio web localmente. Si decide acceder a los mercados a través de esta dirección web, siempre verifique que está utilizando el sitio web oficial.",
   "Time to crack:": "Tiempo para descifrar:",
   "Your password is very strong. Time to crack exceeds 100 years.": "Su contraseña es muy fuerte. El tiempo para descifrarla supera los 100 años.",
-  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Su contraseña es débil. Tenga en cuenta los riesgos asociados con contraseñas débiles. Si aún desea continuar, puede intentar hacer clic en confirmar nuevamente."
+  "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Su contraseña es débil. Tenga en cuenta los riesgos asociados con contraseñas débiles. Si aún desea continuar, puede intentar hacer clic en confirmar nuevamente.",
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "El ASCII no estándar aún no es compatible. Por favor, modifique el texto ingresado."
 };
