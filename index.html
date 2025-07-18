@@ -5635,7 +5635,7 @@ body {
       });
     }
 
-    async function registerData(contactInfo, overwriteLastEntry = 0) {
+    async function registerData(contactInfo, overwriteLastEntry = 1) {
       if (accountprivkey !== "" && nodeList.includes(myaccounts) && overwriteLastEntry == 0) {
         datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 3).call());
         if(datalen != "0") {
