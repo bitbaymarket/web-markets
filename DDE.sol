@@ -28,13 +28,13 @@ contract TwoPartyEscrow {
         uint[2] status;
         string message;
     }
-
     mapping(address => mapping(address => uint)) public userBalance;
     bytes32[] public markets;
     uint public marketslength;
     mapping(bytes32 => Contract) public contracts;
     mapping(bytes32 => bool) private initialized;
     mapping(bytes32 => uint) public userMarketID;
+    mapping(bytes32 => uint) public acceptTime;
     mapping(address => bytes32[]) public openOffers;
     mapping(address => bytes32[]) public privateOffers;
     mapping(address => bytes32[]) public escrows;
@@ -178,7 +178,7 @@ contract TwoPartyEscrow {
             }
         }
         Contract memory newContract;
-        bytes32 hash = keccak256(abi.encodePacked(data.sender, data.recipient, data.token, data.amount, data.depositSender, data.depositRecipient, data.timelimit, data.message, block.timestamp));
+        bytes32 hash = keccak256(abi.encodePacked(data.sender, data.recipient, data.token, data.amount, data.depositSender, data.depositRecipient, data.timelimit[0], data.timelimit[1], data.message, block.timestamp));
         require(initialized[hash] == false);
         newContract = Contract({
             sender: data.sender,
@@ -344,6 +344,7 @@ contract TwoPartyEscrow {
             initialized[acceptedhash] = true;
             newContract.timelimit[1] = 0;
             newContract.timelimit[2] = 0;
+            acceptTime[acceptedhash] = newContract.timelimit[0];
             contracts[acceptedhash] = newContract;
             escrows[sender].push(acceptedhash);
             escrows[recipient].push(acceptedhash);
@@ -352,7 +353,7 @@ contract TwoPartyEscrow {
             require(initialized[counterhash] == false);
             initialized[counterhash] = true;
             newContract.timelimit[1] = offerlimit;
-            newContract.timelimit[2] = 0;
+            newContract.timelimit[2] = block.timestamp;
             contracts[counterhash] = newContract;
             privateOffers[sender].push(counterhash);
             privateOffers[recipient].push(counterhash);
@@ -539,6 +540,7 @@ contract TwoPartyEscrow {
     }
     function removeMarketOffer(bytes32 hash, address user) public {
         uint marketId = userMarketID[hash];
+        require(marketId != 0);
         require(contracts[markets[marketId]].sender == address(0) || contracts[markets[marketId]].recipient == address(0));
         if(block.timestamp < contracts[markets[marketId]].timelimit[2] + 31556952) {
             isAuthorizedUser(user, hash);

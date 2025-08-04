@@ -4012,7 +4012,7 @@ body {
     if(testNetView) {
       DDEaddy = "0xc1620929B151ecB45beB7093AfFb1F9A359656d9"; //Sepolia testnet is default market view
     } else {
-      DDEaddy = "0x213DB7D60F33f3D1Ca9e13F298Ac6578d5Fc20fc" //Polygon is default market view
+      DDEaddy = "0x572d0Da3aF6cdCAcB07F6e76b068E1De232DDE92" //Polygon is default market view
     }
     var myaccounts = "";
     var userpubkey = "";
@@ -4178,7 +4178,7 @@ body {
     function defaultvars() {
       DDEcontract = "";
       myaccounts = "";
-      DDEaddy = "0x213DB7D60F33f3D1Ca9e13F298Ac6578d5Fc20fc";
+      DDEaddy = "0x572d0Da3aF6cdCAcB07F6e76b068E1De232DDE92";
       balances = {};
       baseBalance = 0;
       gasPrice = "";
@@ -4595,7 +4595,7 @@ body {
         });
         netname = "Polygon";
         netname2 = "POL";
-        DDEaddy = "0x213DB7D60F33f3D1Ca9e13F298Ac6578d5Fc20fc";
+        DDEaddy = "0x572d0Da3aF6cdCAcB07F6e76b068E1De232DDE92";
         gasOptions[0] = {
           gasLimit: 1500000,
           gasPrice: null,
@@ -6743,7 +6743,7 @@ body {
     //This way they can also be the ones required to remove the search tags and the contract manages everything.
     var tempCurators = ["0x25A2c592DDD5F930a9CB271b9AC3e72bbBc3d351","0x9A72fb4b7bD8C9Ab38000a7EdE8B23c34D098587"];
     //A basic list of orders to filter for old orders or when users lose contact with the markets
-    var filteredOrders = {"0x6e4eaa11b30c217203d4c2bede00a37df845f2246176ed50feb73c00f983a27a":1,"0x9715805edb03428e2b8c25d604f7a31af5283f9ac1eba4f4c3d604e473c7064a":1,"0xef27781e16f31ed07c35d147a573cf8259bff78026702ba35c499f7686a8b999":1}
+    var filteredOrders = {}
     var batches = [];
     var isLocked = 0;
     async function downloadBatches(checkedHashes, userAddress, DDEcontract5) {
@@ -7484,6 +7484,27 @@ body {
           ],
           message:DOMPurify.sanitize(text)
         };
+        var cHash1 = web3.utils.keccak256(web3.utils.encodePacked({value: data.sender, type: 'address'},{value: data.recipient, type: 'address'},{value: data.token, type: 'address'},{value: data.amount, type: 'uint256'},{value: data.depositSender, type: 'uint256'},{value: data.depositRecipient, type: 'uint256'},{value: data.timelimit[0].toString(), type: 'uint256'},{value: data.timelimit[1], type: 'uint256'},{value: data.message, type: 'string'},{value: data.timelimit[2], type: 'uint256'}));
+        var cHash2 = web3.utils.keccak256(web3.utils.encodePacked({value: data.sender, type: 'address'},{value: data.recipient, type: 'address'},{value: data.token, type: 'address'},{value: data.amount, type: 'uint256'},{value: data.depositSender, type: 'uint256'},{value: data.depositRecipient, type: 'uint256'},{value: data.timelimit[0].toString(), type: 'uint256'},{value: data.message, type: 'string'}));
+        var cHash3 = web3.utils.keccak256(web3.utils.encodePacked({value: data.sender, type: 'address'},{value: data.recipient, type: 'address'},{value: data.token, type: 'address'},{value: data.amount, type: 'uint256'},{value: data.depositSender, type: 'uint256'},{value: data.depositRecipient, type: 'uint256'},{value: data.timelimit[0].toString(), type: 'uint256'},{value: data.message, type: 'string'},{value: data.timelimit[2], type: 'uint256'}));
+        if(jsondata.status[0]==0 || jsondata.status[0]==1) {
+          if(hash != cHash1 && hash != cHash3) {
+            jsondata.hashMismatch = true;
+          }
+        } else {
+          if(hash != cHash2) {
+            try {
+              var originalTime = DOMPurify.sanitize(await DDEcontract3.methods.acceptTime(hash).call());
+              cHash2 = web3.utils.keccak256(web3.utils.encodePacked({value: data.sender, type: 'address'},{value: data.recipient, type: 'address'},{value: data.token, type: 'address'},{value: data.amount, type: 'uint256'},{value: data.depositSender, type: 'uint256'},{value: data.depositRecipient, type: 'uint256'},{value: originalTime, type: 'uint256'},{value: data.message, type: 'string'}));
+              if(hash != cHash2) {
+                jsondata.hashMismatch = true;
+              }
+            } catch (e) {
+              console.log(e);
+              jsondata.hashMismatch = true;
+            }
+          }
+        }
         try {
           var reputation = [0,0,0];
           if(jsondata.sender != "0x0000000000000000000000000000000000000000") {
