@@ -2720,15 +2720,69 @@ h2 {
   --button-text-color: #000;
 }
 
-[data-theme="dark"] {
-  --background-color: #322C62;
-  --text-color: #fff;
-  --button-bg-color: #4e4e50;
-  --button-text-color: #fff;
+body[data-theme="dark"] {
+  /* Main Background - Multiple Gradients */
+  background-image: 
+    /* The pink orb is now on the bottom-left */
+    radial-gradient(circle at 20% 80%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+    /* The purple orb is now on the top-right */
+    radial-gradient(circle at 80% 20%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%),
+    /* Reversed the order of the linear gradient for a left-to-right sweep */
+    linear-gradient(45deg, #16213e 0%, #1a1a2e 50%, #0a0a0a 100%);
+  background-color: #0a0a0a;
+  color: #e0e0e0;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated Grid Pattern */
+body[data-theme="dark"]::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-image: 
+    linear-gradient(rgba(77, 166, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77, 166, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridMove 20s linear infinite;
+}
+
+/* Scanlines Effect */
+body[data-theme="dark"]::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(77, 166, 255, 0.02) 2px,
+    rgba(77, 166, 255, 0.02) 4px
+  );
+}
+
+/* Animations */
+@keyframes gridMove {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 50px 50px;
+  }
 }
 
 body {
-  background-color: var(--background-color);
   color: var(--text-color);
 }
 
@@ -2811,8 +2865,16 @@ body {
 .dark-theme .dashboard-content-wrapper #paginationNumbers button.active,
 .dark-theme .dashboard-content-wrapper #paginationNumbers button:hover,
 .dark-theme .offers-categories .offers-tab-container button,
-.dark-theme .account-details-wrapper button, .dark-theme .about-tab button.active, .dark-theme .about-tab button:hover, .dark-theme .about-tab button {
-  border: 1px solid white;
+.dark-theme .account-details-wrapper button, 
+.dark-theme .about-tab button {
+  border: 1px solid transparent; 
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.25); 
+  transition: box-shadow 0.3s ease-in-out;
+}
+.dark-theme .about-tab button.active,
+.dark-theme .about-tab button:hover {
+  /* A more pronounced, multi-colored glow for visual feedback */
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 15px rgba(120, 219, 255, 0.5); 
 }
 .dark-theme .dashboard-content-wrapper .square-button:hover, .dark-theme .about-tab button.active, .dark-theme .about-tab button:hover {
   background-color: white;
@@ -5543,6 +5605,9 @@ body {
                 const timeRemaining = (parseFloat(parseInt(jsondata.timelimit[0]) - parseInt(blockTimestamp)) / parseFloat(60 * 60 * 24)).toFixed(2);
                 jsondata.timeRemaining = timeRemaining;
                 var escrowInfo = '';
+                if (hashMismatch in jsondata) {
+                  escrowInfo += "<div>" + translateThis('WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.') + "</div>";
+                }
                 if (jsondata.status[0] != 4 && jsondata.status[1] != 4) {
                   if(parseFloat(timeRemaining) < parseFloat(2)) {
                     escrowInfo += "<div>" + translateThis('WARNING: Funds are about to expire. Resolve the escrow with your counter-party or all funds risk being burned.') + "</div>";
@@ -6599,6 +6664,9 @@ body {
             location: DOMPurify.sanitize(jsondata?.location)
           };
         }
+        if(hashMismatch in jsondata) {
+          throw new Error("Hash mistmatch");
+        }
         return orderData;
       } catch (error) {
         console.error("Error in getOrderData:", error);
@@ -6869,6 +6937,10 @@ body {
                   mlen -= 1;
                 } else {
                   jsondata = await getOrderHash(hash);
+                  if(hashMismatch in jsondata) {
+                    mlen -= 1;
+                    continue;
+                  }
                   if(jsondata.message == 'error') {
                     mlen -= 1;
                     continue;
@@ -6997,6 +7069,10 @@ body {
                     added = 1;
                   } else {
                     jsondata = await getOrderHash(hash);
+                    if(hashMismatch in jsondata) {
+                      truetot -= 1;
+                      continue;
+                    }
                     if(jsondata.message == 'error') {
                       truetot -= 1;
                       continue;
@@ -7098,6 +7174,9 @@ body {
               if (offerID == 0) {
               } else {
                 jsondata = await getOrderHash(hash);
+                if(hashMismatch in jsondata) {
+                  throw new Error('Hash mistmatch');
+                }
                 if(jsondata.message == 'error') {
                   throw new Error('a');
                 }
@@ -7198,6 +7277,10 @@ body {
                                 jsondata = marketOffers[hash];
                               } else {
                                 jsondata = await getOrderHash(hash);
+                                if(hashMismatch in jsondata) {
+                                  longestKey -= 1;
+                                  return;
+                                }
                                 if(jsondata.message == 'error') {
                                   longestKey -= 1;
                                   return;
@@ -7309,6 +7392,10 @@ body {
                           return;
                         }
                         jsondata = await getOrderHash(hash);
+                        if(hashMismatch in jsondata) {
+                          trueLength -= 1;
+                          return;
+                        }
                         if(jsondata.message == 'error') {
                           trueLength -= 1;
                           return;
@@ -7562,7 +7649,8 @@ body {
     }
     lastNotified = 0;
     lastNotified2 = 0;
-
+    skipMismatched = true;
+    notifiedMismatch = 0;
     async function populateOffers() {
       const offersContainer = document.getElementById("myoffers");
       const contractsContainer = document.getElementById("mycontracts");
@@ -7593,6 +7681,27 @@ body {
             continue;
           }
           const offerData = await getOrderHash(offerHash);
+          if ("hashMismatch" in offerData && skipMismatched) {
+            const mcurrentTime = Math.floor(Date.now() / 1000);
+            if (mcurrentTime > notifiedMismatch + 300) {
+              notifiedMismatch = mcurrentTime;
+              const mresult = await Swal.fire({
+                title: translateThis("Hash Mismatch Detected"),
+                html: translateThis("WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.") +
+                  "<br><br>" +
+                  translateThis("It is recommended that you skip the mismatched orders until they are retrieved correctly."),
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: translateThis("OK"),
+                cancelButtonText: translateThis("Show me the orders, I understand the risk."),
+                reverseButtons: true
+              });
+
+              if (mresult.isConfirmed) {
+                continue;
+              }
+            }
+          }
           if(parseInt(offerData.timelimit[1]) != 0) {
             if(parseInt(offerData.timelimit[1]) <= parseInt(CurrentTimeStamp)) {
               if(offerData.sender != "0x0000000000000000000000000000000000000000" && offerData.recipient != "0x0000000000000000000000000000000000000000") {
@@ -7696,6 +7805,27 @@ body {
         try {
           const offerHash2 = DOMPurify.sanitize(await DDEcontract.methods.privateOffers(myaccounts, i).call());
           const offerData2 = await getOrderHash(offerHash2);
+          if ("hashMismatch" in offerData2 && skipMismatched) {
+            const mcurrentTime = Math.floor(Date.now() / 1000);
+            if (mcurrentTime > notifiedMismatch + 300) {
+              notifiedMismatch = mcurrentTime;
+              const mresult = await Swal.fire({
+                title: translateThis("Hash Mismatch Detected"),
+                html: translateThis("WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.") +
+                  "<br><br>" +
+                  translateThis("It is recommended that you skip the mismatched orders until they are retrieved correctly."),
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: translateThis("OK"),
+                cancelButtonText: translateThis("Show me the orders, I understand the risk."),
+                reverseButtons: true
+              });
+
+              if (mresult.isConfirmed) {
+                continue;
+              }
+            }
+          }
           if(offerData2.message.includes('"recipient":') && offerData2.message.includes('"cipher":') && offerData2.message.includes('"status":')) {
             const testThis = JSON.parse(offerData2.message)
             if('recipient' in testThis && 'cipher' in testThis.recipient && parseInt(new Date().getTime()/1000) > lastNotified + 300) {
@@ -7912,6 +8042,27 @@ body {
         try {
           const offerHash3 = DOMPurify.sanitize(await DDEcontract.methods.escrows(myaccounts, i).call());
           const offerData3 = await getOrderHash(offerHash3);
+          if ("hashMismatch" in offerData3 && skipMismatched) {
+            const mcurrentTime = Math.floor(Date.now() / 1000);
+            if (mcurrentTime > notifiedMismatch + 300) {
+              notifiedMismatch = mcurrentTime;
+              const mresult = await Swal.fire({
+                title: translateThis("Hash Mismatch Detected"),
+                html: translateThis("WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.") +
+                  "<br><br>" +
+                  translateThis("It is recommended that you skip the mismatched orders until they are retrieved correctly."),
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: translateThis("OK"),
+                cancelButtonText: translateThis("Show me the orders, I understand the risk."),
+                reverseButtons: true
+              });
+
+              if (mresult.isConfirmed) {
+                continue;
+              }
+            }
+          }
           if (offerData3.status[0] == 4 || offerData3.status[1] == 4) {
             if (autoClearCheckbox.checked) {
               readMessages[i] = true;
@@ -8454,6 +8605,9 @@ body {
 
             notificationButton.addEventListener('click', async () => {
               var mylisting = await getOrderHash(notification.listing.hash);
+              if(hashMismatch in mylisting) {
+                return;
+              }
               if(notification.mode == 4) {
                 const currentBlockNumber = await web3.eth.getBlockNumber();
                 const currentBlock = await web3.eth.getBlock(currentBlockNumber);
@@ -12722,7 +12876,7 @@ body {
       const themeToggleButton = document.getElementById('theme-toggle');
       const currentTheme = localStorage.getItem('theme') || 'light';
       document.body.setAttribute('data-theme', currentTheme);
-      themeToggleButton.innerHTML = currentTheme === 'dark' ? '<a href="#" class="day-night-icon"><img src="day-icon.png" alt="day icon"/></a>' : '<a href="#" class="day-night-icon"><img src="night-icon.svg" alt="night icon"/></a>';
+      themeToggleButton.innerHTML = currentTheme === 'dark' ? '<a href="#" class="day-night-icon"><img src="day-icon.png" alt="☉"/></a>' : '<a href="#" class="day-night-icon"><img src="night-icon.png" alt="☾"/></a>';
       currentTheme === 'dark' ? body.classList.add("dark-theme") : body.removeAttribute("class");
       if(currentTheme == 'dark') {
         document.head.insertAdjacentHTML("beforeend", "<style>.main.markets::after { content: ''; background: url('') center no-repeat; position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.25; z-index: -1; }</style>");
@@ -12732,7 +12886,7 @@ body {
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         document.body.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
-        themeToggleButton.innerHTML = newTheme === 'dark' ? '<a href="#" class="day-night-icon"><img src="day-icon.png" alt="day icon"/></a>' : '<a href="#" class="day-night-icon"><img src="night-icon.svg" alt="night icon"/></a>';
+        themeToggleButton.innerHTML = newTheme === 'dark' ? '<a href="#" class="day-night-icon"><img src="day-icon.png" alt="☉"/></a>' : '<a href="#" class="day-night-icon"><img src="night-icon.png" alt="☾"/></a>';
         currentTheme === 'light' ? body.classList.add("dark-theme") : body.removeAttribute("class");
         if(newTheme == 'light') {
           document.head.insertAdjacentHTML("beforeend", "<style>.main.markets::after { content: ''; background: url('./bitbay-dynamic-peg-hero.png') center/cover; position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.25; z-index: -1; }</style>");

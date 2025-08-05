@@ -563,5 +563,9 @@
   "Time to crack:": true,
   "Your password is very strong. Time to crack exceeds 100 years.": true,
   "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": true,
-  "Non-standard ASCII is not yet supported. Please modify entered text.": true
+  "Non-standard ASCII is not yet supported. Please modify entered text.": true,
+  "WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.": true,
+  "Hash Mismatch Detected": true,
+  "Show me the orders, I understand the risk.": true,
+  "It is recommended that you skip the mismatched orders until they are retrieved correctly.": true
 }

@@ -565,7 +565,11 @@ languages['ar']={
   "Time to crack:": "الوقت اللازم للكسر:",
   "Your password is very strong. Time to crack exceeds 100 years.": "كلمة المرور الخاصة بك قوية جدًا. يتجاوز الوقت اللازم للكسر 100 عام.",
   "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "كلمة المرور الخاصة بك ضعيفة. يرجى مراعاة المخاطر المرتبطة بكلمات المرور الضعيفة. إذا كنت لا تزال ترغب في المتابعة، يمكنك محاولة النقر على تأكيد مرة أخرى.",
-  "Non-standard ASCII is not yet supported. Please modify entered text.": "م دعم ASCII غير القياسي بعد. يرجى تعديل النص المُدخل."
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "م دعم ASCII غير القياسي بعد. يرجى تعديل النص المُدخل.",
+  "WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.": "تحذير: بيانات هذا الطلب لا تتطابق مع التجزئة الأصلية على البلوكشين. قد تكون بعض التفاصيل غير صحيحة أو معدّلة، أو ربما حدث خطأ أثناء جلب البيانات. يرجى التحقق من المعلومات بعناية قبل المتابعة.",
+  "Hash Mismatch Detected": "تم اكتشاف عدم تطابق في التجزئة",
+  "Show me the orders, I understand the risk.": "أرني الطلبات، أنا أفهم المخاطرة.",
+  "It is recommended that you skip the mismatched orders until they are retrieved correctly.": "يُوصى بتجاوز الطلبات غير المتطابقة حتى يتم جلبها بشكل صحيح."
 };
 
 
@@ -1134,7 +1138,11 @@ languages['ch']={
   "Time to crack:": "破解所需时间：",
   "Your password is very strong. Time to crack exceeds 100 years.": "您的密码非常强。破解时间超过100年。",
   "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "您的密码较弱。请考虑使用弱密码的相关风险。如果您仍想继续，可以尝试再次点击确认。",
-  "Non-standard ASCII is not yet supported. Please modify entered text.": "尚不支持非标准 ASCII。请修改输入的文本。"
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "尚不支持非标准 ASCII。请修改输入的文本。",
+  "WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.": "警告：该订单的数据与其在区块链上的原始哈希不匹配。部分信息可能不正确、已被更改，或在获取数据时发生了错误。请在继续之前仔细核对信息。",
+  "Hash Mismatch Detected": "检测到哈希不匹配",
+  "Show me the orders, I understand the risk.": "显示订单，我了解相关风险。",
+  "It is recommended that you skip the mismatched orders until they are retrieved correctly.": "建议跳过不匹配的订单，直到其被正确获取。"
 };
 
 languages['en']={
@@ -1764,7 +1772,11 @@ languages['fr']={
   "Time to crack:": "Temps pour déchiffrer :",
   "Your password is very strong. Time to crack exceeds 100 years.": "Votre mot de passe est très fort. Le temps pour le déchiffrer dépasse 100 ans.",
   "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Votre mot de passe est faible. Veuillez considérer les risques associés aux mots de passe faibles. Si vous souhaitez toujours continuer, vous pouvez essayer de cliquer à nouveau sur confirmer.",
-  "Non-standard ASCII is not yet supported. Please modify entered text.": "L'ASCII non standard n'est pas encore pris en charge. Veuillez modifier le texte saisi."
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "L'ASCII non standard n'est pas encore pris en charge. Veuillez modifier le texte saisi.",
+  "WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.": "AVERTISSEMENT : Les données de cette commande ne correspondent pas à son hachage d'origine sur la blockchain. Certaines informations peuvent être incorrectes, modifiées, ou une erreur a pu se produire lors de la récupération des données. Veuillez vérifier attentivement les informations avant de continuer.",
+  "Hash Mismatch Detected": "Incohérence de hachage détectée",
+  "Show me the orders, I understand the risk.": "Montrez-moi les commandes, je comprends le risque.",
+  "It is recommended that you skip the mismatched orders until they are retrieved correctly.": "Il est recommandé d’ignorer les commandes incohérentes jusqu’à ce qu’elles soient correctement récupérées."
 };
 
 languages['ge']={
@@ -2331,7 +2343,11 @@ languages['ge']={
   "Time to crack:": "Zeit zum Knacken:",
   "Your password is very strong. Time to crack exceeds 100 years.": "Ihr Passwort ist sehr stark. Die Zeit zum Knacken beträgt mehr als 100 Jahre.",
   "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Ihr Passwort ist schwach. Bitte bedenken Sie die Risiken, die mit schwachen Passwörtern verbunden sind. Wenn Sie trotzdem fortfahren möchten, können Sie erneut auf Bestätigen klicken.",
-  "Non-standard ASCII is not yet supported. Please modify entered text.": "Nicht-standardmäßiges ASCII wird noch nicht unterstützt. Bitte ändern Sie den eingegebenen Text."
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "Nicht-standardmäßiges ASCII wird noch nicht unterstützt. Bitte ändern Sie den eingegebenen Text.",
+  "WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.": "WARNUNG: Die Daten dieser Bestellung stimmen nicht mit ihrem ursprünglichen Hash auf der Blockchain überein. Einige Angaben könnten falsch, verändert oder beim Abrufen fehlerhaft sein. Bitte überprüfen Sie die Informationen sorgfältig, bevor Sie fortfahren.",
+  "Hash Mismatch Detected": "Hash-Übereinstimmung nicht erkannt",
+  "Show me the orders, I understand the risk.": "Zeigen Sie mir die Bestellungen, ich verstehe das Risiko.",
+  "It is recommended that you skip the mismatched orders until they are retrieved correctly.": "Es wird empfohlen, die nicht übereinstimmenden Bestellungen zu überspringen, bis sie korrekt abgerufen wurden."
 };
 
 languages['it']={
@@ -2899,7 +2915,11 @@ languages['it']={
   "Time to crack:": "Tempo per violare:",
   "Your password is very strong. Time to crack exceeds 100 years.": "La tua password è molto sicura. Il tempo per violarla supera i 100 anni.",
   "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "La tua password è debole. Considera i rischi associati a password deboli. Se desideri comunque procedere, puoi provare a fare nuovamente clic su conferma.",
-  "Non-standard ASCII is not yet supported. Please modify entered text.": "ASCII non standard non è ancora supportato. Si prega di modificare il testo inserito."
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "ASCII non standard non è ancora supportato. Si prega di modificare il testo inserito.",
+  "WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.": "ATTENZIONE: I dati di questo ordine non corrispondono al suo hash originale sulla blockchain. Alcune informazioni potrebbero essere errate, alterate o potrebbe esserci stato un errore durante il recupero dei dati. Verificare attentamente le informazioni prima di procedere.",
+  "Hash Mismatch Detected": "Incoerenza dell'hash rilevata",
+  "Show me the orders, I understand the risk.": "Mostrami gli ordini, comprendo il rischio.",
+  "It is recommended that you skip the mismatched orders until they are retrieved correctly.": "Si consiglia di ignorare gli ordini non corrispondenti fino a quando non vengono recuperati correttamente."
 };
 
 languages['ja']={
@@ -3467,7 +3487,11 @@ languages['ja']={
   "Time to crack:": "解読時間：",
   "Your password is very strong. Time to crack exceeds 100 years.": "あなたのパスワードは非常に強力です。解読時間は100年以上です。",
   "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "あなたのパスワードは弱いです。弱いパスワードのリスクを考慮してください。それでも進む場合は、再度確認をクリックしてください。",
-  "Non-standard ASCII is not yet supported. Please modify entered text.": "非標準のASCIIはまだサポートされていません。入力されたテキストを修正してください。"
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "非標準のASCIIはまだサポートされていません。入力されたテキストを修正してください。",
+  "WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.": "警告：この注文のデータは、オンチェーン上の元のハッシュと一致しません。一部の情報が不正確、改ざんされている、またはデータ取得時にエラーが発生した可能性があります。続行する前に情報をよく確認してください。",
+  "Hash Mismatch Detected": "ハッシュの不一致が検出されました",
+  "Show me the orders, I understand the risk.": "注文を表示してください。リスクは理解しています。",
+  "It is recommended that you skip the mismatched orders until they are retrieved correctly.": "不一致のある注文は、正しく取得されるまでスキップすることをお勧めします。"
 };
 
 languages['ko']={
@@ -4035,7 +4059,11 @@ languages['ko']={
   "Time to crack:": "해킹 시간:",
   "Your password is very strong. Time to crack exceeds 100 years.": "비밀번호는 매우 강력합니다. 해킹 시간은 100년을 초과합니다.",
   "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "비밀번호가 약합니다. 약한 비밀번호에 관련된 위험을 고려하세요. 그래도 계속 진행하려면 확인을 다시 클릭해 보세요.",
-  "Non-standard ASCII is not yet supported. Please modify entered text.": "비표준 ASCII는 아직 지원되지 않습니다. 입력한 텍스트를 수정해 주세요."
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "비표준 ASCII는 아직 지원되지 않습니다. 입력한 텍스트를 수정해 주세요.",
+  "WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.": "경고: 이 주문의 데이터가 온체인에 기록된 원래 해시와 일치하지 않습니다. 일부 정보가 부정확하거나 변경되었거나, 데이터를 가져오는 중 오류가 발생했을 수 있습니다. 계속 진행하기 전에 정보를 신중하게 확인하십시오.",
+  "Hash Mismatch Detected": "해시 불일치가 감지되었습니다",
+  "Show me the orders, I understand the risk.": "주문을 보여주세요. 위험을 이해하고 있습니다.",
+  "It is recommended that you skip the mismatched orders until they are retrieved correctly.": "불일치된 주문은 올바르게 가져올 수 있을 때까지 건너뛰는 것이 좋습니다."
 };
 
 languages['po']={
@@ -4603,7 +4631,11 @@ languages['po']={
   "Time to crack:": "Tempo para quebrar:",
   "Your password is very strong. Time to crack exceeds 100 years.": "Sua senha é muito forte. O tempo para quebrá-la excede 100 anos.",
   "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Sua senha é fraca. Considere os riscos envolvidos com senhas fracas. Se ainda quiser continuar, tente clicar em confirmar novamente.",
-  "Non-standard ASCII is not yet supported. Please modify entered text.": "ASCII não padrão ainda não é suportado. Por favor, modifique o texto inserido."
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "ASCII não padrão ainda não é suportado. Por favor, modifique o texto inserido.",
+  "WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.": "AVISO: Os dados deste pedido não correspondem ao hash original na blockchain. Alguns detalhes podem estar incorretos, alterados ou pode ter ocorrido um erro ao recuperar os dados. Verifique cuidadosamente as informações antes de continuar.",
+  "Hash Mismatch Detected": "Incompatibilidade de hash detectada",
+  "Show me the orders, I understand the risk.": "Mostre-me os pedidos, entendo o risco.",
+  "It is recommended that you skip the mismatched orders until they are retrieved correctly.": "Recomenda-se que você ignore os pedidos com incompatibilidade até que sejam recuperados corretamente."
 };
 
 languages['ru'] = {
@@ -5171,7 +5203,11 @@ languages['ru'] = {
   "Time to crack:": "Время на взлом:",
   "Your password is very strong. Time to crack exceeds 100 years.": "Ваш пароль очень надежный. Время на его взлом превышает 100 лет.",
   "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Ваш пароль слабый. Пожалуйста, учитывайте риски, связанные с использованием слабых паролей. Если вы все равно хотите продолжить, попробуйте нажать кнопку подтверждения еще раз.",
-  "Non-standard ASCII is not yet supported. Please modify entered text.": "Нестандартный ASCII пока не поддерживается. Пожалуйста, измените введённый текст."
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "Нестандартный ASCII пока не поддерживается. Пожалуйста, измените введённый текст.",
+  "WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.": "ПРЕДУПРЕЖДЕНИЕ: Данные этого заказа не совпадают с его исходным хэшем в блокчейне. Некоторые детали могут быть неверны, изменены или могла произойти ошибка при получении данных. Пожалуйста, внимательно проверьте информацию перед продолжением.",
+  "Hash Mismatch Detected": "Обнаружено несоответствие хэша",
+  "Show me the orders, I understand the risk.": "Показать заказы, я понимаю риск.",
+  "It is recommended that you skip the mismatched orders until they are retrieved correctly.": "Рекомендуется пропустить заказы с несоответствием, пока они не будут правильно получены."
 };
 
 languages['sp'] = {
@@ -5739,5 +5775,9 @@ languages['sp'] = {
   "Time to crack:": "Tiempo para descifrar:",
   "Your password is very strong. Time to crack exceeds 100 years.": "Su contraseña es muy fuerte. El tiempo para descifrarla supera los 100 años.",
   "Your password is weak. Please consider the risks involved with weak passwords. If you still want to proceed you may try clicking confirm again.": "Su contraseña es débil. Tenga en cuenta los riesgos asociados con contraseñas débiles. Si aún desea continuar, puede intentar hacer clic en confirmar nuevamente.",
-  "Non-standard ASCII is not yet supported. Please modify entered text.": "El ASCII no estándar aún no es compatible. Por favor, modifique el texto ingresado."
+  "Non-standard ASCII is not yet supported. Please modify entered text.": "El ASCII no estándar aún no es compatible. Por favor, modifique el texto ingresado.",
+  "WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.": "ADVERTENCIA: Los datos de este pedido no coinciden con su hash original en la cadena. Algunos detalles pueden ser incorrectos, alterados o puede haber ocurrido un error al recuperar los datos. Verifique cuidadosamente la información antes de continuar.",
+  "Hash Mismatch Detected": "Desajuste de hash detectado",
+  "Show me the orders, I understand the risk.": "Muéstrame los pedidos, entiendo el riesgo.",
+  "It is recommended that you skip the mismatched orders until they are retrieved correctly.": "Se recomienda omitir los pedidos desajustados hasta que se recuperen correctamente."
 };
