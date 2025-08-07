@@ -5605,7 +5605,7 @@ body {
                 const timeRemaining = (parseFloat(parseInt(jsondata.timelimit[0]) - parseInt(blockTimestamp)) / parseFloat(60 * 60 * 24)).toFixed(2);
                 jsondata.timeRemaining = timeRemaining;
                 var escrowInfo = '';
-                if (hashMismatch in jsondata) {
+                if ("hashMismatch" in jsondata) {
                   escrowInfo += "<div>" + translateThis('WARNING: This order’s data does not match its original hash on-chain. Some details may be incorrect, altered, or there may have been an error retrieving the data. Please verify the information carefully before proceeding.') + "</div>";
                 }
                 if (jsondata.status[0] != 4 && jsondata.status[1] != 4) {
@@ -6664,7 +6664,7 @@ body {
             location: DOMPurify.sanitize(jsondata?.location)
           };
         }
-        if(hashMismatch in jsondata) {
+        if("hashMismatch" in jsondata) {
           throw new Error("Hash mistmatch");
         }
         return orderData;
@@ -6937,7 +6937,7 @@ body {
                   mlen -= 1;
                 } else {
                   jsondata = await getOrderHash(hash);
-                  if(hashMismatch in jsondata) {
+                  if("hashMismatch" in jsondata) {
                     mlen -= 1;
                     continue;
                   }
@@ -7069,7 +7069,7 @@ body {
                     added = 1;
                   } else {
                     jsondata = await getOrderHash(hash);
-                    if(hashMismatch in jsondata) {
+                    if("hashMismatch" in jsondata) {
                       truetot -= 1;
                       continue;
                     }
@@ -7174,7 +7174,7 @@ body {
               if (offerID == 0) {
               } else {
                 jsondata = await getOrderHash(hash);
-                if(hashMismatch in jsondata) {
+                if("hashMismatch" in jsondata) {
                   throw new Error('Hash mistmatch');
                 }
                 if(jsondata.message == 'error') {
@@ -7277,7 +7277,7 @@ body {
                                 jsondata = marketOffers[hash];
                               } else {
                                 jsondata = await getOrderHash(hash);
-                                if(hashMismatch in jsondata) {
+                                if("hashMismatch" in jsondata) {
                                   longestKey -= 1;
                                   return;
                                 }
@@ -7392,7 +7392,7 @@ body {
                           return;
                         }
                         jsondata = await getOrderHash(hash);
-                        if(hashMismatch in jsondata) {
+                        if("hashMismatch" in jsondata) {
                           trueLength -= 1;
                           return;
                         }
@@ -7574,7 +7574,7 @@ body {
         var cHash1 = web3.utils.keccak256(web3.utils.encodePacked({value: data.sender, type: 'address'},{value: data.recipient, type: 'address'},{value: data.token, type: 'address'},{value: data.amount, type: 'uint256'},{value: data.depositSender, type: 'uint256'},{value: data.depositRecipient, type: 'uint256'},{value: data.timelimit[0].toString(), type: 'uint256'},{value: data.timelimit[1], type: 'uint256'},{value: data.message, type: 'string'},{value: data.timelimit[2], type: 'uint256'}));
         var cHash2 = web3.utils.keccak256(web3.utils.encodePacked({value: data.sender, type: 'address'},{value: data.recipient, type: 'address'},{value: data.token, type: 'address'},{value: data.amount, type: 'uint256'},{value: data.depositSender, type: 'uint256'},{value: data.depositRecipient, type: 'uint256'},{value: data.timelimit[0].toString(), type: 'uint256'},{value: data.message, type: 'string'}));
         var cHash3 = web3.utils.keccak256(web3.utils.encodePacked({value: data.sender, type: 'address'},{value: data.recipient, type: 'address'},{value: data.token, type: 'address'},{value: data.amount, type: 'uint256'},{value: data.depositSender, type: 'uint256'},{value: data.depositRecipient, type: 'uint256'},{value: data.timelimit[0].toString(), type: 'uint256'},{value: data.message, type: 'string'},{value: data.timelimit[2], type: 'uint256'}));
-        if(jsondata.status[0]==0 || jsondata.status[0]==1) {
+        if(jsondata.status[0]==0 || jsondata.status[1]==0) {
           if(hash != cHash1 && hash != cHash3) {
             jsondata.hashMismatch = true;
           }
@@ -8605,7 +8605,7 @@ body {
 
             notificationButton.addEventListener('click', async () => {
               var mylisting = await getOrderHash(notification.listing.hash);
-              if(hashMismatch in mylisting) {
+              if("hashMismatch" in mylisting) {
                 return;
               }
               if(notification.mode == 4) {
