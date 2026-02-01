@@ -12,9 +12,16 @@
 <script type="text/javascript" src="./web3.min.js"></script>
 <script type="text/javascript" src="./jdenticon.min.js"></script>
 <script type="text/javascript" src="./simple-scrollbar.min.js"></script>
-<script type="text/javascript" src="zxcvbn.js"></script>
+<script type="text/javascript" src="./zxcvbn.js"></script>
+<script type="text/javascript" src="./rotating-provider.js"></script>
 <script src="lottie-player.js"></script>
-<script>fetch(`https://counterapi.com/api/${window.location.hostname}/view/?startNumber=1`).catch(() => {});</script>
+<script>
+  const host = window.location.hostname;
+  if (host !== 'localhost' && host !== '127.0.0.1' && host !== '') {
+    fetch(`https://counterapi.com/api/${host}/view/?startNumber=1`)
+      .catch(() => {});
+  }
+</script>
 <link rel="stylesheet" href="./open-sans.css">
 <link rel="stylesheet" href="./simple-scrollbar.css">
 <html>
@@ -4134,7 +4141,7 @@ body {
     if(testNetView) {
       web3 = new Web3("https://eth-sepolia.public.blastapi.io");
     } else {
-      web3 = new Web3("https://polygon-rpc.com");
+      web3 = new Web3(new RotatingProvider());
       //web3 = new Web3("https://polygon-bor-rpc.publicnode.com");      
       //web3 = new Web3("https://polygon-mainnet.public.blastapi.io");
     }
@@ -4386,7 +4393,7 @@ body {
                     document.getElementById("myPasswordInput").value = Crypto.SHA256("default");
                     document.getElementById("myPasswordInput").disabled = true;
                     if (parseInt(network) === 0) {
-                        web3 = new Web3("https://polygon-rpc.com");
+                        web3 = new Web3(new RotatingProvider());
                         //web3 = new Web3("https://polygon-bor-rpc.publicnode.com");
                         //web3 = new Web3("https://polygon-mainnet.public.blastapi.io");
                     } else {
@@ -4567,7 +4574,7 @@ body {
                         document.getElementById("myPasswordInput").value = Crypto.SHA256("default");
                         document.getElementById("myPasswordInput").disabled = true;
                         if(parseInt(network) == 0) {
-                            web3 = new Web3("https://polygon-rpc.com");
+                            web3 = new Web3(new RotatingProvider());
                             //web3 = new Web3("https://polygon-bor-rpc.publicnode.com");
                             //web3 = new Web3("https://polygon-mainnet.public.blastapi.io");
                         } else {

@@ -21,6 +21,7 @@
   <script type="text/javascript" src="./static/web3.min.js"></script>
   <script type="text/javascript" src="./static/axios.min.js"></script>
   <script type="text/javascript" src="./static/sweetalert211.min.js"></script>
+  <script type="text/javascript" src="./static/rotating-provider.js"></script>
   <script>
     var hashedPassword = Crypto.SHA256("$123myLongPasswordABC$");
     for (var i = 1; i < 50000; i++) {
@@ -98,7 +99,7 @@
     var web3;
     var showMod = false;
     if (chainID == "137") {
-        web3 = new Web3("https://polygon-mainnet.public.blastapi.io");
+        web3 = new Web3(new RotatingProvider());
     } else {
         web3 = new Web3("https://eth-sepolia.public.blastapi.io");
     }
@@ -248,7 +249,7 @@
           return reqdb[request.hash];
         }
         if (request.chain == "137") {
-            web3 = new Web3("https://polygon-mainnet.public.blastapi.io");
+            web3 = new Web3(new RotatingProvider());
             DDEcontract = new web3.eth.Contract(DDEabi, "0x572d0Da3aF6cdCAcB07F6e76b068E1De232DDE92");
             tokens = [
               {
