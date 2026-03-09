@@ -86,7 +86,8 @@ var fallbackProvidersDefault = [
       message.includes('dialing to the given tcp address timed out') ||
       message.includes('api key disabled') ||
       message.includes('rpc error') ||
-      message.includes('unauthorized')
+      message.includes('unauthorized') ||
+      message.includes('paid plan')
     );
   }
 
@@ -186,7 +187,8 @@ var fallbackProvidersDefault = [
     this.preferredStats = [];
     this.fallbackProviders = [];
     this.fallbackStats = [];
-    this.retries = 0;
+    this.callRetries = 0;
+    this.txRetries = 0;
     
     // Track indices
     this.preferredIndex = prefInx;
@@ -573,22 +575,25 @@ var fallbackProvidersDefault = [
       
       attempts++;
       
+      var isTx = payload && (payload.method === 'eth_sendTransaction' || payload.method === 'eth_sendRawTransaction');
       return sendToProvider(provider, payload).then(function(response) {
         // On successful request, update cooldown state
         self._updateCooldownOnSuccess();
         // EIP-1193 request() should return just the result value
-        self.retries = 0;
+        // Reset only the counter relevant to this call type (tx vs read)
+        if (isTx) { self.txRetries = 0; } else { self.callRetries = 0; }
         return response && response.result !== undefined ? response.result : response;
       }).catch(function(err) {
         lastError = err;
         
         // Only rotate on rate limit errors
         if (!isRateLimitError(err)) {
-          self.retries += 1;
-          if(self.retries < 10) {
+          // Use separate counters: tx failures and call failures should not influence each other
+          var retryCount = isTx ? (++self.txRetries) : (++self.callRetries);
+          if(retryCount < 10) {
             throw err; // Semantic error, don't retry
           } else {
-            self.retries = 0;
+            if (isTx) { self.txRetries = 0; } else { self.callRetries = 0; }
           }
         }
         
