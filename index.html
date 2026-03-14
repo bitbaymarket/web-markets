@@ -3433,32 +3433,31 @@ body {
       await populateListings();
     });
 
-    function validation(input, extra="") {
-      if (Array.isArray(input)) {
-        return input.map(function(item) { return validation(item); });
+    function validation(input, extra = "") {
+      const safeExtra = extra ? extra.replace(/[\]\\^-]/g, '\\$&') : "";
+      const stripRegex = new RegExp('[^a-zA-Z0-9_\\-' + safeExtra + ']', 'g');
+      const blockedKeys = new Set(["__proto__", "constructor", "prototype"]);
+      const safeKeyRegex = /^[a-zA-Z0-9_-]+$/;
+      function clean(value) {
+        if (Array.isArray(value)) {
+          return value.map(clean);
+        }
+        if (value !== null && typeof value === 'object') {
+          const result = {};
+          Object.keys(value).forEach(function(key) {
+            if (!blockedKeys.has(key) && safeKeyRegex.test(key)) {
+              result[key] = clean(value[key]);
+            }
+          });
+          return result;
+        }
+        if (!value && value !== 0) return "";
+        const str = String(value);
+        if (str.toLowerCase() === "true") return true;
+        if (str.toLowerCase() === "false") return false;
+        return str.replace(stripRegex, "");
       }
-      if (input !== null && typeof input === 'object') {
-        var result = {};
-        Object.keys(input).forEach(function(key) {
-          var safeKey = /^[a-zA-Z0-9_-]+$/.test(key) ? key : "";
-          if (safeKey !== "") {
-            result[safeKey] = validation(input[key]);
-          }
-        });
-        return result;
-      }
-      if (!input && input !== 0) return "";
-      var str = String(input);
-      if (str.toLowerCase() === "true") {
-        return true;
-      }
-      if (str.toLowerCase() === "false") {
-        return false;
-      }
-      var pattern = extra
-        ? new RegExp('^[a-zA-Z0-9_\\-' + extra.replace(/[\]\\^-]/g, '\\$&') + ']+$')
-        : /^[a-zA-Z0-9_-]+$/;
-      return pattern.test(str) ? str : "";
+      return clean(input);
     }
 
     function translateThis(mytext) {
