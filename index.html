@@ -7661,9 +7661,9 @@ body {
               storeFile(Crypto.SHA256(JSON.stringify(myimg)), myimg);
               jsondata.image = Crypto.SHA256(JSON.stringify(myimg));
               jsondata.message = messageData.message;
-              jsondata.contact = messageData.contact;
-              jsondata.title = validation(messageData.title);
-              jsondata.location = messageData.location;
+              jsondata.contact = validation(messageData.contact, ". ,!?@");
+              jsondata.title = validation(messageData.title, ". ,!?@");
+              jsondata.location = validation(messageData.location, ". ,!?@");
             }
           } catch (e) {
             console.log("Error loading data");
@@ -9016,9 +9016,9 @@ body {
               storeFile(Crypto.SHA256(listing.message), thisText);
               listing.image = Crypto.SHA256(JSON.stringify(myimg));
               listing.message = messageData.message;
-              listing.contact = messageData.contact;
-              listing.title = validation(messageData.title);
-              listing.location = messageData.location;
+              listing.contact = validation(messageData.contact, ". ,!?@");
+              listing.title = validation(messageData.title, ". ,!?@");
+              listing.location = validation(messageData.location, ". ,!?@");
             } catch (e) {
               console.log(e);
               console.log("Decryption failed");
@@ -11436,9 +11436,9 @@ body {
           var depositSender = document.getElementById("sender-deposit-input").value;
           var depositRecipient = document.getElementById("recipient-deposit-input").value;
           var timeLimit = document.getElementById("timeLimit").value;
-          var contactinfo = document.getElementById("contactInfo").value;
-          var title = document.getElementById("contractTitle").value;
-          var location = document.getElementById("contractLocation").value;
+          var contactinfo = validation(document.getElementById("contactInfo").value, ". ,!?@");
+          var title = validation(document.getElementById("contractTitle").value, ". ,!?@");
+          var location = validation(document.getElementById("contractLocation").value, ". ,!?@");
           var contractDetails = document.getElementById("contractDetails").value;
           var message = JSON.stringify({
             message: document.getElementById("contractDetails").value,
