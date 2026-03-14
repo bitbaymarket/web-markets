@@ -3435,14 +3435,14 @@ body {
 
     function validation(input, extra="") {
       if (Array.isArray(input)) {
-        return input.map(function(item) { return validation(item, extra); });
+        return input.map(function(item) { return validation(item); });
       }
       if (input !== null && typeof input === 'object') {
         var result = {};
         Object.keys(input).forEach(function(key) {
           var safeKey = /^[a-zA-Z0-9_-]+$/.test(key) ? key : "";
           if (safeKey !== "") {
-            result[safeKey] = validation(input[key], extra);
+            result[safeKey] = validation(input[key]);
           }
         });
         return result;
@@ -5048,7 +5048,7 @@ body {
         await Swal.fire(translateThis("Not connected."));
       }
       else {
-        await Swal.fire({title: translateThis("Error sending transaction"), text: validation(error.message, ". :/(),'"), icon: 'error', confirmButtonText: translateThis('OK')});
+        await Swal.fire({title: translateThis("Error sending transaction"), text: validation(error.message, ". :/,'"), icon: 'error', confirmButtonText: translateThis('OK')});
       }
     }
 
@@ -6294,7 +6294,7 @@ body {
           if(x+1<maxtries) {
             continue
           }
-          errorMessage = validation(error.message, ". :/(),'");
+          errorMessage = validation(error.message, ". :/,'");
           return DOMPurify.sanitize(JSON.stringify({"error": errorMessage}));
         }
       }
@@ -7643,7 +7643,8 @@ body {
         }
         try {
           jsondata.tags = [];
-          jsondata.tags = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract3.methods.getTags(hash).call()))));
+          var rawTags = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract3.methods.getTags(hash).call()))));
+          jsondata.tags = Array.isArray(rawTags) ? rawTags : [];
         } catch (e) {
           console.log("Error loading tags");
         }
