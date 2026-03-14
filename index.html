@@ -6271,8 +6271,8 @@ body {
               if(x+1<maxtries) {
                 continue;
               }
-              errorMessage = response.data.error;
-              return DOMPurify.sanitize(JSON.stringify({"error": response.data.error}));
+              errorMessage = validation(DOMPurify.sanitize(response.data.error), ". ,");
+              return DOMPurify.sanitize(JSON.stringify({"error": errorMessage}));
             }
             throw new Error("error");
           } catch {
@@ -6507,7 +6507,7 @@ body {
             }
         } catch (error) {
             console.log("Caught error:", error);
-            return DOMPurify.sanitize(JSON.stringify({ error: error.message }));
+            return DOMPurify.sanitize(JSON.stringify({ error: validation(error.message, ". ,") }));
         }
     }
     var notifyOnce = false;
