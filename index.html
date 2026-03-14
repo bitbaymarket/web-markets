@@ -3674,7 +3674,7 @@ body {
 
       if (pendingTransactions.length > 0) {
         var webAddress = "https://polygonscan.com/tx/";
-        const currentChainId = DOMPurify.sanitize(await web3.eth.net.getId());
+        const currentChainId = validation(DOMPurify.sanitize(await web3.eth.net.getId()));
         if(currentChainId == "11155111") {
           webAddress = "https://sepolia.etherscan.io/tx/"
         }
@@ -3717,7 +3717,7 @@ body {
         return;
       }
 
-      const currentGasPrice = DOMPurify.sanitize(await web3.eth.getGasPrice());
+      const currentGasPrice = validation(DOMPurify.sanitize(await web3.eth.getGasPrice()));
       const nonce = originalTx.nonce;
       const gasLimit = originalTx.gas;
 
@@ -3739,7 +3739,7 @@ body {
         const newGasLimit = formValues[1];
         const estimatedCost = web3.utils.toBN(newGasPrice).mul(web3.utils.toBN(newGasLimit));
 
-        const balance = DOMPurify.sanitize(await web3.eth.getBalance(originalTx.from));
+        const balance = validation(DOMPurify.sanitize(await web3.eth.getBalance(originalTx.from)));
         if (web3.utils.toBN(balance).lt(estimatedCost)) {
           await Swal.fire(`${translateThis('Not enough funds')}`, `${translateThis('Your balance is too low to cover the gas fees for this transaction.')}`, 'error');
           return;
@@ -3771,7 +3771,7 @@ body {
             const signedTx = await web3.eth.accounts.signTransaction(newTx, accountprivkey);
             const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
             .on('transactionHash', function(hash){
-              const sanitizedHash = DOMPurify.sanitize(hash);
+              const sanitizedHash = validation(DOMPurify.sanitize(hash));
               console.log("Transaction Updated Hash", sanitizedHash);
               updatePendingTransactionHash(txHash, sanitizedHash);
               currentTxHash = sanitizedHash;
@@ -3807,12 +3807,12 @@ body {
         return;
       }
 
-      const currentGasPrice = DOMPurify.sanitize(await web3.eth.getGasPrice());
+      const currentGasPrice = validation(DOMPurify.sanitize(await web3.eth.getGasPrice()));
       const increasedGasPrice = web3.utils.toBN(currentGasPrice).mul(web3.utils.toBN(2)); // Increase gas price by 2x for faster cancellation
       const gasLimit = originalTx.gas;
       const estimatedCost = web3.utils.toBN(increasedGasPrice).mul(web3.utils.toBN(gasLimit));
 
-      const balance = DOMPurify.sanitize(await web3.eth.getBalance(originalTx.from));
+      const balance = validation(DOMPurify.sanitize(await web3.eth.getBalance(originalTx.from)));
       if (web3.utils.toBN(balance).lt(estimatedCost)) {
         await Swal.fire(`${translateThis('Not enough funds')}`, `${translateThis('Your balance is too low to cover the gas fees for this cancellation.')}`, 'error');
         return;
@@ -3843,7 +3843,7 @@ body {
             const signedTx = await web3.eth.accounts.signTransaction(cancelTx, accountprivkey);
             web3.eth.sendSignedTransaction(signedTx.rawTransaction)
             .on('transactionHash', function(newHash){
-              const sanitizedHash = DOMPurify.sanitize(newHash);
+              const sanitizedHash = validation(DOMPurify.sanitize(newHash));
               updatePendingTransactionHash(txHash, sanitizedHash);
               currentTxHash = sanitizedHash;
               removeTransactionHash(txHash);
@@ -3856,7 +3856,7 @@ body {
     }
 
     function storeTransactionHash(hash) {
-      const sanitizedHash = DOMPurify.sanitize(hash);
+      const sanitizedHash = validation(DOMPurify.sanitize(hash));
       if(accountprivkey !== ""){
         pendingTransactions.push(sanitizedHash);
         localStorage.setItem(myaccounts + DDEaddy + 'pendingTransactions', JSON.stringify(pendingTransactions));
@@ -4676,12 +4676,12 @@ body {
         document.getElementById("connectionstatus").innerHTML = isMobile ? '' : translateThis("Please unlock Metamask so it can connect.");
         return;
       }
-      var currentChainId = DOMPurify.sanitize(await web3.eth.net.getId());
+      var currentChainId = validation(DOMPurify.sanitize(await web3.eth.net.getId()));
       var netname = "unknown";
       var netname2 = "ETH";
       if (currentChainId == "137") {
         await web3.eth.getGasPrice().then(function (theGasPrice) {
-          gasPrice = window.web3.utils.toWei(parseInt(parseInt(DOMPurify.sanitize(theGasPrice)) * 1.5).toString(), 'wei');
+          gasPrice = window.web3.utils.toWei(parseInt(parseInt(validation(DOMPurify.sanitize(theGasPrice))) * 1.5).toString(), 'wei');
           //console.log(gasPrice)
           if(parseInt(gasPrice) > 2500000000000) {
             gasPrice = "2500000000000";
@@ -4721,7 +4721,7 @@ body {
       }
       if (currentChainId == "11155111") {
         await web3.eth.getGasPrice().then(function (theGasPrice) {
-          gasPrice = window.web3.utils.toWei(parseInt(parseInt(DOMPurify.sanitize(theGasPrice)) * 1.5).toString(), 'wei');
+          gasPrice = window.web3.utils.toWei(parseInt(parseInt(validation(DOMPurify.sanitize(theGasPrice))) * 1.5).toString(), 'wei');
           if(parseInt(gasPrice) > 2500000000000) {
             gasPrice = "2500000000000";
           }
@@ -4770,7 +4770,7 @@ body {
       if(accountprivkey != "") {
         myaccounts = await web3.eth.accounts.privateKeyToAccount(accountprivkey).address;
       } else {
-        myaccounts = DOMPurify.sanitize(myaccounts2[0]);
+        myaccounts = validation(DOMPurify.sanitize(myaccounts2[0]));
       }
       var cached = await getContactInfo(myaccounts);
       document.getElementById("myContactInfo").value = cached;
@@ -4859,7 +4859,7 @@ body {
       }
       const currentBlockNumber = await web3.eth.getBlockNumber();
       const currentBlock = await web3.eth.getBlock(currentBlockNumber);
-      CurrentTimeStamp = DOMPurify.sanitize(currentBlock.timestamp);
+      CurrentTimeStamp = validation(DOMPurify.sanitize(currentBlock.timestamp));
       DDEcontract = new web3.eth.Contract(DDEabi, DDEaddy);
       balances = {};
       var btext = [];
@@ -4868,21 +4868,21 @@ body {
           console.log(err);
           return;
         } else {
-          baseBalance = DOMPurify.sanitize(result1);//window.web3.utils.fromWei(result1, "ether");
+          baseBalance = validation(DOMPurify.sanitize(result1));//window.web3.utils.fromWei(result1, "ether");
           // document.getElementById("account").innerHTML = "<bdo>" + DOMPurify.sanitize(translateThis("Current Network:") + "</bdo> " + netname + "<br>" + myaccounts + "<br>" + netname2 + " <bdo>" + translateThis("wallet balance:") + "</bdo> " + window.web3.utils.fromWei(baseBalance, "ether") + btext);
           balances['base'] = {token: "base", decimals: 18, amount: baseBalance};
         }
       });
       for (var i = 0; i < tokens.length; i++) {
           await DDEcontract.methods.userBalance(myaccounts,tokens[i].address).call().then(function (liquid1) {
-            balances[tokens[i].address]=({token:tokens[i].token, decimals: tokens[i].decimals, amount: DOMPurify.sanitize(liquid1), amount2: "0", total: web3.utils.toBN(DOMPurify.sanitize(liquid1))});
+            balances[tokens[i].address]=({token:tokens[i].token, decimals: tokens[i].decimals, amount: validation(DOMPurify.sanitize(liquid1)), amount2: "0", total: web3.utils.toBN(validation(DOMPurify.sanitize(liquid1)))});
           });
           if(accountprivkey != "") {
             if(tokens[i].token == tokens[0].token) {
               //balances[tokens[i].address].total=balances[tokens[i].address].total.add(web3.utils.toBN(baseBalance));
             } else {
               var tokenContract = new web3.eth.Contract(ERC20abi, tokens[i].address);
-              var base2 = DOMPurify.sanitize(await tokenContract.methods.balanceOf(myaccounts).call());
+              var base2 = validation(DOMPurify.sanitize(await tokenContract.methods.balanceOf(myaccounts).call()));
               //balances[tokens[i].address].total=balances[tokens[i].address].total.add(web3.utils.toBN(base2));                
               balances[tokens[i].address].amount2 = base2;
               btext+="<br>"+balances[tokens[i].address].token+" <bdo>"+translateThis("wallet balance:")+"</bdo> "+displayDecimals(tokens[i].address, balances[tokens[i].address].amount2.toString());
@@ -4891,14 +4891,14 @@ body {
           btext+="<br>"+balances[tokens[i].address].token+" <bdo>"+translateThis("balance deposited to markets:")+"</bdo> "+displayDecimals(tokens[i].address, balances[tokens[i].address].total.toString());
       }
       reputation = [0,0,0];
-      reputation = JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(myaccounts).call())));
+      reputation = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(myaccounts).call()))));
       if((parseInt(reputation[0]) + parseInt(reputation[1])) > 0) {
           btext+="<br><bdo>" + translateThis("Contracting success rate:") + "</bdo> " + (parseFloat(parseFloat(reputation[0]) / (parseFloat(reputation[0]) + parseFloat(reputation[1]))) * parseFloat(100)).toFixed(2) + "% (" + parseInt(reputation[0]) + "/" + (parseInt(reputation[0]) + parseInt(reputation[1])) + ")";
       }
       document.getElementById("account").innerHTML = "<bdo>" + DOMPurify.sanitize(translateThis("Current Network:") + "</bdo> " + netname + "<br>" + myaccounts + "<br>" + netname2 + " <bdo>" + translateThis("wallet balance:") + "</bdo> " + window.web3.utils.fromWei(baseBalance, "ether") + btext);
       try {
-          var afee = DOMPurify.sanitize(await DDEcontract.methods.affiliateFee().call());
-          var cfee = DOMPurify.sanitize(await DDEcontract.methods.customFee(myaccounts).call());
+          var afee = validation(DOMPurify.sanitize(await DDEcontract.methods.affiliateFee().call()));
+          var cfee = validation(DOMPurify.sanitize(await DDEcontract.methods.customFee(myaccounts).call()));
           var atext = "<bdo>" + translateThis("Base referral fee paid to affiliates:") + "</bdo> " + (afee / 100).toFixed(2) + "%";
           baseFee = afee;
           if(cfee != 0) {
@@ -4907,16 +4907,16 @@ body {
           if(reputation[2] >= 10) {
             atext += "<br><bdo>" + translateThis("You are an affiliate! You may market this system using your affiliate link.") + "</bdo>";
           } else {
-            var cooldown = DOMPurify.sanitize(await DDEcontract.methods.cooldown(myaccounts).call());
+            var cooldown = validation(DOMPurify.sanitize(await DDEcontract.methods.cooldown(myaccounts).call()));
                 if(cooldown != 0 && (cooldown - CurrentTimeStamp) > 0) {
               atext += "<br><bdo>" + translateThis("Cooldown between next deal to qualify as an affiliate:") + "</bdo> " + ((parseFloat(cooldown) - parseFloat(CurrentTimeStamp)) / 60 / 60 / 24).toFixed(2) + translateThis("(days)");
             } else {
-              var threshold = DOMPurify.sanitize(await DDEcontract.methods.minimumFeeThreshold(tokens[0].address).call());
+              var threshold = validation(DOMPurify.sanitize(await DDEcontract.methods.minimumFeeThreshold(tokens[0].address).call()));
               atext += "<br><bdo>" + translateThis("Minimum qualifying fee on next deal to become affiliate:") + "</bdo> " + displayDecimals(tokens[0].address, threshold);
             }
             atext += "<br><bdo>" + translateThis("Qualifying contracts remaining until you can become an affiliate:") + "</bdo> " + (10 - reputation[2]);
           }
-          var referral2 = DOMPurify.sanitize(await DDEcontract.methods.referral(myaccounts).call());
+          var referral2 = validation(DOMPurify.sanitize(await DDEcontract.methods.referral(myaccounts).call()));
           if(referral2 == "0x0000000000000000000000000000000000000000" && referral == "0x0000000000000000000000000000000000000000") {
             atext += "<br><bdo>" + translateThis("No affiliate assigned! It's recommended to assign one so the fee is not burned.") + "</bdo>";
           }
@@ -4924,7 +4924,7 @@ body {
             atext += "<br><bdo>" + translateThis("Current affiliate assigned to account:") + "</bdo> " + referral2;
           }
           if(referral != "0x0000000000000000000000000000000000000000") {
-            var arep = JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(referral).call())));
+            var arep = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(referral).call()))));
             if(arep[2]>=10) {
               atext += "<br><bdo>" + translateThis("Future affiliate assigned on next contract:") + "</bdo> " + referral;
             } else {
@@ -4945,7 +4945,7 @@ body {
       var shortPublicKey = '';
       var datatext = '';
       try {
-        datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 3).call());
+        datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 3).call()));
         if(datalen > 0) {
           contact2 = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(myaccounts, datalen-1).call()));
           if("mycontact" in contact2) {
@@ -5139,7 +5139,7 @@ body {
     var mySelectedAPI = "a";    
 
     async function saveAPI(setAPI = '') {
-      const myCurrentChainId = DOMPurify.sanitize(await web3.eth.net.getId());
+      const myCurrentChainId = validation(DOMPurify.sanitize(await web3.eth.net.getId()));
       var mySelectedAPI = '';
       if(setAPI == 'a' || setAPI == 'b') {
         mySelectedAPI = setAPI;
@@ -5235,7 +5235,7 @@ body {
     selectAPI.addEventListener('change', saveAPI);
 
     async function getUserAPI(mychainid) {
-      mylen = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 4).call()));
+      mylen = parseInt(validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 4).call())));
       selectAPI.removeEventListener('change', saveAPI);
       const mySelectElement = document.getElementById('connectMethod');
 
@@ -5439,13 +5439,13 @@ body {
     }
 
     async function modifyCustodian() {
-      const dataLength = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 4).call());
+      const dataLength = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 4).call()));
       let custodians = [];
       let custodianOptions = {};
 
       for (let index = 0; index < dataLength; index++) {
-        const custodianAddress = DOMPurify.sanitize(await DDEcontract.methods.custodianList(myaccounts, index).call());
-        const isActive = DOMPurify.sanitize(await DDEcontract.methods.isCustodian(myaccounts, custodianAddress).call());
+        const custodianAddress = validation(DOMPurify.sanitize(await DDEcontract.methods.custodianList(myaccounts, index).call()));
+        const isActive = validation(DOMPurify.sanitize(await DDEcontract.methods.isCustodian(myaccounts, custodianAddress).call()));
         if (isActive) {
           custodians.push(custodianAddress);
           custodianOptions[custodianAddress] = custodianAddress;
@@ -5580,12 +5580,12 @@ body {
     async function cosign() {
       var swalOptions = {};
       var swalOptions2 = {};
-      var y = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 5).call());
+      var y = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 5).call()));
       var tot = 0;
       for(let x = 0; x < y; x++) {
         try {
-          var coaddy = DOMPurify.sanitize(await DDEcontract.methods.custodianList2(myaccounts, x).call());
-          var active = DOMPurify.sanitize(await DDEcontract.methods.isCustodian(coaddy, myaccounts).call());
+          var coaddy = validation(DOMPurify.sanitize(await DDEcontract.methods.custodianList2(myaccounts, x).call()));
+          var active = validation(DOMPurify.sanitize(await DDEcontract.methods.isCustodian(coaddy, myaccounts).call()));
           if(active) {
             swalOptions[coaddy] = coaddy;
             tot+=1;
@@ -5613,8 +5613,8 @@ body {
           var contracts = {};
           var readMessages = JSON.parse(localStorage.getItem(myaccounts + DDEaddy + addy + ":escrows")) || {};
           try {
-            var y = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(addy, 2).call());
-            var auth = DOMPurify.sanitize(await DDEcontract.methods.isAuthorized(addy, myaccounts, "0x").call());
+            var y = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(addy, 2).call()));
+            var auth = validation(DOMPurify.sanitize(await DDEcontract.methods.isAuthorized(addy, myaccounts, "0x").call()));
           } catch (e) {
             console.log(e);
             await(showError(e));
@@ -5625,18 +5625,18 @@ body {
               if(x in readMessages) {
                 continue;
               }
-              var hash = DOMPurify.sanitize(await DDEcontract.methods.escrows(addy, x).call());
+              var hash = validation(DOMPurify.sanitize(await DDEcontract.methods.escrows(addy, x).call()));
               var jsondata = await getOrderHash(hash);
               if(parseInt(jsondata.status[0]) < 4 && parseInt(jsondata.status[1]) < 4) {
                 if(!auth) {
-                  var auth2 = DOMPurify.sanitize(await DDEcontract.methods.isAuthorized(addy, myaccounts, hash).call());
+                  var auth2 = validation(DOMPurify.sanitize(await DDEcontract.methods.isAuthorized(addy, myaccounts, hash).call()));
                   if(!auth2) {
                     continue;
                   }
                 }
                 const currentBlockNumber = await web3.eth.getBlockNumber();
                 const currentBlock = await web3.eth.getBlock(currentBlockNumber);
-                const blockTimestamp = DOMPurify.sanitize(currentBlock.timestamp);
+                const blockTimestamp = validation(DOMPurify.sanitize(currentBlock.timestamp));
                 const timeRemaining = (parseFloat(parseInt(jsondata.timelimit[0]) - parseInt(blockTimestamp)) / parseFloat(60 * 60 * 24)).toFixed(2);
                 jsondata.timeRemaining = timeRemaining;
                 var escrowInfo = '';
@@ -5737,7 +5737,7 @@ body {
 
     async function registerData(contactInfo, overwriteLastEntry = 1) {
       if (accountprivkey !== "" && nodeList.includes(myaccounts) && overwriteLastEntry == 0) {
-        datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 3).call());
+        datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 3).call()));
         if(datalen != "0") {
           await Swal.fire(translateThis("This function is currently not available for a node."));
           return;
@@ -5847,7 +5847,7 @@ body {
       langOptions.forEach((lang) => {
         swalOptions[lang] = lang;
       });
-      var arep = JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(myaccounts).call())));
+      var arep = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(myaccounts).call()))));
       if(arep[2]<10) {
         await Swal.fire(translateThis("You have not completed 10 deals with the minimum threshold and requirements yet. Only then can you become an affiliate."));
         return;
@@ -5916,7 +5916,7 @@ body {
             return;
           }
           var reputation = [0,0,0];
-          reputation = JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(affiliate).call())));
+          reputation = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(affiliate).call()))));
           if(reputation[2] >= 10) {
             try {
               setActionActive(myaccounts+"changeAffiliate"+affiliate, true);
@@ -6090,7 +6090,7 @@ body {
           }
         });
         // console.log(response.data.IpfsHash);
-        return DOMPurify.sanitize(response.data.IpfsHash);
+        return validation(DOMPurify.sanitize(response.data.IpfsHash));
       } catch (error) {
         console.log(error);
         return 'error';
@@ -6218,7 +6218,7 @@ body {
     async function moderationGateway(orderData, hash = '', ipfs = '') {
       var request = {};
       request.address = myaccounts;
-      request.chain = DOMPurify.sanitize(await web3.eth.net.getId());
+      request.chain = validation(DOMPurify.sanitize(await web3.eth.net.getId()));
       if(hash == '') {
         request.hash = hashObject(JSON.stringify(orderData));
       } else {
@@ -6596,7 +6596,7 @@ body {
           }
           if (changed == 1) {
             if(Object.keys(checkedHashes).length > 10000) {
-              const mylen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 3).call());
+              const mylen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 3).call()));
               if (!checkedHashes['batch'].includes(mylen)) {
                 checkedHashes['batch'].push(mylen)
               }
@@ -6628,7 +6628,7 @@ body {
             DDEcontract5 = DDEcontract;
         }
         if(mylen=='') {
-          mylen = parseInt(DOMPurify.sanitize(await DDEcontract5.methods.getArrayLength(userAddress, 3).call()));
+          mylen = parseInt(validation(DOMPurify.sanitize(await DDEcontract5.methods.getArrayLength(userAddress, 3).call())));
         }
         if(mylen > 0) {
           const lastEntry = JSON.parse(DOMPurify.sanitize(await DDEcontract5.methods.userdata(userAddress, mylen - 1).call()));
@@ -6656,7 +6656,7 @@ body {
         if(lastIndex == null) {
           lastIndex = 0;
         }
-        const totalOrders = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength("0x0000000000000000000000000000000000000000",1).call()));
+        const totalOrders = parseInt(validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength("0x0000000000000000000000000000000000000000",1).call())));
         var orders = [];
         const maxcount = 100;
         var currentCount = 0;
@@ -6667,7 +6667,7 @@ body {
           if(currentCount==maxcount) {
             break;
           }
-          const orderHash = DOMPurify.sanitize(await DDEcontract.methods.privateOffers("0x0000000000000000000000000000000000000000",i).call());
+          const orderHash = validation(DOMPurify.sanitize(await DDEcontract.methods.privateOffers("0x0000000000000000000000000000000000000000",i).call()));
           orders.push([orderHash,i]);
           currentCount+=1;
         }
@@ -6815,7 +6815,7 @@ body {
       const lastTimestamp = localStorage.getItem('lastTimestamp');
       var marketsLength = 0;
       await DDEcontract.methods.marketslength().call().then(async function (result) {
-        marketsLength = DOMPurify.sanitize(result);
+        marketsLength = validation(DOMPurify.sanitize(result));
       });
       const currentTimestamp2 = new Date().getTime();
 
@@ -6911,10 +6911,10 @@ body {
         }
         let myhashes = JSON.parse(localStorage.getItem('myhashes'+DDEaddy)) || {};
         await DDEcontract3.methods.marketslength().call().then(async function (result) {
-            currentMarketsLength = DOMPurify.sanitize(result);
-            mlength = parseInt(DOMPurify.sanitize(result));
+            currentMarketsLength = validation(DOMPurify.sanitize(result));
+            mlength = parseInt(validation(DOMPurify.sanitize(result)));
         });
-        var listlen = DOMPurify.sanitize(await DDEcontract3.methods.getArrayLength(tempCurators[0],3).call());
+        var listlen = validation(DOMPurify.sanitize(await DDEcontract3.methods.getArrayLength(tempCurators[0],3).call()));
         var udata = {};
         if(listlen > 0) {
           var udata2 = JSON.parse(DOMPurify.sanitize(await DDEcontract3.methods.userdata(tempCurators[0], listlen-1).call()));
@@ -6966,7 +6966,7 @@ body {
                   mlen -= 1;
                   continue;
                 }
-                const offerID = parseInt(DOMPurify.sanitize(await DDEcontract3.methods.userMarketID(hash).call()));
+                const offerID = parseInt(validation(DOMPurify.sanitize(await DDEcontract3.methods.userMarketID(hash).call())));
                 if (offerID == 0) {
                   expiredOffers.push(hash);
                   mlen -= 1;
@@ -7067,7 +7067,7 @@ body {
               var mylen = 0;
               if(!web3.utils.isAddress(userAddress)) {
               } else {
-                mylen = DOMPurify.sanitize(await DDEcontract3.methods.getArrayLength(userAddress, 0).call());
+                mylen = validation(DOMPurify.sanitize(await DDEcontract3.methods.getArrayLength(userAddress, 0).call()));
                 var cached = localStorage.getItem(userAddress + DDEaddy + ":userStoreCache");
                 if (cached) {
                   expiredOffers = JSON.parse(cached);
@@ -7084,7 +7084,7 @@ body {
                   continue;
                 }                
                 try {
-                  const hash = DOMPurify.sanitize(await DDEcontract3.methods.openOffers(userAddress, myinx).call());
+                  const hash = validation(DOMPurify.sanitize(await DDEcontract3.methods.openOffers(userAddress, myinx).call()));
                   if(hash in filteredOrders) {
                     truetot -= 1;
                     continue;
@@ -7097,7 +7097,7 @@ body {
                     truetot -= 1;
                     continue;
                   }
-                  const offerID = parseInt(DOMPurify.sanitize(await DDEcontract3.methods.userMarketID(hash).call()));
+                  const offerID = parseInt(validation(DOMPurify.sanitize(await DDEcontract3.methods.userMarketID(hash).call())));
                   if (offerID == 0) {
                     truetot -= 1;
                     expiredOffers.push(myinx);
@@ -7205,7 +7205,7 @@ body {
               return;
             }
             try {
-              const offerID = parseInt(DOMPurify.sanitize(await DDEcontract3.methods.userMarketID(hash).call()));
+              const offerID = parseInt(validation(DOMPurify.sanitize(await DDEcontract3.methods.userMarketID(hash).call())));
               if (offerID == 0) {
               } else {
                 jsondata = await getOrderHash(hash);
@@ -7269,7 +7269,7 @@ body {
               let keywordLength = 0;
               await DDEcontract3.methods.taglength(keyword.toLowerCase()).call().then(async function (result) {
                   keywordIndex = 0;
-                  keywordLength = parseInt(DOMPurify.sanitize(result));
+                  keywordLength = parseInt(validation(DOMPurify.sanitize(result)));
                   if(low == 0) {
                     longestKey += keywordLength;
                   }
@@ -7280,7 +7280,7 @@ body {
                       }
                       try {
                           await DDEcontract3.methods.hashtag(keyword.toLowerCase(), keywordIndex).call().then(async function (hash) {
-                              hash = DOMPurify.sanitize(hash);
+                              hash = validation(DOMPurify.sanitize(hash));
                               if(hash in filteredOrders) {
                                 longestKey -= 1;
                                 return;
@@ -7289,7 +7289,7 @@ body {
                                 longestKey -= 1;
                                 return;
                               }
-                              const offerID = parseInt(DOMPurify.sanitize(await DDEcontract3.methods.userMarketID(hash).call()));
+                              const offerID = parseInt(validation(DOMPurify.sanitize(await DDEcontract3.methods.userMarketID(hash).call())));
                               if (offerID == 0) {
                                 longestKey -= 1;
                                 return;
@@ -7413,7 +7413,7 @@ body {
                 searchThis = [];
                 try {
                     await DDEcontract3.methods.markets(index).call().then(async function (hash) {
-                        hash = DOMPurify.sanitize(hash);
+                        hash = validation(DOMPurify.sanitize(hash));
                         if(hash in filteredOrders) {
                           trueLength -= 1;
                           return;
@@ -7616,7 +7616,7 @@ body {
         } else {
           if(hash != cHash2) {
             try {
-              var originalTime = DOMPurify.sanitize(await DDEcontract3.methods.acceptTime(hash).call());
+              var originalTime = validation(DOMPurify.sanitize(await DDEcontract3.methods.acceptTime(hash).call()));
               cHash2 = web3.utils.keccak256(web3.utils.encodePacked({value: data.sender, type: 'address'},{value: data.recipient, type: 'address'},{value: data.token, type: 'address'},{value: data.amount, type: 'uint256'},{value: data.depositSender, type: 'uint256'},{value: data.depositRecipient, type: 'uint256'},{value: originalTime, type: 'uint256'},{value: data.message, type: 'string'}));
               if(hash != cHash2) {
                 jsondata.hashMismatch = true;
@@ -7630,11 +7630,11 @@ body {
         try {
           var reputation = [0,0,0];
           if(jsondata.sender != "0x0000000000000000000000000000000000000000") {
-            reputation = JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract3.methods.getCompleted(jsondata.sender).call())));
+            reputation = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract3.methods.getCompleted(jsondata.sender).call()))));
             jsondata.reputationSender = reputation;
           }
           if(jsondata.recipient != "0x0000000000000000000000000000000000000000") {
-            reputation = JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract3.methods.getCompleted(jsondata.recipient).call())));
+            reputation = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract3.methods.getCompleted(jsondata.recipient).call()))));
             jsondata.reputationRecipient = reputation;
           }
         } catch (e) {
@@ -7700,7 +7700,7 @@ body {
       var notify = 0;
       var myhash = '';
       try {
-        mylen = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 0).call()));
+        mylen = parseInt(validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 0).call())));
       } catch(error) {
         console.log(error);
       }
@@ -7709,8 +7709,8 @@ body {
           continue;
         }
         try {
-          const offerHash = DOMPurify.sanitize(await DDEcontract.methods.openOffers(myaccounts, i).call());
-          const offerID = DOMPurify.sanitize(await DDEcontract.methods.userMarketID(offerHash).call());
+          const offerHash = validation(DOMPurify.sanitize(await DDEcontract.methods.openOffers(myaccounts, i).call()));
+          const offerID = validation(DOMPurify.sanitize(await DDEcontract.methods.userMarketID(offerHash).call()));
           if (offerID == 0) {
             readMessages[i] = true;
             localStorage.setItem(myaccounts + DDEaddy + ":readmessages", JSON.stringify(readMessages));
@@ -7829,7 +7829,7 @@ body {
       list2.classList.add("offers-list-box");
       readMessages = JSON.parse(localStorage.getItem(myaccounts + DDEaddy + ":readmessages2")) || {};
       try {
-        mylen = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 1).call()));
+        mylen = parseInt(validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 1).call())));
       } catch(error) {
         mylen = 0
         console.log(error);
@@ -7839,7 +7839,7 @@ body {
           continue;
         }
         try {
-          const offerHash2 = DOMPurify.sanitize(await DDEcontract.methods.privateOffers(myaccounts, i).call());
+          const offerHash2 = validation(DOMPurify.sanitize(await DDEcontract.methods.privateOffers(myaccounts, i).call()));
           const offerData2 = await getOrderHash(offerHash2);
           if ("hashMismatch" in offerData2 && skipMismatched) {
             const mcurrentTime = Math.floor(Date.now() / 1000);
@@ -7954,7 +7954,7 @@ body {
             mode = 2;
           }
           if(offerHash2 in notifications) {
-            var mslen = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getMessageLength(offerHash2, counterpartyAddress2).call()));
+            var mslen = parseInt(validation(DOMPurify.sanitize(await DDEcontract.methods.getMessageLength(offerHash2, counterpartyAddress2).call())));
             var msIndex = localStorage.getItem(myaccounts + DDEaddy + offerHash2 + counterpartyAddress2 + 'lastMessageIndex') || 0;
             if(mslen > msIndex) {
               offerData2.newMessage = true;
@@ -8066,7 +8066,7 @@ body {
       list3.classList.add('offers-list-box');
       readMessages = JSON.parse(localStorage.getItem(myaccounts + DDEaddy + ":readmessages3")) || {};
       try {
-        mylen = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 2).call()));
+        mylen = parseInt(validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 2).call())));
       } catch(error) {
         mylen = 0;
         console.log(error);
@@ -8076,7 +8076,7 @@ body {
           continue;
         }
         try {
-          const offerHash3 = DOMPurify.sanitize(await DDEcontract.methods.escrows(myaccounts, i).call());
+          const offerHash3 = validation(DOMPurify.sanitize(await DDEcontract.methods.escrows(myaccounts, i).call()));
           const offerData3 = await getOrderHash(offerHash3);
           if ("hashMismatch" in offerData3 && skipMismatched) {
             const mcurrentTime = Math.floor(Date.now() / 1000);
@@ -8116,7 +8116,7 @@ body {
 
           const currentBlockNumber = await web3.eth.getBlockNumber();
           const currentBlock = await web3.eth.getBlock(currentBlockNumber);
-          const blockTimestamp = DOMPurify.sanitize(currentBlock.timestamp);
+          const blockTimestamp = validation(DOMPurify.sanitize(currentBlock.timestamp));
           const timeRemaining = (parseFloat(parseInt(offerData3.timelimit[0]) - parseInt(blockTimestamp)) / parseFloat(60 * 60 * 24)).toFixed(2);
           var offerHashDisp3 = offerHash3;
           if(window.innerWidth < 550) {
@@ -8221,7 +8221,7 @@ body {
           }
           offerData3.index = i;
           if(offerHash3 in notifications) {
-            var mslen2 = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getMessageLength(offerHash3, counterpartyAddress3).call()));
+            var mslen2 = parseInt(validation(DOMPurify.sanitize(await DDEcontract.methods.getMessageLength(offerHash3, counterpartyAddress3).call())));
             var msIndex2 = localStorage.getItem(myaccounts + DDEaddy + offerHash3 + counterpartyAddress3 + 'lastMessageIndex') || 0;
             if(mslen2 > msIndex2) {
               offerData3.newMessage = true;
@@ -8647,7 +8647,7 @@ body {
               if(notification.mode == 4) {
                 const currentBlockNumber = await web3.eth.getBlockNumber();
                 const currentBlock = await web3.eth.getBlock(currentBlockNumber);
-                const blockTimestamp = DOMPurify.sanitize(currentBlock.timestamp);
+                const blockTimestamp = validation(DOMPurify.sanitize(currentBlock.timestamp));
                 mylisting.timeRemaining = (parseFloat(parseInt(mylisting.timelimit[0]) - parseInt(blockTimestamp)) / parseFloat(60 * 60 * 24)).toFixed(2);
                 mylisting.escrowInfo = notification.listing.escrowInfo;
                 mylisting.index = notification.listing.index;
@@ -8851,7 +8851,7 @@ body {
     async function getTotalItemsForUserStore(userStoreKey) {
         try {
             const totalItems = await DDEcontract3.methods.getArrayLength(userStoreKey, 0).call();
-            return DOMPurify.sanitize(totalItems);
+            return validation(DOMPurify.sanitize(totalItems));
         } catch (error) {
             console.error("Error fetching total items for user store:", error);
             return 0;
@@ -9364,7 +9364,7 @@ body {
       var reputation = [0,0,0];
       if(theuser != listing.recipient && listing.recipient != "0x0000000000000000000000000000000000000000" && DDEcontract != '') {
         try {
-          datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(listing.recipient, 3).call());
+          datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(listing.recipient, 3).call()));
           if(datalen > 0) {
             contact2 = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(listing.recipient, datalen-1).call()));
             if(typeof contact2 === 'object' && 'mycontact' in contact2) {
@@ -9373,7 +9373,7 @@ body {
               }
             }
           }
-          reputation = JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(listing.recipient).call())));
+          reputation = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(listing.recipient).call()))));
           if(reputation[0] == 0 && reputation[1] == 0) {
             message.innerHTML += '<br><br>' + translateThis('Recipient is a new user of the markets.') + '<br>';
           } else {
@@ -9385,7 +9385,7 @@ body {
       }
       if(theuser != listing.sender && listing.sender != "0x0000000000000000000000000000000000000000" && DDEcontract != '') {
         try {
-          datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(listing.sender, 3).call());
+          datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(listing.sender, 3).call()));
           if(datalen > 0) {
             contact2 = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(listing.sender, datalen-1).call()));
             if(typeof contact2 === 'object' && 'mycontact' in contact2) {
@@ -9394,7 +9394,7 @@ body {
               }
             }
           }
-          reputation = JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(listing.sender).call())));
+          reputation = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(listing.sender).call()))));
           if(reputation[0] == 0 && reputation[1] == 0) {
             message.innerHTML += '<br><br>' + translateThis('Sender is a new user of the markets.') + '<br>';
           } else {
@@ -10183,7 +10183,7 @@ body {
             storedMessage = "ENC:" + cryptico.encrypt(message + "#*#*#" + timestamp + padding, userpubkey).cipher;
           }
           setActionActive(myaccounts+"sendMessage"+finalMessage, true);
-          var mslen = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getMessageLength(hash, senderAddress).call())) + 1;
+          var mslen = parseInt(validation(DOMPurify.sanitize(await DDEcontract.methods.getMessageLength(hash, senderAddress).call()))) + 1;
 
           if(accountprivkey != "") {
             const gasEstimate = 150000;
@@ -10329,7 +10329,7 @@ body {
       let unreadMessageCount = 0;
 
       try {
-          var mslen = parseInt(DOMPurify.sanitize(await DDEcontract.methods.getMessageLength(hash, user).call()));
+          var mslen = parseInt(validation(DOMPurify.sanitize(await DDEcontract.methods.getMessageLength(hash, user).call())));
           while (index < mslen) {
               const message = DOMPurify.sanitize(await DDEcontract.methods.messages(hash, user, index).call());
               if (!message) break;
@@ -10341,7 +10341,7 @@ body {
                   const messageParts = decryptionResult.plaintext.split("#*#*#");
                   if (messageParts.length === 2) {
                       const timestampAndPadding = messageParts[1];
-                      msgtimestamp = DOMPurify.sanitize(timestampAndPadding.slice(0, 13));
+                      msgtimestamp = validation(DOMPurify.sanitize(timestampAndPadding.slice(0, 13)));
                       const padding = timestampAndPadding.slice(13);
                       if (padding.length === 16 && !isNaN(msgtimestamp)) {
                           decryptedMessage = DOMPurify.sanitize(messageParts[0]);
@@ -10558,7 +10558,7 @@ body {
           // If the selected token is not ETH, deposit the selected token
           try {
             // var tokenContract = new web3.eth.Contract(ERC20abi, tokenAddress);
-            // var allowance = DOMPurify.sanitize(await tokenContract.methods.allowance(myaccounts, DDEaddy).call());
+            // var allowance = validation(DOMPurify.sanitize(await tokenContract.methods.allowance(myaccounts, DDEaddy).call()));
             var value = (new BigNumber(amount.toString()).times(new BigNumber(10).pow(decimals))).toString()
             setActionActive(myaccounts+"deposit"+tokenAddress+value, true);
             await getApproval(tokenAddress, value);
@@ -10595,7 +10595,7 @@ body {
     async function getApproval(tokenAddress, value) {
       if(tokennames[tokenAddress] != tokens[0].token) {
         var tokenContract = new web3.eth.Contract(ERC20abi, tokenAddress);
-        var allowance = DOMPurify.sanitize(await tokenContract.methods.allowance(myaccounts, DDEaddy).call());
+        var allowance = validation(DOMPurify.sanitize(await tokenContract.methods.allowance(myaccounts, DDEaddy).call()));
         if (web3.utils.toBN(allowance).lt(web3.utils.toBN(value))) {
           await Swal.fire(translateThis("Waiting for approval..."));
           if( accountprivkey == ""){
@@ -11411,7 +11411,7 @@ body {
           var recipient = "0x0000000000000000000000000000000000000000";
           const currentBlockNumber = await web3.eth.getBlockNumber();
           const currentBlock = await web3.eth.getBlock(currentBlockNumber);
-          const blockTimestamp = DOMPurify.sanitize(currentBlock.timestamp);
+          const blockTimestamp = validation(DOMPurify.sanitize(currentBlock.timestamp));
           if (contractType.value === 'private') {
             sender = counterPartyInput;
             recipient = myaccounts;
@@ -11563,7 +11563,7 @@ body {
             }
             var returnThis = 0;
             if(otherparty != "0x0000000000000000000000000000000000000000") {
-              datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(otherparty, 3).call());
+              datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(otherparty, 3).call()));
               if(datalen > 0) {
                 contact2 = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(otherparty, datalen-1).call()));
                 if('publickey' in contact2 && userprivkey != '') {
@@ -11691,7 +11691,7 @@ body {
             data2.referred = counterdata.referred;
             if(myaccounts == sender2) {
               data2.referred = referral;
-              const rfee2 = parseInt(DOMPurify.sanitize(await DDEcontract.methods.customFee(otherparty).call()));
+              const rfee2 = parseInt(validation(DOMPurify.sanitize(await DDEcontract.methods.customFee(otherparty).call())));
               if(rfee2 > baseFee) {
                 data2.rfee = rfee2;
               }
@@ -12037,7 +12037,7 @@ body {
         var selectedValue = offerExpirationSelect.value;
         const currentBlockNumber = await web3.eth.getBlockNumber();
         const currentBlock = await web3.eth.getBlock(currentBlockNumber);
-        const blockTimestamp = DOMPurify.sanitize(currentBlock.timestamp);
+        const blockTimestamp = validation(DOMPurify.sanitize(currentBlock.timestamp));
         if (selectedValue === "never") {
           accepttimelimit = 0; // Set the time limit to 0 seconds for "Never" option
         } else if (selectedValue === "two-weeks") {
@@ -12103,7 +12103,7 @@ body {
           return false;
         }
         if(mylisting.sender == "0x0000000000000000000000000000000000000000" || mylisting.recipient == "0x0000000000000000000000000000000000000000" ) {
-          const offerID = DOMPurify.sanitize(await DDEcontract.methods.userMarketID(mylisting.hash).call());
+          const offerID = validation(DOMPurify.sanitize(await DDEcontract.methods.userMarketID(mylisting.hash).call()));
           if(offerID == 0) {
             await Swal.fire(translateThis("Offer no longer available!"));
             return;
@@ -12144,7 +12144,7 @@ body {
               }
               var counterbalance = "";
               await DDEcontract.methods.userBalance(counterparty,mylisting.token).call().then(function (bal) {            
-                counterbalance = DOMPurify.sanitize(bal);
+                counterbalance = validation(DOMPurify.sanitize(bal));
               });
               var mytotal = "0";
               var mybal = web3.utils.toBN(balances[mylisting.token].amount);
@@ -12180,7 +12180,7 @@ body {
               var datalen = 0;
               var contact2 = '';
               try {
-                datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(counterparty, 3).call());
+                datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(counterparty, 3).call()));
                 if(datalen > 0) {
                   contact2 = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(counterparty, datalen-1).call()));
                 }
@@ -12312,7 +12312,7 @@ body {
           }
           var counterbalance = "";
           await DDEcontract.methods.userBalance(counterparty,mylisting.token).call().then(function (bal) {            
-            counterbalance = DOMPurify.sanitize(bal);
+            counterbalance = validation(DOMPurify.sanitize(bal));
           });
           var mytotal = "0";
           var mybal = web3.utils.toBN(balances[mylisting.token].amount);
@@ -12348,7 +12348,7 @@ body {
           var datalen = 0;
           var contact2 = '';
           try {
-            datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(counterparty, 3).call());
+            datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(counterparty, 3).call()));
             if(datalen > 0) {
               contact2 = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(counterparty, datalen-1).call()));
             }
@@ -12623,7 +12623,7 @@ body {
     async function userSupportsEncryption(userAddress) {
       try {
         var DDEcontract4 = new web3.eth.Contract(DDEabi, DDEaddy);
-        const dataLength = DOMPurify.sanitize(await DDEcontract4.methods.getArrayLength(userAddress, 3).call());
+        const dataLength = validation(DOMPurify.sanitize(await DDEcontract4.methods.getArrayLength(userAddress, 3).call()));
         if (dataLength > 0) {
           const userData = JSON.parse(DOMPurify.sanitize(await DDEcontract4.methods.userdata(userAddress, dataLength - 1).call()));
           return {
@@ -12821,7 +12821,7 @@ body {
     }
     async function getAPI(index) {
       if(index == 'b') {
-        const myCurrentChainId = DOMPurify.sanitize(await web3.eth.net.getId());
+        const myCurrentChainId = validation(DOMPurify.sanitize(await web3.eth.net.getId()));
         var APIKEYS;
         try {
           APIKEYS = JSON.parse(localStorage.getItem(myaccounts + DDEaddy + myCurrentChainId + ":apiKeys")) || 'none';
@@ -12840,8 +12840,8 @@ body {
         }
       }
       if(index == 'a') {
-        var minter = DOMPurify.sanitize(await DDEcontract.methods.minter().call());
-        var datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(minter, 3).call());
+        var minter = validation(DOMPurify.sanitize(await DDEcontract.methods.minter().call()));
+        var datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(minter, 3).call()));
         if(datalen > 0) {
           var mdata = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(minter, datalen-1).call()));
           if('curators' in mdata) {
