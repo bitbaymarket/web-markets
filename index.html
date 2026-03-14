@@ -3433,6 +3433,34 @@ body {
       await populateListings();
     });
 
+    function validation(input, extra="") {
+      if (Array.isArray(input)) {
+        return input.map(function(item) { return validation(item, extra); });
+      }
+      if (input !== null && typeof input === 'object') {
+        var result = {};
+        Object.keys(input).forEach(function(key) {
+          var safeKey = /^[a-zA-Z0-9_-]+$/.test(key) ? key : "";
+          if (safeKey !== "") {
+            result[safeKey] = validation(input[key], extra);
+          }
+        });
+        return result;
+      }
+      if (!input && input !== 0) return "";
+      var str = String(input);
+      if (str.toLowerCase() === "true") {
+        return true;
+      }
+      if (str.toLowerCase() === "false") {
+        return false;
+      }
+      var pattern = extra
+        ? new RegExp('^[a-zA-Z0-9_\\-' + extra.replace(/[\]\\^-]/g, '\\$&') + ']+$')
+        : /^[a-zA-Z0-9_-]+$/;
+      return pattern.test(str) ? str : "";
+    }
+
     function translateThis(mytext) {
       const selectedLanguageCode = document.getElementById("languageSelect").value;
       if(selectedLanguageCode in languages) {
@@ -5020,7 +5048,7 @@ body {
         await Swal.fire(translateThis("Not connected."));
       }
       else {
-        await Swal.fire({title: translateThis("Error sending transaction"), text: error.message, icon: 'error', confirmButtonText: translateThis('OK')});
+        await Swal.fire({title: translateThis("Error sending transaction"), text: validation(error.message, ". :/(),'"), icon: 'error', confirmButtonText: translateThis('OK')});
       }
     }
 
@@ -6266,8 +6294,8 @@ body {
           if(x+1<maxtries) {
             continue
           }
-          errorMessage = error.message;
-          return JSON.stringify({"error": error.message});
+          errorMessage = validation(error.message, ". :/(),'");
+          return DOMPurify.sanitize(JSON.stringify({"error": errorMessage}));
         }
       }
       return JSON.stringify({"error": errorMessage});
@@ -7556,26 +7584,26 @@ body {
           console.log(e);
         }
         jsondata = {
-          sender: DOMPurify.sanitize(data.sender),
-          recipient: DOMPurify.sanitize(data.recipient),
-          token: DOMPurify.sanitize(data.token),
-          referred: DOMPurify.sanitize(data.referred),
-          amount: DOMPurify.sanitize(data.amount),
-          depositSender: DOMPurify.sanitize(data.depositSender),
-          depositRecipient: DOMPurify.sanitize(data.depositRecipient),
+          sender: validation(DOMPurify.sanitize(data.sender)),
+          recipient: validation(DOMPurify.sanitize(data.recipient)),
+          token: validation(DOMPurify.sanitize(data.token)),
+          referred: validation(DOMPurify.sanitize(data.referred)),
+          amount: validation(DOMPurify.sanitize(data.amount)),
+          depositSender: validation(DOMPurify.sanitize(data.depositSender)),
+          depositRecipient: validation(DOMPurify.sanitize(data.depositRecipient)),
           quantity: [
-            DOMPurify.sanitize(data.quantity[0]),
-            DOMPurify.sanitize(data.quantity[1]),
+            validation(DOMPurify.sanitize(data.quantity[0])),
+            validation(DOMPurify.sanitize(data.quantity[1])),
           ],
-          rfee: DOMPurify.sanitize(data.rfee),
+          rfee: validation(DOMPurify.sanitize(data.rfee)),
           timelimit: [
-            DOMPurify.sanitize(data.timelimit[0]),
-            DOMPurify.sanitize(data.timelimit[1]),
-            DOMPurify.sanitize(data.timelimit[2]),
+            validation(DOMPurify.sanitize(data.timelimit[0])),
+            validation(DOMPurify.sanitize(data.timelimit[1])),
+            validation(DOMPurify.sanitize(data.timelimit[2])),
           ],
           status: [
-            DOMPurify.sanitize(data.status[0]),
-            DOMPurify.sanitize(data.status[1]),
+            validation(DOMPurify.sanitize(data.status[0])),
+            validation(DOMPurify.sanitize(data.status[1])),
           ],
           message:DOMPurify.sanitize(text)
         };
@@ -7615,7 +7643,7 @@ body {
         }
         try {
           jsondata.tags = [];
-          jsondata.tags = JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract3.methods.getTags(hash).call())));
+          jsondata.tags = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract3.methods.getTags(hash).call()))));
         } catch (e) {
           console.log("Error loading tags");
         }
@@ -7634,7 +7662,7 @@ body {
               jsondata.image = Crypto.SHA256(JSON.stringify(myimg));
               jsondata.message = messageData.message;
               jsondata.contact = messageData.contact;
-              jsondata.title = messageData.title;
+              jsondata.title = validation(messageData.title);
               jsondata.location = messageData.location;
             }
           } catch (e) {
@@ -8989,7 +9017,7 @@ body {
               listing.image = Crypto.SHA256(JSON.stringify(myimg));
               listing.message = messageData.message;
               listing.contact = messageData.contact;
-              listing.title = messageData.title;
+              listing.title = validation(messageData.title);
               listing.location = messageData.location;
             } catch (e) {
               console.log(e);
