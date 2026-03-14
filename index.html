@@ -5047,7 +5047,7 @@ body {
         await Swal.fire(translateThis("Not connected."));
       }
       else {
-        await Swal.fire({title: translateThis("Error sending transaction"), text: validation(error.message, ". :/,'"), icon: 'error', confirmButtonText: translateThis('OK')});
+        await Swal.fire({title: translateThis("Error sending transaction"), text: validation(error.message, ". ,"), icon: 'error', confirmButtonText: translateThis('OK')});
       }
     }
 
@@ -6293,7 +6293,7 @@ body {
           if(x+1<maxtries) {
             continue
           }
-          errorMessage = validation(error.message, ". :/,'");
+          errorMessage = validation(error.message, ". ,");
           return DOMPurify.sanitize(JSON.stringify({"error": errorMessage}));
         }
       }
