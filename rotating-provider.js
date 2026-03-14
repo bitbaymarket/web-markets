@@ -87,7 +87,8 @@ var fallbackProvidersDefault = [
       message.includes('api key disabled') ||
       message.includes('rpc error') ||
       message.includes('unauthorized') ||
-      message.includes('paid plan')
+      message.includes('paid plan') ||
+      message.includes('max fee per gas less than block base fee')
     );
   }
 
@@ -482,42 +483,6 @@ var fallbackProvidersDefault = [
   }
 
   /**
-   * For eth_call (read-only calls), strip gas pricing parameters.
-   * Gas pricing is irrelevant for read calls and some RPC nodes reject eth_call
-   * if maxFeePerGas is below the current block base fee.
-   * @param {Object} payload - The JSON-RPC request payload
-   * @returns {Object} - Payload with gas pricing stripped for eth_call
-   */
-  function stripGasPricingForEthCall(payload) {
-    if (!payload || payload.method !== 'eth_call') return payload;
-    if (!payload.params || !payload.params[0]) return payload;
-
-    var txObj = payload.params[0];
-    if (!txObj.gasPrice && !txObj.maxFeePerGas && !txObj.maxPriorityFeePerGas) return payload;
-
-    // Build a new call object without gas pricing fields
-    var cleanedTx = {};
-    for (var key in txObj) {
-      if (txObj.hasOwnProperty(key) &&
-          key !== 'gasPrice' &&
-          key !== 'maxFeePerGas' &&
-          key !== 'maxPriorityFeePerGas') {
-        cleanedTx[key] = txObj[key];
-      }
-    }
-
-    // Return new payload with cleaned transaction params
-    var newParams = payload.params.slice();
-    newParams[0] = cleanedTx;
-    return {
-      jsonrpc: payload.jsonrpc,
-      id: payload.id,
-      method: payload.method,
-      params: newParams
-    };
-  }
-
-  /**
    * Send a request to the underlying provider (wraps callback in Promise)
    * Returns the FULL JSON-RPC response unchanged - true passthrough
    * @param {Object} provider - The HttpProvider to use
@@ -529,9 +494,6 @@ var fallbackProvidersDefault = [
       // Ensure payload has required JSON-RPC 2.0 fields
       // Some RPC providers are strict and reject requests without jsonrpc/id
       var formattedPayload = ensureJsonRpcFormat(payload);
-      // For eth_call read calls, strip gas pricing to avoid nodes rejecting
-      // with "max fee per gas less than block base fee"
-      formattedPayload = stripGasPricingForEthCall(formattedPayload);
       
       provider.send(formattedPayload, function(err, result) {
         if (err) {
@@ -668,9 +630,6 @@ var fallbackProvidersDefault = [
       Math.min(4, this.fallbackProviders.length);
     var attempts = 0;
     var formattedPayload = ensureJsonRpcFormat(payload);
-    // For eth_call read calls, strip gas pricing to avoid nodes rejecting
-    // with "max fee per gas less than block base fee"
-    formattedPayload = stripGasPricingForEthCall(formattedPayload);
 
     function trySend() {
       var provider = self._getCurrentProvider();
