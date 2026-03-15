@@ -4947,7 +4947,7 @@ body {
       try {
         datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(myaccounts, 3).call()));
         if(datalen > 0) {
-          contact2 = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(myaccounts, datalen-1).call()));
+          contact2 = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(myaccounts, datalen-1).call())),". ,!?@+/=");
           if("mycontact" in contact2) {
             datatext += "<bdo>" + translateThis("Registered contact information:") + "</bdo> " + contact2['mycontact'];
           }
@@ -6631,7 +6631,7 @@ body {
           mylen = parseInt(validation(DOMPurify.sanitize(await DDEcontract5.methods.getArrayLength(userAddress, 3).call())));
         }
         if(mylen > 0) {
-          const lastEntry = JSON.parse(DOMPurify.sanitize(await DDEcontract5.methods.userdata(userAddress, mylen - 1).call()));
+          const lastEntry = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract5.methods.userdata(userAddress, mylen - 1).call())),". ,!?@+/=");
           if (lastEntry?.ipfsLink) {
             const ipfsHash = lastEntry.ipfsLink.ipfs;
             var ipfsData = await retrieveFromIPFS(ipfsHash);
@@ -6641,7 +6641,7 @@ body {
                 return {'error':true};
               }
             }
-            return JSON.parse(DOMPurify.sanitize(ipfsData));
+            return validation(JSON.parse(DOMPurify.sanitize(ipfsData)),". ,!?@+/=");
           }
         }
         return {};
@@ -6713,7 +6713,7 @@ body {
       if(sightengineApiUser == '') {
         return await moderationGateway(orderData, thehash, ipfs);
       }
-      const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
+      const validImageTypes = ['image/jpeg', 'image/png'];
       let isGood = false;
       let imagesResult = true;
       let textResult = true;
@@ -6917,7 +6917,7 @@ body {
         var listlen = validation(DOMPurify.sanitize(await DDEcontract3.methods.getArrayLength(tempCurators[0],3).call()));
         var udata = {};
         if(listlen > 0) {
-          var udata2 = JSON.parse(DOMPurify.sanitize(await DDEcontract3.methods.userdata(tempCurators[0], listlen-1).call()));
+          var udata2 = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract3.methods.userdata(tempCurators[0], listlen-1).call())),". ,!?@+/=");
           if(typeof udata2 === 'object' && 'users' in udata2) {
             for(var uinx = 0; uinx < udata2['users'].length; uinx++) {
               udata[udata2['users'][uinx]] = 1;
@@ -7661,9 +7661,9 @@ body {
               storeFile(Crypto.SHA256(JSON.stringify(myimg)), myimg);
               jsondata.image = Crypto.SHA256(JSON.stringify(myimg));
               jsondata.message = messageData.message;
-              jsondata.contact = validation(messageData.contact, ". ,!?@");
-              jsondata.title = validation(messageData.title, ". ,!?@");
-              jsondata.location = validation(messageData.location, ". ,!?@");
+              jsondata.contact = validation(messageData.contact, ". ,!?@+/=");
+              jsondata.title = validation(messageData.title, ". ,!?@+/=");
+              jsondata.location = validation(messageData.location, ". ,!?@+/=");
             }
           } catch (e) {
             console.log("Error loading data");
@@ -7772,7 +7772,7 @@ body {
           }
           let myimg = await getFile(offerData.image);
           if (myimg && myimg.length > 0) {
-            const imageMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
+            const imageMimeTypes = ['image/jpeg', 'image/png'];
             for (let i = 0; i < myimg.length; i++) {
               try {
                 const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
@@ -7912,7 +7912,7 @@ body {
           let myimg = await getFile(offerData2.image);
 
           if (myimg && myimg.length > 0) {
-            const imageMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
+            const imageMimeTypes = ['image/jpeg', 'image/png'];
             for (let i = 0; i < myimg.length; i++) {
               try {
                 const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
@@ -8126,7 +8126,7 @@ body {
           let myimg = await getFile(offerData3.image);
 
           if (myimg && myimg.length > 0) {
-            const imageMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
+            const imageMimeTypes = ['image/jpeg', 'image/png'];
             try {
               for (let i = 0; i < myimg.length; i++) {
                 const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
@@ -8442,7 +8442,7 @@ body {
         var foundImage = false; 
 
         if (myimg.length > 0) {
-          const imageMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
+          const imageMimeTypes = ['image/jpeg', 'image/png'];
 
           for (let j = 0; j < myimg.length; j++) {
             try {
@@ -8610,7 +8610,7 @@ body {
 
             // Check if there are any images returned and process them
             if (myimg && myimg.length > 0) {
-              const imageMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
+              const imageMimeTypes = ['image/jpeg', 'image/png'];
 
               for (let i = 0; i < myimg.length; i++) {
                 try {
@@ -9016,9 +9016,9 @@ body {
               storeFile(Crypto.SHA256(listing.message), thisText);
               listing.image = Crypto.SHA256(JSON.stringify(myimg));
               listing.message = messageData.message;
-              listing.contact = validation(messageData.contact, ". ,!?@");
-              listing.title = validation(messageData.title, ". ,!?@");
-              listing.location = validation(messageData.location, ". ,!?@");
+              listing.contact = validation(messageData.contact, ". ,!?@+/=");
+              listing.title = validation(messageData.title, ". ,!?@+/=");
+              listing.location = validation(messageData.location, ". ,!?@+/=");
             } catch (e) {
               console.log(e);
               console.log("Decryption failed");
@@ -9366,7 +9366,7 @@ body {
         try {
           datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(listing.recipient, 3).call()));
           if(datalen > 0) {
-            contact2 = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(listing.recipient, datalen-1).call()));
+            contact2 = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(listing.recipient, datalen-1).call())),". ,!?@+/=");
             if(typeof contact2 === 'object' && 'mycontact' in contact2) {
               if(listing.contact != contact2['mycontact']) {
                 message.innerHTML += '<br><br><bdo>' + translateThis('Recipients contact information:') + '</bdo><br>' + contact2['mycontact'];
@@ -9387,7 +9387,7 @@ body {
         try {
           datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(listing.sender, 3).call()));
           if(datalen > 0) {
-            contact2 = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(listing.sender, datalen-1).call()));
+            contact2 = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(listing.sender, datalen-1).call())),". ,!?@+/=");
             if(typeof contact2 === 'object' && 'mycontact' in contact2) {
               if(listing.contact != contact2['mycontact']) {
                 message.innerHTML += '<br><br><bdo>' + translateThis('Senders contact information:') + '</bdo><br>' + contact2['mycontact'];
@@ -11130,7 +11130,7 @@ body {
 
         for (const file of imageInput.files) {
           const fileType = file.type;
-          const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
+          const validImageTypes = ['image/jpeg', 'image/png'];
           const validTextType = ['text/plain'];
           const validDocTypes = ['application/msword', 'application/pdf', 'application/zip'];
           const isZipFile = fileType.includes('zip');
@@ -11261,7 +11261,7 @@ body {
       function appendFileToDisplay(imgSrc, index) {
         const file = selectedFiles[index];
         const fileType = file.type;
-        const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
+        const validImageTypes = ['image/jpeg', 'image/png'];
         const isImage = validImageTypes.includes(fileType);
         
         const fileElement = document.createElement('div');
@@ -11436,9 +11436,9 @@ body {
           var depositSender = document.getElementById("sender-deposit-input").value;
           var depositRecipient = document.getElementById("recipient-deposit-input").value;
           var timeLimit = document.getElementById("timeLimit").value;
-          var contactinfo = validation(document.getElementById("contactInfo").value, ". ,!?@");
-          var title = validation(document.getElementById("contractTitle").value, ". ,!?@");
-          var location = validation(document.getElementById("contractLocation").value, ". ,!?@");
+          var contactinfo = document.getElementById("contactInfo").value;
+          var title = document.getElementById("contractTitle").value;
+          var location = document.getElementById("contractLocation").value;
           var contractDetails = document.getElementById("contractDetails").value;
           var message = JSON.stringify({
             message: document.getElementById("contractDetails").value,
@@ -11565,7 +11565,7 @@ body {
             if(otherparty != "0x0000000000000000000000000000000000000000") {
               datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(otherparty, 3).call()));
               if(datalen > 0) {
-                contact2 = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(otherparty, datalen-1).call()));
+                contact2 = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(otherparty, datalen-1).call())),". ,!?@+/=");
                 if('publickey' in contact2 && userprivkey != '') {
                   var paddedMessage = message + "#*#*#" + (new Date().getTime()) + Crypto.SHA256(new Date().getTime());
                   if(myaccounts == sender2) {
@@ -12182,7 +12182,7 @@ body {
               try {
                 datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(counterparty, 3).call()));
                 if(datalen > 0) {
-                  contact2 = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(counterparty, datalen-1).call()));
+                  contact2 = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(counterparty, datalen-1).call())),". ,!?@+/=");
                 }
               } catch(e) {
                 console.log(e);
@@ -12350,7 +12350,7 @@ body {
           try {
             datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(counterparty, 3).call()));
             if(datalen > 0) {
-              contact2 = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(counterparty, datalen-1).call()));
+              contact2 = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(counterparty, datalen-1).call())),". ,!?@+/=");
             }
           } catch(e) {
             console.log(e);
@@ -12625,7 +12625,7 @@ body {
         var DDEcontract4 = new web3.eth.Contract(DDEabi, DDEaddy);
         const dataLength = validation(DOMPurify.sanitize(await DDEcontract4.methods.getArrayLength(userAddress, 3).call()));
         if (dataLength > 0) {
-          const userData = JSON.parse(DOMPurify.sanitize(await DDEcontract4.methods.userdata(userAddress, dataLength - 1).call()));
+          const userData = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract4.methods.userdata(userAddress, dataLength - 1).call())),". ,!?@+/=");
           return {
             supportsEncryption: !!userData.publickey,
             publicKey: userData.publickey
