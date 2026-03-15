@@ -3520,7 +3520,7 @@ body {
         measurer.style.cssText = 'position:absolute;visibility:hidden;width:100%;font-size:' + majority.fontSize + ';font-family:' + majority.fontFamily + ';';
         measurer.innerHTML = cleanedHtml;
         document.body.appendChild(measurer);
-        iframeHeight = Math.min(measurer.scrollHeight, 400) + 'px';
+        iframeHeight = measurer.scrollHeight + 'px';
         document.body.removeChild(measurer);
       }
 
