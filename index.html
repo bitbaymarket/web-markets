@@ -9484,6 +9484,7 @@ body {
       if (typeof listing.contact !== 'undefined') {
         message2.innerHTML = '<bdo>' + translateThis('Contact information:') + '</bdo>' + listing.contact;
       }
+      const extraInfo = document.createElement('div');
       var contact2 = '';
       var datalen = 0;
       var reputation = [0,0,0];
@@ -9494,15 +9495,15 @@ body {
             contact2 = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(listing.recipient, datalen-1).call())),". ,!?@+/=");
             if(typeof contact2 === 'object' && 'mycontact' in contact2) {
               if(listing.contact != contact2['mycontact']) {
-                message.insertAdjacentHTML('beforeend', '<br><br><bdo>' + translateThis('Recipients contact information:') + '</bdo><br>' + contact2['mycontact']);
+                extraInfo.innerHTML += '<br><br><bdo>' + translateThis('Recipients contact information:') + '</bdo><br>' + contact2['mycontact'];
               }
             }
           }
           reputation = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(listing.recipient).call()))));
           if(reputation[0] == 0 && reputation[1] == 0) {
-            message.insertAdjacentHTML('beforeend', '<br><br>' + translateThis('Recipient is a new user of the markets.') + '<br>');
+            extraInfo.innerHTML += '<br><br>' + translateThis('Recipient is a new user of the markets.') + '<br>';
           } else {
-            message.insertAdjacentHTML('beforeend', '<br><br>' + translateThis('Recipients success rate:') + '<br><br><bdo>' + translateThis('Completed:') + '</bdo> ' + reputation[0] + '<br><br><bdo>' + translateThis('Failed:') + '</bdo> ' + reputation[1]);
+            extraInfo.innerHTML += '<br><br>' + translateThis('Recipients success rate:') + '<br><br><bdo>' + translateThis('Completed:') + '</bdo> ' + reputation[0] + '<br><br><bdo>' + translateThis('Failed:') + '</bdo> ' + reputation[1];
           }
         } catch(e) {
           console.log(e);
@@ -9515,15 +9516,15 @@ body {
             contact2 = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(listing.sender, datalen-1).call())),". ,!?@+/=");
             if(typeof contact2 === 'object' && 'mycontact' in contact2) {
               if(listing.contact != contact2['mycontact']) {
-                message.insertAdjacentHTML('beforeend', '<br><br><bdo>' + translateThis('Senders contact information:') + '</bdo><br>' + contact2['mycontact']);
+                extraInfo.innerHTML += '<br><br><bdo>' + translateThis('Senders contact information:') + '</bdo><br>' + contact2['mycontact'];
               }
             }
           }
           reputation = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(listing.sender).call()))));
           if(reputation[0] == 0 && reputation[1] == 0) {
-            message.insertAdjacentHTML('beforeend', '<br><br>' + translateThis('Sender is a new user of the markets.') + '<br>');
+            extraInfo.innerHTML += '<br><br>' + translateThis('Sender is a new user of the markets.') + '<br>';
           } else {
-            message.insertAdjacentHTML('beforeend', '<br><br>' + translateThis('Senders success rate:') + '<br><bdo>' + translateThis('Completed:') + '</bdo> ' + reputation[0] + '<br><bdo>' + translateThis('Failed:') + '</bdo> ' + reputation[1]);
+            extraInfo.innerHTML += '<br><br>' + translateThis('Senders success rate:') + '<br><bdo>' + translateThis('Completed:') + '</bdo> ' + reputation[0] + '<br><bdo>' + translateThis('Failed:') + '</bdo> ' + reputation[1];
           }
         } catch(e) {
           console.log(e);
@@ -9926,6 +9927,7 @@ body {
       details.appendChild(title);
       message.style.whiteSpace = 'normal';
       details.appendChild(message);
+      details.appendChild(extraInfo);
       details.appendChild(location);
       details.appendChild(message2);
 
