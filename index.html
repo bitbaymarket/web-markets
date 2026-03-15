@@ -6299,7 +6299,7 @@ body {
           if(x+1<maxtries) {
             continue
           }
-          errorMessage = validation(DOMPurify.sanitize(String(error.message)), ". ,");
+          errorMessage = validation(error.message, ". ,");
           return DOMPurify.sanitize(JSON.stringify({"error": errorMessage}));
         }
       }
