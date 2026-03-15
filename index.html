@@ -6149,8 +6149,7 @@ body {
 
     // Function to retrieve a file from IPFS
     const retrieveFromIPFS = async (hash) => {
-      const safeHash = validation(DOMPurify.sanitize(String(hash)));
-      var url = "https://ipfs.io/ipfs/"+safeHash;
+      var url = "https://ipfs.io/ipfs/"+hash;
       try {
         //const response = await fetch(url);
         const response = await customFetch(url, maxFileSize, progress => {
@@ -6166,11 +6165,10 @@ body {
       return result;
     }
     const retrieveFromPinataIPFS = async (hash) => {
-      const safeHash = validation(DOMPurify.sanitize(String(hash)));
-      var url = pinataGateway + safeHash;
+      var url = pinataGateway + hash;
       if(pinataGateway != "https://gateway.pinata.cloud/ipfs/") {
         if(pinataToken == '') {
-          url = "https://gateway.pinata.cloud/ipfs/" + safeHash;
+          url = "https://gateway.pinata.cloud/ipfs/" + hash;
         } else {
           url += "?pinataGatewayToken=" + pinataToken;
         }
@@ -6793,7 +6791,7 @@ body {
       if(sightengineApiUser == '') {
         const isGood = await validateOrderData(checkedHashes, '', true);
         if(isGood.toString().toLowerCase().includes("order passed ai test") || isGood.toString().toLowerCase().includes("order failed ai test")) {
-          ipfsHash = validation(DOMPurify.sanitize(JSON.parse(isGood)['ipfs']));
+          ipfsHash = JSON.parse(isGood)['ipfs'];
         } else {
           throw new Error('Failed to pin data to IPFS');
         }
@@ -11635,7 +11633,7 @@ body {
             var validated = false;
             if(isGood.toString().toLowerCase().includes("order passed ai test") || isGood.toString().toLowerCase().includes("order failed ai test")) {
               if(isGood.toString().toLowerCase().includes("order passed ai test")) {
-                result = validation(DOMPurify.sanitize(JSON.parse(isGood)['ipfs']));
+                result = JSON.parse(isGood)['ipfs'];
                 validated = true;
               } else if (isGood.toString().toLowerCase().includes("order failed ai test")) {
                 validated = false;
