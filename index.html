@@ -10312,7 +10312,7 @@ body {
                     const timestamp = timestampAndPadding.slice(0, 13);
                     const padding = timestampAndPadding.slice(13);
                     if (padding.length === 16 && !isNaN(timestamp)) {
-                      return { ...msg, message: DOMPurify.sanitize(messageParts[0]) }; // Only return the actual message part
+                      return { ...msg, message: validation(DOMPurify.sanitize(messageParts[0]), " .,!?-+_@") }; // Only return the actual message part
                     } else {
                       console.error("Invalid padding or timestamp length");
                       return { ...msg, timestamp: new Date().getTime(), message: "Failed to decrypt message" };
@@ -10335,9 +10335,9 @@ body {
               }
           } else {
             if(isNaN(msg.timestamp)) {
-              return { ...msg, timestamp: new Date().getTime(), message: DOMPurify.sanitize(msg.message) };
+              return { ...msg, timestamp: new Date().getTime(), message: validation(DOMPurify.sanitize(msg.message), " .,!?-+_@") };
             } else {
-              return { ...msg, message: DOMPurify.sanitize(msg.message) }; // Return the plaintext message if not encrypted
+              return { ...msg, message: validation(DOMPurify.sanitize(msg.message), " .,!?-+_@") }; // Return the plaintext message if not encrypted
             }
           }
       });
@@ -10390,7 +10390,7 @@ body {
               const message = DOMPurify.sanitize(await DDEcontract.methods.messages(hash, user, index).call());
               if (!message) break;
               var msgtimestamp =  new Date().getTime();
-              let decryptedMessage = message;
+              let decryptedMessage = validation(message, " .,!?-+_@");
               if (message.startsWith("ENC:")) {
                 var decryptionResult = cryptico.decrypt(message.substring(4), userprivkey);
                 if (decryptionResult.status === "success") {
@@ -10400,7 +10400,7 @@ body {
                       msgtimestamp = validation(DOMPurify.sanitize(timestampAndPadding.slice(0, 13)));
                       const padding = timestampAndPadding.slice(13);
                       if (padding.length === 16 && !isNaN(msgtimestamp)) {
-                          decryptedMessage = DOMPurify.sanitize(messageParts[0]);
+                          decryptedMessage = validation(DOMPurify.sanitize(messageParts[0]), " .,!?-+_@");
                       } else {
                           console.error("Invalid padding or timestamp length");
                           decryptedMessage = "Failed to decrypt message";
