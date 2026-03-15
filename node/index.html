@@ -109,7 +109,6 @@
       const stripRegex = new RegExp('[^a-zA-Z0-9_\\-' + safeExtra + ']', 'g');
       const blockedKeys = new Set(["__proto__", "constructor", "prototype"]);
       const safeKeyRegex = /^[a-zA-Z0-9_-]+$/;
-      const base64Regex = /^[A-Za-z0-9+/=]+$/;
       function clean(value) {
         if (Array.isArray(value)) {
           return value.map(clean);
@@ -130,14 +129,9 @@
         if (prefixes.length > 0) {
           for (let p = 0; p < prefixes.length; p++) {
             if (str.startsWith(prefixes[p])) {
-              const remainder = str.slice(prefixes[p].length);
-              if (base64Regex.test(remainder)) {
-                return str;
-              }
-              return "";
+              return prefixes[p] + str.slice(prefixes[p].length).replace(stripRegex, "");
             }
           }
-          return "";
         }
         return str.replace(stripRegex, "");
       }
@@ -466,7 +460,7 @@
             try {
               const mime = img.match(/^data:(.*);base64,/)[1];  // Match base64 data URL
               if (['image/jpeg', 'image/png'].includes(mime)) {
-                const validatedImg = validation(img, "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                const validatedImg = validation(img, "+/=", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
                 if (validatedImg === "") return null;
                 dataURLtoFile(validatedImg, `image${index}.${mime.split('/')[1]}`);
                 return validatedImg;
@@ -537,7 +531,7 @@
             .map((img, index) => {
               const mime = img.match(/data:(.*);base64,/)[1];
               if (validImageTypes.includes(mime)) {
-                const validatedImg = validation(img, "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                const validatedImg = validation(img, "+/=", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
                 if (validatedImg === "") return null;
                 return dataURLtoFile(validatedImg, `image${index}.${mime.split('/')[1]}`);
               }

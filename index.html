@@ -3438,7 +3438,6 @@ body {
       const stripRegex = new RegExp('[^a-zA-Z0-9_\\-' + safeExtra + ']', 'g');
       const blockedKeys = new Set(["__proto__", "constructor", "prototype"]);
       const safeKeyRegex = /^[a-zA-Z0-9_-]+$/;
-      const base64Regex = /^[A-Za-z0-9+/=]+$/;
       function clean(value) {
         if (Array.isArray(value)) {
           return value.map(clean);
@@ -3459,14 +3458,9 @@ body {
         if (prefixes.length > 0) {
           for (let p = 0; p < prefixes.length; p++) {
             if (str.startsWith(prefixes[p])) {
-              const remainder = str.slice(prefixes[p].length);
-              if (base64Regex.test(remainder)) {
-                return str;
-              }
-              return "";
+              return prefixes[p] + str.slice(prefixes[p].length).replace(stripRegex, "");
             }
           }
-          return "";
         }
         return str.replace(stripRegex, "");
       }
@@ -6741,7 +6735,7 @@ body {
             .map((img, index) => {
               const mime = img.match(/data:(.*);base64,/)[1];
               if (validImageTypes.includes(mime)) {
-                const validatedImg = validation(img, "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                const validatedImg = validation(img, "+/=", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
                 if (validatedImg === "") return null;
                 return dataURLtoFile(validatedImg, `image${index}.${mime.split('/')[1]}`);
               }
@@ -7796,7 +7790,7 @@ body {
               try {
                 const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
                 if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                  const validatedImg = validation(myimg[i], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                  const validatedImg = validation(myimg[i], "+/=", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
                   if (validatedImg !== "") {
                     dataUrl = validatedImg;
                     break;
@@ -7939,7 +7933,7 @@ body {
               try {
                 const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
                 if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                  const validatedImg = validation(myimg[i], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                  const validatedImg = validation(myimg[i], "+/=", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
                   if (validatedImg !== "") {
                     dataUrl2 = validatedImg;
                     break;
@@ -8156,7 +8150,7 @@ body {
               for (let i = 0; i < myimg.length; i++) {
                 const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
                 if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                  const validatedImg = validation(myimg[i], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                  const validatedImg = validation(myimg[i], "+/=", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
                   if (validatedImg !== "") {
                     dataUrl3 = validatedImg;
                     break;
@@ -8476,7 +8470,7 @@ body {
             try {
               const mimeType = myimg[j].match(/^data:(.*?);/)[1].toLowerCase();
               if (imageMimeTypes.includes(mimeType)) {
-                  const validatedImg = validation(myimg[j], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                  const validatedImg = validation(myimg[j], "+/=", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
                   if (validatedImg !== "") {
                     tempimg = '<img src="' + validatedImg + '" alt="./blank-image.jpg">';
                     foundImage = true;
@@ -8647,7 +8641,7 @@ body {
                 try {
                   const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
                   if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                    const validatedImg = validation(myimg[i], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                    const validatedImg = validation(myimg[i], "+/=", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
                     if (validatedImg !== "") {
                       tempimg = `<img src="${validatedImg}" alt="Notification image">`;
                       foundImage = true;
@@ -9135,7 +9129,7 @@ body {
           const [fileTypePrefix, base64Content] = fileData.split(';base64,');
 
           if (fileTypePrefix === 'data:image/jpeg' || fileTypePrefix === 'data:image/png') {
-              const validatedFile = validation(fileData, "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+              const validatedFile = validation(fileData, "+/=", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
               if (validatedFile !== "") {
                 const img = document.createElement('img');
                 img.src = validatedFile;
