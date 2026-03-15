@@ -128,9 +128,9 @@
         if (str.toLowerCase() === "true") return true;
         if (str.toLowerCase() === "false") return false;
         if (prefixes.length > 0) {
-          for (var p = 0; p < prefixes.length; p++) {
+          for (let p = 0; p < prefixes.length; p++) {
             if (str.startsWith(prefixes[p])) {
-              var remainder = str.slice(prefixes[p].length);
+              const remainder = str.slice(prefixes[p].length);
               if (base64Regex.test(remainder)) {
                 return str;
               }
@@ -466,7 +466,7 @@
             try {
               const mime = img.match(/^data:(.*);base64,/)[1];  // Match base64 data URL
               if (['image/jpeg', 'image/png'].includes(mime)) {
-                var validatedImg = validation(img, "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                const validatedImg = validation(img, "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
                 if (validatedImg === "") return null;
                 dataURLtoFile(validatedImg, `image${index}.${mime.split('/')[1]}`);
                 return validatedImg;
@@ -537,7 +537,7 @@
             .map((img, index) => {
               const mime = img.match(/data:(.*);base64,/)[1];
               if (validImageTypes.includes(mime)) {
-                var validatedImg = validation(img, "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                const validatedImg = validation(img, "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
                 if (validatedImg === "") return null;
                 return dataURLtoFile(validatedImg, `image${index}.${mime.split('/')[1]}`);
               }
