@@ -3046,17 +3046,6 @@ body {
       loadedFiles[hash] = data;
     }
 
-    function validImageSrc(img) {
-      if (typeof img !== 'string') return '';
-      const validPrefixes = ['data:image/jpeg;base64,', 'data:image/png;base64,'];
-      for (const p of validPrefixes) {
-        if (img.startsWith(p)) {
-          return p + img.slice(p.length).replace(/[^A-Za-z0-9+/=]/g, '');
-        }
-      }
-      return '';
-    }
-
     async function storeFiles(files) {
       // Open a read-write transaction
       var transaction = db.transaction(['files'], 'readwrite');
@@ -5248,7 +5237,7 @@ body {
               jsondata.message = DOMPurify.sanitize(text);
               jsondata.contact = '';
             } else {
-              var myimg = Array.isArray(messageData.image) ? messageData.image.map(validImageSrc).filter(img => img !== '') : [];
+              var myimg = Array.isArray(messageData.image) ? messageData.image : [''];
               storeFile(Crypto.SHA256(JSON.stringify(myimg)), myimg);
               jsondata.image = Crypto.SHA256(JSON.stringify(myimg));
               jsondata.message = messageData.message;
@@ -5856,21 +5845,16 @@ body {
         var foundImage = false; 
 
         if (myimg.length > 0) {
-          const imageMimeTypes = ['image/jpeg', 'image/png'];
+          const imageMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
 
           for (let i = 0; i < myimg.length; i++) {
-            try {
               const mimeType = myimg[i].match(/^data:(.*?);/)[1].toLowerCase();
+
               if (imageMimeTypes.includes(mimeType)) {
-                  const validImg = validImageSrc(myimg[i]);
-                  if (validImg !== '') {
-                    tempimg = '<img src="' + validImg + '" alt="./blank-image.jpg">';
-                    foundImage = true;
-                    break;
-                  }
+                  tempimg = '<img src="' + myimg[i] + '" alt="./blank-image.jpg">';
+                  foundImage = true;
+                  break; 
               }
-            } catch {
-            }
           }
 
           if (!foundImage) {
@@ -6329,7 +6313,7 @@ body {
                 throw new Error("Failed");
               }
               var messageData = JSON.parse(thisText);
-              var myimg = Array.isArray(messageData.image) ? messageData.image.map(validImageSrc).filter(img => img !== '') : [];
+              var myimg = Array.isArray(messageData.image) ? messageData.image : [''];
               storeFile(Crypto.SHA256(JSON.stringify(myimg)), myimg);
               storeFile(Crypto.SHA256(listing.message), thisText);
               listing.image = Crypto.SHA256(JSON.stringify(myimg));
@@ -6415,10 +6399,11 @@ body {
           const li = document.createElement('li');
           const fileData = myimgs[i];
           const [fileTypePrefix, base64Content] = fileData.split(';base64,');
-          const validImg = validImageSrc(fileData);
-          if (validImg !== '') {
+
+          // Check if the file type is an image
+          if (fileTypePrefix.startsWith('data:image')) {
               const img = document.createElement('img');
-              img.src = validImg;
+              img.src = fileTypePrefix + ';base64,' + base64Content;
               img.classList.add('popup-image');
               li.appendChild(img);
               imageCount++;
@@ -8209,7 +8194,7 @@ body {
 
           for (const file of imageInput.files) {
               const fileType = file.type;
-              const validImageTypes = ['image/jpeg', 'image/png'];
+              const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
               const validTextType = ['text/plain'];
               const validDocTypes = ['application/msword', 'application/pdf', 'application/zip'];
               const isZipFile = fileType.includes('zip');
@@ -8276,7 +8261,7 @@ body {
       function appendFileToDisplay(imgSrc, index) {
         const file = selectedFiles[index];
         const fileType = file.type;
-        const validImageTypes = ['image/jpeg', 'image/png'];
+        const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
         const isImage = validImageTypes.includes(fileType);
         
         const fileElement = document.createElement('div');

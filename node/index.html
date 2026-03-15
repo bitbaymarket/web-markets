@@ -222,11 +222,11 @@
             if (response.data.result) {
                 Swal.fire('Verification Result:' + DOMPurify.sanitize(JSON.stringify(response.data.result)));
             } else if (response.data.error) {
-                Swal.fire('Error:' + DOMPurify.sanitize(String(response.data.error)));
+                Swal.fire('Error:' + DOMPurify.sanitize(String(response.data.error)).replace(/[^a-zA-Z0-9_\-. ,]/g, ''));
             }
             return DOMPurify.sanitize(JSON.stringify(response.data.result)); // Sanitizing response content
         } catch (error) {
-            Swal.fire(error.message);
+            Swal.fire(DOMPurify.sanitize(String(error.message)).replace(/[^a-zA-Z0-9_\-. ,]/g, ''));
             return 'error';
         }
     }

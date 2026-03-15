@@ -6791,7 +6791,7 @@ body {
       if(sightengineApiUser == '') {
         const isGood = await validateOrderData(checkedHashes, '', true);
         if(isGood.toString().toLowerCase().includes("order passed ai test") || isGood.toString().toLowerCase().includes("order failed ai test")) {
-          ipfsHash = JSON.parse(isGood)['ipfs'];
+          ipfsHash = validation(JSON.parse(isGood)['ipfs']);
         } else {
           throw new Error('Failed to pin data to IPFS');
         }
@@ -11633,7 +11633,7 @@ body {
             var validated = false;
             if(isGood.toString().toLowerCase().includes("order passed ai test") || isGood.toString().toLowerCase().includes("order failed ai test")) {
               if(isGood.toString().toLowerCase().includes("order passed ai test")) {
-                result = JSON.parse(isGood)['ipfs'];
+                result = validation(JSON.parse(isGood)['ipfs']);
                 validated = true;
               } else if (isGood.toString().toLowerCase().includes("order failed ai test")) {
                 validated = false;

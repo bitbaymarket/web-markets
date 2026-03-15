@@ -3497,17 +3497,6 @@ body {
       loadedFiles[hash] = data;
     }
 
-    function validImageSrc(img) {
-      if (typeof img !== 'string') return '';
-      const validPrefixes = ['data:image/jpeg;base64,', 'data:image/png;base64,'];
-      for (const p of validPrefixes) {
-        if (img.startsWith(p)) {
-          return p + img.slice(p.length).replace(/[^A-Za-z0-9+/=]/g, '');
-        }
-      }
-      return '';
-    }
-
     async function storeFiles(files) {
       // Open a read-write transaction
       var transaction = db.transaction(['files'], 'readwrite');
@@ -5608,7 +5597,7 @@ body {
     }
 
     async function validateOrderData(orderData) {
-      const validImageTypes = ['image/jpeg', 'image/png'];
+      const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
       let isGood = false;
       let imagesResult = true;
       let textResult = true;
@@ -6382,7 +6371,7 @@ body {
               jsondata.title = '';
               jsondata.location = '';
             } else {
-              var myimg = Array.isArray(messageData.image) ? messageData.image.map(validImageSrc).filter(img => img !== '') : [];
+              var myimg = Array.isArray(messageData.image) ? messageData.image : [''];
               storeFile(Crypto.SHA256(JSON.stringify(myimg)), myimg);
               jsondata.image = Crypto.SHA256(JSON.stringify(myimg));
               jsondata.message = messageData.message;
@@ -6475,15 +6464,12 @@ body {
           }
           let myimg = await getFile(offerData.image);
           if (myimg && myimg.length > 0) {
-            const imageMimeTypes = ['image/jpeg', 'image/png'];
+            const imageMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
             for (let i = 0; i < myimg.length; i++) {
-              try {
-                const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
-                if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                  dataUrl = validImageSrc(myimg[i]);
-                  break;
-                }
-              } catch {
+              const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
+              if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
+                dataUrl = myimg[i];
+                break;
               }
             }
           }
@@ -6593,15 +6579,12 @@ body {
           let myimg = await getFile(offerData2.image);
 
           if (myimg && myimg.length > 0) {
-            const imageMimeTypes = ['image/jpeg', 'image/png'];
+            const imageMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
             for (let i = 0; i < myimg.length; i++) {
-              try {
-                const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
-                if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                  dataUrl2 = validImageSrc(myimg[i]);
-                  break;
-                }
-              } catch {
+              const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
+              if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
+                dataUrl2 = myimg[i];
+                break;
               }
             }
           }
@@ -6785,15 +6768,12 @@ body {
           let myimg = await getFile(offerData3.image);
 
           if (myimg && myimg.length > 0) {
-            const imageMimeTypes = ['image/jpeg', 'image/png'];
+            const imageMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
             for (let i = 0; i < myimg.length; i++) {
-              try {
-                const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
-                if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                  dataUrl3 = validImageSrc(myimg[i]);
-                  break;
-                }
-              } catch {
+              const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
+              if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
+                dataUrl3 = myimg[i];
+                break;
               }
             }
           }
@@ -7101,21 +7081,16 @@ body {
         var foundImage = false; 
 
         if (myimg.length > 0) {
-          const imageMimeTypes = ['image/jpeg', 'image/png'];
+          const imageMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
 
           for (let j = 0; j < myimg.length; j++) {
-            try {
               const mimeType = myimg[j].match(/^data:(.*?);/)[1].toLowerCase();
+
               if (imageMimeTypes.includes(mimeType)) {
-                  const validImg = validImageSrc(myimg[j]);
-                  if (validImg !== '') {
-                    tempimg = '<img src="' + validImg + '" alt="./blank-image.jpg">';
-                    foundImage = true;
-                    break;
-                  }
+                  tempimg = '<img src="' + myimg[j] + '" alt="./blank-image.jpg">';
+                  foundImage = true;
+                  break; 
               }
-            } catch {
-            }
           }
 
           if (!foundImage) {
@@ -7272,20 +7247,14 @@ body {
 
             // Check if there are any images returned and process them
             if (myimg && myimg.length > 0) {
-              const imageMimeTypes = ['image/jpeg', 'image/png'];
+              const imageMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
 
               for (let i = 0; i < myimg.length; i++) {
-                try {
-                  const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
-                  if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                    const validImg = validImageSrc(myimg[i]);
-                    if (validImg !== '') {
-                      tempimg = `<img src="${validImg}" alt="Notification image">`;
-                      foundImage = true;
-                      break;
-                    }
-                  }
-                } catch {
+                const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
+                if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
+                  tempimg = `<img src="${myimg[i]}" alt="Notification image">`;
+                  foundImage = true;
+                  break;
                 }
               }
 
@@ -7673,7 +7642,7 @@ body {
                 throw new Error("Failed");
               }
               var messageData = JSON.parse(thisText);
-              var myimg = Array.isArray(messageData.image) ? messageData.image.map(validImageSrc).filter(img => img !== '') : [];
+              var myimg = Array.isArray(messageData.image) ? messageData.image : [''];
               storeFile(Crypto.SHA256(JSON.stringify(myimg)), myimg);
               storeFile(Crypto.SHA256(listing.message), thisText);
               listing.image = Crypto.SHA256(JSON.stringify(myimg));
@@ -7761,10 +7730,11 @@ body {
           const li = document.createElement('li');
           const fileData = myimgs[i];
           const [fileTypePrefix, base64Content] = fileData.split(';base64,');
-          const validImg = validImageSrc(fileData);
-          if (validImg !== '') {
+
+          // Check if the file type is an image
+          if (fileTypePrefix.startsWith('data:image')) {
               const img = document.createElement('img');
-              img.src = validImg;
+              img.src = fileTypePrefix + ';base64,' + base64Content;
               img.classList.add('popup-image');
               li.appendChild(img);
               imageCount++;
@@ -9801,7 +9771,7 @@ body {
 
         for (const file of imageInput.files) {
           const fileType = file.type;
-          const validImageTypes = ['image/jpeg', 'image/png'];
+          const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
           const validTextType = ['text/plain'];
           const validDocTypes = ['application/msword', 'application/pdf', 'application/zip'];
           const isZipFile = fileType.includes('zip');
@@ -9932,7 +9902,7 @@ body {
       function appendFileToDisplay(imgSrc, index) {
         const file = selectedFiles[index];
         const fileType = file.type;
-        const validImageTypes = ['image/jpeg', 'image/png'];
+        const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
         const isImage = validImageTypes.includes(fileType);
         
         const fileElement = document.createElement('div');
