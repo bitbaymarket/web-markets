@@ -255,11 +255,11 @@
             if (response.data.result) {
                 Swal.fire('Verification Result:' + DOMPurify.sanitize(JSON.stringify(response.data.result)));
             } else if (response.data.error) {
-                Swal.fire('Error:' + response.data.error);
+                Swal.fire('Error:' + validation(DOMPurify.sanitize(response.data.error), ". ,"));
             }
             return DOMPurify.sanitize(JSON.stringify(response.data.result)); // Sanitizing response content
         } catch (error) {
-            Swal.fire(error.message);
+            Swal.fire(validation(error.message, ". ,"));
             return 'error';
         }
     }
