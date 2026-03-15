@@ -3467,6 +3467,67 @@ body {
       return clean(input);
     }
 
+    function SafeDiv(rawHtml, containerStyle = "", height = "150px") {
+      function sanitizeHtml(html) {
+        const temp = document.createElement("div");
+        temp.innerHTML = html;
+        const walker = document.createTreeWalker(temp, NodeFilter.SHOW_ELEMENT, null, false);
+        while (walker.nextNode()) {
+          const el = walker.currentNode;
+          el.removeAttribute("width");
+          el.removeAttribute("height");
+          el.removeAttribute("position");
+          if (el.tagName === "SCRIPT") { el.remove(); continue; }
+          [...el.attributes].forEach(attr => {
+            if (attr.name.startsWith("on")) el.removeAttribute(attr.name);
+          });
+        }
+        return temp.innerHTML;
+      }
+      const cleanedHtml = sanitizeHtml(rawHtml);
+
+      function getMajorityStyles() {
+        const elements = document.body.querySelectorAll("*");
+        const colorCount = {}, fontSizeCount = {}, fontFamilyCount = {}, bgCount = {};
+        elements.forEach(el => {
+          const s = getComputedStyle(el);
+          colorCount[s.color] = (colorCount[s.color] || 0) + 1;
+          fontSizeCount[s.fontSize] = (fontSizeCount[s.fontSize] || 0) + 1;
+          fontFamilyCount[s.fontFamily] = (fontFamilyCount[s.fontFamily] || 0) + 1;
+          if (s.backgroundColor !== "rgba(0, 0, 0, 0)") bgCount[s.backgroundColor] = (bgCount[s.backgroundColor] || 0) + 1;
+        });
+        const majority = (obj) => Object.entries(obj).sort((a, b) => b[1] - a[1])[0]?.[0];
+        return {
+          color: majority(colorCount) || "#000",
+          fontSize: majority(fontSizeCount) || "16px",
+          fontFamily: majority(fontFamilyCount) || "sans-serif",
+          background: majority(bgCount) || "transparent"
+        };
+      }
+      const majority = getMajorityStyles();
+
+      const iframe = document.createElement("iframe");
+      iframe.setAttribute("sandbox", "");
+      iframe.style.border = "none";
+      iframe.style.display = "block";
+      iframe.style.width = "100%";
+      iframe.style.height = height;
+
+      const isSmallField = (height !== 'auto' && parseInt(height) < 60);
+      iframe.style.overflow = isSmallField ? "hidden" : "auto";
+
+      iframe.srcdoc = `<!DOCTYPE html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; font-src data:;"><style>html, body {margin:0; padding:0; width:100%; height:100%; box-sizing:border-box; background:${majority.background}; color:${majority.color}; font-size:${majority.fontSize}; font-family:${majority.fontFamily}; display:${isSmallField ? 'flex' : 'block'}; align-items:${isSmallField ? 'center' : 'unset'}; overflow:${isSmallField ? 'hidden' : 'auto'};} * {box-sizing:border-box;}</style></head><body><div style="width:100%;">${cleanedHtml}</div></body></html>`;
+
+      const container = document.createElement("div");
+      container.style.cssText = containerStyle;
+      container.style.width = "100%";
+      container.style.height = height;
+      container.style.overflow = "hidden";
+      container.appendChild(iframe);
+
+      return container;
+    }
+
     function translateThis(mytext) {
       const selectedLanguageCode = document.getElementById("languageSelect").value;
       if(selectedLanguageCode in languages) {
@@ -7808,7 +7869,7 @@ body {
             <div><bdo>` + translateThis('Quantity:') + `</bdo> ${parseInt(offerData.quantity[0])}` + translateThis('(Total)') + ` - ${parseInt(offerData.quantity[1])}` + translateThis('(Maximum)') + `</div>
             <div><bdo>` + translateThis('Time Limit:') + `</bdo> ${parseInt(offerData.timelimit[0]) / (60 * 60 * 24 * 7)} ` + translateThis('weeks') + `</div>
             ${offerData.title ? `<div><bdo>` + translateThis('Title:') + `</bdo> ${offerData.title}</div>` : ''}
-            <div><bdo>` + translateThis('Message:') + `</bdo> ${offerData.message.slice(0, 20)}...</div><br>
+            <div><bdo>` + translateThis('Message:') + `</bdo> ${validation(offerData.message, " .,!?-+_@").slice(0, 20)}...</div><br>
           `;
           myhash = web3.utils.keccak256(li.innerHTML);
           const existingNotes = localStorage.getItem(myaccounts + DDEaddy +'notes_' + offerHash) || '';
@@ -7951,7 +8012,7 @@ body {
             <div><bdo>` + translateThis('Quantity:') + `</bdo> ${parseInt(offerData2.quantity[0])}</div>
             <div><bdo>` + translateThis('Time Limit:') + `</bdo> ${parseInt(offerData2.timelimit[0]) / (60 * 60 * 24 * 7)} ` + translateThis('weeks') + `</div>
             ${offerData2.title ? `<div><bdo>` + translateThis('Title:') + `</bdo> ${offerData2.title}</div>` : ''}
-            <div><bdo>` + translateThis('Message:') + `</bdo> ${offerData2.message.slice(0, 20)}...</div><br>
+            <div><bdo>` + translateThis('Message:') + `</bdo> ${validation(offerData2.message, " .,!?-+_@").slice(0, 20)}...</div><br>
           `;
           myhash = web3.utils.keccak256(li2.innerHTML);
           const existingNotes2 = localStorage.getItem(myaccounts + DDEaddy +'notes_' + offerHash2) || '';
@@ -8233,7 +8294,7 @@ body {
           }
           offerData3.escrowInfo = escrowInfo;
           li3.innerHTML += escrowInfo;
-          li3.innerHTML += `<div>` + translateThis("Message:") + `${offerData3.message.slice(0, 20)}...</div><br>`
+          li3.innerHTML += `<div>` + translateThis("Message:") + `${validation(offerData3.message, " .,!?-+_@").slice(0, 20)}...</div><br>`
           const lineToExcludeRegex = new RegExp("<div>" + translateThis("Time Until Funds Expire:") + ".*" + translateThis("days") + "</div>");
           const inputString = li3.innerHTML.replace(lineToExcludeRegex, '');
           myhash = web3.utils.keccak256(inputString);
@@ -8493,7 +8554,7 @@ body {
                   <div class="token">` + '<bdo class="theText">' + translateThis("Currency:") + '</bdo>' + ` ${tokennames[offer.token]}</div>
                   <div class="amount">` + '<bdo class="theText">' + translateThis("Amount:") + '</bdo>'  + ` ${displayDecimals(offer.token, offer.amount)}</div>
                 </div>
-                <div class="message">` + '<bdo class="theText">' + translateThis("Details:") + '</bdo>' + ` ${offer.title ? offer.title : offer.message.slice(0, 20) + (offer.message.length > 20 ? "..." : "")}</div>
+                <div class="message">` + '<bdo class="theText">' + translateThis("Details:") + '</bdo>' + ` ${offer.title ? validation(offer.title, " .,!?-+_@") : validation(offer.message, " .,!?-+_@").slice(0, 20) + (offer.message.length > 20 ? "..." : "")}</div>
             </div>
         `;
 
@@ -9403,8 +9464,9 @@ body {
         title.innerHTML = '<bdo>' + translateThis('Title:') + '</bdo>' + listing.title;
       }
 
-      const message = document.createElement('p');
-      message.innerHTML = '<bdo>' + translateThis('Details:') + '</bdo>' + listing.message;
+      const message = document.createElement('div');
+      message.innerHTML = '<bdo>' + translateThis('Details:') + '</bdo>';
+      message.appendChild(SafeDiv(listing.message));
 
       const location = document.createElement('p');
       if (typeof listing.location !== 'undefined') {
@@ -9425,15 +9487,15 @@ body {
             contact2 = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(listing.recipient, datalen-1).call())),". ,!?@+/=");
             if(typeof contact2 === 'object' && 'mycontact' in contact2) {
               if(listing.contact != contact2['mycontact']) {
-                message.innerHTML += '<br><br><bdo>' + translateThis('Recipients contact information:') + '</bdo><br>' + contact2['mycontact'];
+                message.insertAdjacentHTML('beforeend', '<br><br><bdo>' + translateThis('Recipients contact information:') + '</bdo><br>' + contact2['mycontact']);
               }
             }
           }
           reputation = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(listing.recipient).call()))));
           if(reputation[0] == 0 && reputation[1] == 0) {
-            message.innerHTML += '<br><br>' + translateThis('Recipient is a new user of the markets.') + '<br>';
+            message.insertAdjacentHTML('beforeend', '<br><br>' + translateThis('Recipient is a new user of the markets.') + '<br>');
           } else {
-            message.innerHTML += '<br><br>' + translateThis('Recipients success rate:') + '<br><br><bdo>' + translateThis('Completed:') + '</bdo> ' + reputation[0] + '<br><br><bdo>' + translateThis('Failed:') + '</bdo> ' + reputation[1];
+            message.insertAdjacentHTML('beforeend', '<br><br>' + translateThis('Recipients success rate:') + '<br><br><bdo>' + translateThis('Completed:') + '</bdo> ' + reputation[0] + '<br><br><bdo>' + translateThis('Failed:') + '</bdo> ' + reputation[1]);
           }
         } catch(e) {
           console.log(e);
@@ -9446,15 +9508,15 @@ body {
             contact2 = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(listing.sender, datalen-1).call())),". ,!?@+/=");
             if(typeof contact2 === 'object' && 'mycontact' in contact2) {
               if(listing.contact != contact2['mycontact']) {
-                message.innerHTML += '<br><br><bdo>' + translateThis('Senders contact information:') + '</bdo><br>' + contact2['mycontact'];
+                message.insertAdjacentHTML('beforeend', '<br><br><bdo>' + translateThis('Senders contact information:') + '</bdo><br>' + contact2['mycontact']);
               }
             }
           }
           reputation = validation(JSON.parse(DOMPurify.sanitize(JSON.stringify(await DDEcontract.methods.getCompleted(listing.sender).call()))));
           if(reputation[0] == 0 && reputation[1] == 0) {
-            message.innerHTML += '<br><br>' + translateThis('Sender is a new user of the markets.') + '<br>';
+            message.insertAdjacentHTML('beforeend', '<br><br>' + translateThis('Sender is a new user of the markets.') + '<br>');
           } else {
-            message.innerHTML += '<br><br>' + translateThis('Senders success rate:') + '<br><bdo>' + translateThis('Completed:') + '</bdo> ' + reputation[0] + '<br><bdo>' + translateThis('Failed:') + '</bdo> ' + reputation[1];
+            message.insertAdjacentHTML('beforeend', '<br><br>' + translateThis('Senders success rate:') + '<br><bdo>' + translateThis('Completed:') + '</bdo> ' + reputation[0] + '<br><bdo>' + translateThis('Failed:') + '</bdo> ' + reputation[1]);
           }
         } catch(e) {
           console.log(e);
