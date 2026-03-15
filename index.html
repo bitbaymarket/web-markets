@@ -3491,7 +3491,7 @@ body {
       const cleanedHtml = sanitizeHtml(rawHtml);
 
       function getMajorityStyles() {
-        if (_safeDivStylesCache) return _safeDivStylesCache;
+        if (window._safeDivStylesCache) return window._safeDivStylesCache;
         const elements = document.body.querySelectorAll("*");
         const colorCount = {}, fontSizeCount = {}, fontFamilyCount = {}, bgCount = {};
         elements.forEach(el => {
@@ -3503,43 +3503,63 @@ body {
         });
         const majority = (obj) => Object.entries(obj).sort((a, b) => b[1] - a[1])[0]?.[0];
         const sanitizeCss = (val) => val ? val.replace(/[<>"'`;{}()\\]/g, '') : '';
-        _safeDivStylesCache = {
+        window._safeDivStylesCache = {
           color: sanitizeCss(majority(colorCount)) || "#000",
           fontSize: sanitizeCss(majority(fontSizeCount)) || "16px",
           fontFamily: sanitizeCss(majority(fontFamilyCount)) || "sans-serif",
           background: sanitizeCss(majority(bgCount)) || "transparent"
         };
-        return _safeDivStylesCache;
+        return window._safeDivStylesCache;
       }
       const majority = getMajorityStyles();
 
       const isSmallField = (height !== 'auto' && parseInt(height) < 60);
-      let iframeHeight = height;
-      if (!isSmallField) {
-        const measurer = document.createElement('div');
-        measurer.style.cssText = 'position:absolute;visibility:hidden;width:100%;font-size:' + majority.fontSize + ';font-family:' + majority.fontFamily + ';';
-        measurer.innerHTML = cleanedHtml;
-        document.body.appendChild(measurer);
-        iframeHeight = measurer.scrollHeight + 'px';
-        document.body.removeChild(measurer);
-      }
+      const limitHeight = (height !== 'auto' && !isSmallField) ? parseInt(height) : Infinity;
+
+      const container = document.createElement("div");
+      container.style.cssText = containerStyle;
+      container.style.width = "100%";
+      container.style.overflow = "hidden";
 
       const iframe = document.createElement("iframe");
       iframe.setAttribute("sandbox", "");
       iframe.style.border = "none";
       iframe.style.display = "block";
       iframe.style.width = "100%";
-      iframe.style.height = iframeHeight;
       iframe.style.overflow = isSmallField ? "hidden" : "auto";
+      
+      iframe.srcdoc = `<!DOCTYPE html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; font-src data:;"><style>html, body {margin:0; padding:0; width:100%; height:100%; box-sizing:border-box; font-size:${majority.fontSize}; font-family:${majority.fontFamily}; display:${isSmallField ? 'flex' : 'block'}; align-items:${isSmallField ? 'center' : 'unset'}; word-wrap:break-word;} * {box-sizing:border-box;} div > *:first-child { margin-top: 0 !important; } div > *:last-child { margin-bottom: 0 !important; }</style></head><body><div style="width:100%;">${cleanedHtml}</div></body></html>`;
 
-      iframe.srcdoc = `<!DOCTYPE html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; font-src data:;"><style>html, body {margin:0; padding:0; width:100%; height:100%; box-sizing:border-box; font-size:${majority.fontSize}; font-family:${majority.fontFamily}; display:${isSmallField ? 'flex' : 'block'}; align-items:${isSmallField ? 'center' : 'unset'}; overflow:${isSmallField ? 'hidden' : 'auto'};} * {box-sizing:border-box;}</style></head><body><div style="width:100%;">${cleanedHtml}</div></body></html>`;
-
-      const container = document.createElement("div");
-      container.style.cssText = containerStyle;
-      container.style.width = "100%";
-      container.style.height = iframeHeight;
-      container.style.overflow = "hidden";
       container.appendChild(iframe);
+
+      if (isSmallField) {
+        iframe.style.height = height;
+        container.style.height = height;
+      } else {
+        let lastMeasuredWidth = 0;
+        const resizeObserver = new ResizeObserver((entries) => {
+          for (let entry of entries) {
+            const actualParentWidth = entry.contentRect.width;
+            
+            if (actualParentWidth === 0 || actualParentWidth === lastMeasuredWidth) continue; 
+            lastMeasuredWidth = actualParentWidth;
+
+            const measurer = document.createElement('div');
+            measurer.style.cssText = `position:absolute;visibility:hidden;width:${actualParentWidth}px;font-size:${majority.fontSize};font-family:${majority.fontFamily};word-wrap:break-word;box-sizing:border-box;`;
+            measurer.innerHTML = DOMPurify.sanitize(cleanedHtml).replace(/[^a-zA-Z0-9\s.,!?@+/=]/g, 'O');
+            document.body.appendChild(measurer);
+            
+            const rawHeight = measurer.scrollHeight + 15;
+            document.body.removeChild(measurer);
+
+            const exactHeight = Math.min(rawHeight, limitHeight);
+            iframe.style.height = exactHeight + 'px';
+            container.style.height = exactHeight + 'px';
+          }
+        });
+        
+        resizeObserver.observe(container);
+      }
 
       return container;
     }
@@ -9482,10 +9502,14 @@ body {
 
       const messageLabel = document.createElement('p');
       messageLabel.innerHTML = '<bdo>' + translateThis('Details:') + '</bdo>';
+      messageLabel.style.marginBottom = '5px';
+
       const message = document.createElement('div');
+      message.style.marginBottom = '15px';
       message.appendChild(SafeDiv(listing.message));
 
       const location = document.createElement('p');
+
       if (typeof listing.location !== 'undefined') {
         location.innerHTML = '<bdo>' + translateThis('Location:') + '</bdo>' + listing.location;
       }
