@@ -9186,20 +9186,24 @@ body {
                 cancelButtonText: translateThis('Cancel'),
             });
             if (result.isConfirmed) {
-                downloadLinks.forEach(link => {
+                downloadLinks.forEach((link, idx) => {
                     try {
                         const [prefix, b64] = link.split(';base64,');
                         const mimeType = prefix.replace('data:', '');
                         const binary = atob(b64);
-                        const array = new Uint8Array(binary.length);
-                        for (let k = 0; k < binary.length; k++) {
-                            array[k] = binary.charCodeAt(k);
-                        }
+                        const array = Uint8Array.from(binary, c => c.charCodeAt(0));
                         const blob = new Blob([array], { type: mimeType });
                         const blobUrl = URL.createObjectURL(blob);
+                        const extMap = {
+                            'text/plain': '.txt',
+                            'application/msword': '.doc',
+                            'application/pdf': '.pdf',
+                            'application/zip': '.zip'
+                        };
+                        const ext = extMap[mimeType] || '';
                         const tempLink = document.createElement('a');
                         tempLink.href = blobUrl;
-                        tempLink.download = translateThis('downloaded_file');
+                        tempLink.download = translateThis('downloaded_file') + '_' + (idx + 1) + ext;
                         document.body.appendChild(tempLink);
                         tempLink.click();
                         document.body.removeChild(tempLink);
