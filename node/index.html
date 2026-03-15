@@ -104,7 +104,46 @@
         web3 = new Web3("https://eth-sepolia.public.blastapi.io");
     }
 
-    // Function to post a file to Pinata IPFS
+    function validation(input, extra = "", prefixes = []) {
+      const safeExtra = extra ? extra.replace(/[\]\\^-]/g, '\\$&') : "";
+      const stripRegex = new RegExp('[^a-zA-Z0-9_\\-' + safeExtra + ']', 'g');
+      const blockedKeys = new Set(["__proto__", "constructor", "prototype"]);
+      const safeKeyRegex = /^[a-zA-Z0-9_-]+$/;
+      const base64Regex = /^[A-Za-z0-9+/=]+$/;
+      function clean(value) {
+        if (Array.isArray(value)) {
+          return value.map(clean);
+        }
+        if (value !== null && typeof value === 'object') {
+          const result = {};
+          Object.keys(value).forEach(function(key) {
+            if (!blockedKeys.has(key) && safeKeyRegex.test(key)) {
+              result[key] = clean(value[key]);
+            }
+          });
+          return result;
+        }
+        if (!value && value !== 0) return "";
+        const str = String(value);
+        if (str.toLowerCase() === "true") return true;
+        if (str.toLowerCase() === "false") return false;
+        if (prefixes.length > 0) {
+          for (var p = 0; p < prefixes.length; p++) {
+            if (str.startsWith(prefixes[p])) {
+              var remainder = str.slice(prefixes[p].length);
+              if (base64Regex.test(remainder)) {
+                return str;
+              }
+              return "";
+            }
+          }
+          return "";
+        }
+        return str.replace(stripRegex, "");
+      }
+      return clean(input);
+    }
+
     async function pinToPinataIPFS (text) {
       const url = 'https://api.pinata.cloud/pinning/pinFILEToIPFS';
 
@@ -120,7 +159,7 @@
           }
         });
         // console.log(response.data.IpfsHash);
-        return DOMPurify.sanitize(response.data.IpfsHash);
+        return validation(DOMPurify.sanitize(response.data.IpfsHash));
       } catch (error) {
         console.error("Error:", error);
         return 'error';
@@ -278,11 +317,11 @@
             ]
         }
         if(true) {
-          const datalen = DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(request.address, 3).call());
+          const datalen = validation(DOMPurify.sanitize(await DDEcontract.methods.getArrayLength(request.address, 3).call()));
           if(datalen == 0) {
             return {'false':'user has not registred public key'};
           }
-          const registeredData = JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(request.address, datalen-1).call()));
+          const registeredData = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(request.address, datalen-1).call())));
           if("publickey" in registeredData) {
             if(registeredData['publickey'] != request.publicKey) {
               return {'false':'public key mismatch'};
@@ -311,13 +350,13 @@
             console.log(err);
             return;
           } else {
-            baseBalance = DOMPurify.sanitize(result1);
+            baseBalance = validation(DOMPurify.sanitize(result1));
           }
         });
         if(request.chain == "137") {
           var token = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
           await DDEcontract.methods.userBalance(request.address, token).call().then(function (liquid1) {
-            var baseBalance2 = DOMPurify.sanitize(liquid1);
+            var baseBalance2 = validation(DOMPurify.sanitize(liquid1));
             baseBalance = web3.utils.toBN(baseBalance).add(web3.utils.toBN(baseBalance2));
             if(web3.utils.toBN(baseBalance).gt(web3.utils.toBN(userData.minBalance[token]))) {
               userData.minBalance[token] = baseBalance.toString();
@@ -329,7 +368,7 @@
           });
           token = "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
           await DDEcontract.methods.userBalance(request.address, token).call().then(function (liquid1) {
-            baseBalance = DOMPurify.sanitize(liquid1);
+            baseBalance = validation(DOMPurify.sanitize(liquid1));
             if(web3.utils.toBN(baseBalance).gt(web3.utils.toBN(userData.minBalance[token]))) {
               userData.minBalance[token] = baseBalance.toString();
             } else {
@@ -341,7 +380,7 @@
         } else {
           var token = "0xA66857Da8d75BE2363968a3B01BfE1f417B28202";
           await DDEcontract.methods.userBalance(request.address, token).call().then(function (liquid1) {
-            var baseBalance2 = DOMPurify.sanitize(liquid1);
+            var baseBalance2 = validation(DOMPurify.sanitize(liquid1));
             baseBalance = web3.utils.toBN(baseBalance).add(web3.utils.toBN(baseBalance2));
             if(web3.utils.toBN(baseBalance).gt(web3.utils.toBN(userData.minBalance[token]))) {
               userData.minBalance[token] = baseBalance.toString();
@@ -426,9 +465,11 @@
           orderData['image'] = orderData.image.map((img, index) => {
             try {
               const mime = img.match(/^data:(.*);base64,/)[1];  // Match base64 data URL
-              if (['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'].includes(mime)) {
-                dataURLtoFile(img, `image${index}.${mime.split('/')[1]}`);
-                return img;
+              if (['image/jpeg', 'image/png'].includes(mime)) {
+                var validatedImg = validation(img, "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                if (validatedImg === "") return null;
+                dataURLtoFile(validatedImg, `image${index}.${mime.split('/')[1]}`);
+                return validatedImg;
               }
             } catch {
               return null;  // Return null for invalid or non-base64 images
@@ -486,7 +527,7 @@
     }
 
     async function validateOrderData(orderData) {
-      const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
+      const validImageTypes = ['image/jpeg', 'image/png'];
       let imagesResult = true;
       let textResult = true;
 
@@ -496,7 +537,9 @@
             .map((img, index) => {
               const mime = img.match(/data:(.*);base64,/)[1];
               if (validImageTypes.includes(mime)) {
-                return dataURLtoFile(img, `image${index}.${mime.split('/')[1]}`);
+                var validatedImg = validation(img, "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                if (validatedImg === "") return null;
+                return dataURLtoFile(validatedImg, `image${index}.${mime.split('/')[1]}`);
               }
               return null;
             })

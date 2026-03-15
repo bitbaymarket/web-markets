@@ -3433,11 +3433,12 @@ body {
       await populateListings();
     });
 
-    function validation(input, extra = "") {
+    function validation(input, extra = "", prefixes = []) {
       const safeExtra = extra ? extra.replace(/[\]\\^-]/g, '\\$&') : "";
       const stripRegex = new RegExp('[^a-zA-Z0-9_\\-' + safeExtra + ']', 'g');
       const blockedKeys = new Set(["__proto__", "constructor", "prototype"]);
       const safeKeyRegex = /^[a-zA-Z0-9_-]+$/;
+      const base64Regex = /^[A-Za-z0-9+/=]+$/;
       function clean(value) {
         if (Array.isArray(value)) {
           return value.map(clean);
@@ -3455,6 +3456,18 @@ body {
         const str = String(value);
         if (str.toLowerCase() === "true") return true;
         if (str.toLowerCase() === "false") return false;
+        if (prefixes.length > 0) {
+          for (var p = 0; p < prefixes.length; p++) {
+            if (str.startsWith(prefixes[p])) {
+              var remainder = str.slice(prefixes[p].length);
+              if (base64Regex.test(remainder)) {
+                return str;
+              }
+              return "";
+            }
+          }
+          return "";
+        }
         return str.replace(stripRegex, "");
       }
       return clean(input);
@@ -6141,8 +6154,9 @@ body {
       });
     }
 
-    // Function to retrieve a file from IPFS
     const retrieveFromIPFS = async (hash) => {
+      hash = validation(hash);
+      if (hash === "") return "error";
       var url = "https://ipfs.io/ipfs/"+hash;
       try {
         //const response = await fetch(url);
@@ -6159,6 +6173,8 @@ body {
       return result;
     }
     const retrieveFromPinataIPFS = async (hash) => {
+      hash = validation(hash);
+      if (hash === "") return "error";
       var url = pinataGateway + hash;
       if(pinataGateway != "https://gateway.pinata.cloud/ipfs/") {
         if(pinataToken == '') {
@@ -6633,7 +6649,8 @@ body {
         if(mylen > 0) {
           const lastEntry = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract5.methods.userdata(userAddress, mylen - 1).call())),". ,!?@+/=");
           if (lastEntry?.ipfsLink) {
-            const ipfsHash = lastEntry.ipfsLink.ipfs;
+            const ipfsHash = validation(lastEntry.ipfsLink.ipfs);
+            if (ipfsHash === "") return {'error':true};
             var ipfsData = await retrieveFromIPFS(ipfsHash);
             if(ipfsData == "error") {
               ipfsData = await retrieveFromPinataIPFS(ipfsHash);
@@ -6724,7 +6741,9 @@ body {
             .map((img, index) => {
               const mime = img.match(/data:(.*);base64,/)[1];
               if (validImageTypes.includes(mime)) {
-                return dataURLtoFile(img, `image${index}.${mime.split('/')[1]}`);
+                var validatedImg = validation(img, "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                if (validatedImg === "") return null;
+                return dataURLtoFile(validatedImg, `image${index}.${mime.split('/')[1]}`);
               }
               return null;
             })
@@ -7777,8 +7796,11 @@ body {
               try {
                 const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
                 if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                  dataUrl = myimg[i];
-                  break;
+                  var validatedImg = validation(myimg[i], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                  if (validatedImg !== "") {
+                    dataUrl = validatedImg;
+                    break;
+                  }
                 }
               } catch {
               }
@@ -7917,8 +7939,11 @@ body {
               try {
                 const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
                 if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                  dataUrl2 = myimg[i];
-                  break;
+                  var validatedImg = validation(myimg[i], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                  if (validatedImg !== "") {
+                    dataUrl2 = validatedImg;
+                    break;
+                  }
                 }
               } catch {
               }
@@ -8131,8 +8156,11 @@ body {
               for (let i = 0; i < myimg.length; i++) {
                 const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
                 if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                  dataUrl3 = myimg[i];
-                  break;
+                  var validatedImg = validation(myimg[i], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                  if (validatedImg !== "") {
+                    dataUrl3 = validatedImg;
+                    break;
+                  }
                 }
               }
             } catch {
@@ -8448,9 +8476,12 @@ body {
             try {
               const mimeType = myimg[j].match(/^data:(.*?);/)[1].toLowerCase();
               if (imageMimeTypes.includes(mimeType)) {
-                  tempimg = '<img src="' + myimg[j] + '" alt="./blank-image.jpg">';
-                  foundImage = true;
-                  break; 
+                  var validatedImg = validation(myimg[j], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                  if (validatedImg !== "") {
+                    tempimg = '<img src="' + validatedImg + '" alt="./blank-image.jpg">';
+                    foundImage = true;
+                    break;
+                  }
               }
             } catch {
             }
@@ -8616,9 +8647,12 @@ body {
                 try {
                   const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
                   if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                    tempimg = `<img src="${myimg[i]}" alt="Notification image">`;
-                    foundImage = true;
-                    break;
+                    var validatedImg = validation(myimg[i], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                    if (validatedImg !== "") {
+                      tempimg = `<img src="${validatedImg}" alt="Notification image">`;
+                      foundImage = true;
+                      break;
+                    }
                   }
                 } catch {
                 }
@@ -9100,13 +9134,15 @@ body {
           const fileData = myimgs[i];
           const [fileTypePrefix, base64Content] = fileData.split(';base64,');
 
-          // Check if the file type is an image
-          if (fileTypePrefix.startsWith('data:image')) {
-              const img = document.createElement('img');
-              img.src = fileTypePrefix + ';base64,' + base64Content;
-              img.classList.add('popup-image');
-              li.appendChild(img);
-              imageCount++;
+          if (fileTypePrefix === 'data:image/jpeg' || fileTypePrefix === 'data:image/png') {
+              var validatedFile = validation(fileData, "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+              if (validatedFile !== "") {
+                const img = document.createElement('img');
+                img.src = validatedFile;
+                img.classList.add('popup-image');
+                li.appendChild(img);
+                imageCount++;
+              }
           } else {
               downloadLinks.push(fileTypePrefix + ';base64,' + base64Content);
           }
