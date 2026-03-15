@@ -3433,11 +3433,12 @@ body {
       await populateListings();
     });
 
-    function validation(input, extra = "") {
+    function validation(input, extra = "", prefix = "") {
       const safeExtra = extra ? extra.replace(/[\]\\^-]/g, '\\$&') : "";
       const stripRegex = new RegExp('[^a-zA-Z0-9_\\-' + safeExtra + ']', 'g');
       const blockedKeys = new Set(["__proto__", "constructor", "prototype"]);
       const safeKeyRegex = /^[a-zA-Z0-9_-]+$/;
+      const prefixes = Array.isArray(prefix) ? prefix : (prefix ? [prefix] : []);
       function clean(value) {
         if (Array.isArray(value)) {
           return value.map(clean);
@@ -3455,6 +3456,11 @@ body {
         const str = String(value);
         if (str.toLowerCase() === "true") return true;
         if (str.toLowerCase() === "false") return false;
+        for (const p of prefixes) {
+          if (str.startsWith(p)) {
+            return p + str.slice(p.length).replace(/[^A-Za-z0-9+/=]/g, '');
+          }
+        }
         return str.replace(stripRegex, "");
       }
       return clean(input);
@@ -7657,7 +7663,7 @@ body {
               jsondata.title = '';
               jsondata.location = '';
             } else {
-              var myimg = Array.isArray(messageData.image) ? messageData.image : [];
+              var myimg = Array.isArray(messageData.image) ? messageData.image.map(img => validation(img, "", ['data:image/jpeg;base64,', 'data:image/png;base64,'])).filter(img => img !== '') : [];
               storeFile(Crypto.SHA256(JSON.stringify(myimg)), myimg);
               jsondata.image = Crypto.SHA256(JSON.stringify(myimg));
               jsondata.message = messageData.message;
@@ -7777,7 +7783,7 @@ body {
               try {
                 const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
                 if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                  dataUrl = myimg[i];
+                  dataUrl = validation(myimg[i], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
                   break;
                 }
               } catch {
@@ -7917,7 +7923,7 @@ body {
               try {
                 const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
                 if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                  dataUrl2 = myimg[i];
+                  dataUrl2 = validation(myimg[i], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
                   break;
                 }
               } catch {
@@ -8131,7 +8137,7 @@ body {
               for (let i = 0; i < myimg.length; i++) {
                 const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
                 if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                  dataUrl3 = myimg[i];
+                  dataUrl3 = validation(myimg[i], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
                   break;
                 }
               }
@@ -8448,9 +8454,12 @@ body {
             try {
               const mimeType = myimg[j].match(/^data:(.*?);/)[1].toLowerCase();
               if (imageMimeTypes.includes(mimeType)) {
-                  tempimg = '<img src="' + myimg[j] + '" alt="./blank-image.jpg">';
-                  foundImage = true;
-                  break; 
+                  const validImg = validation(myimg[j], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                  if (validImg !== '') {
+                    tempimg = '<img src="' + validImg + '" alt="./blank-image.jpg">';
+                    foundImage = true;
+                    break;
+                  }
               }
             } catch {
             }
@@ -8616,9 +8625,12 @@ body {
                 try {
                   const mimeTypeMatch = myimg[i].match(/^data:(.*?);/);
                   if (mimeTypeMatch && imageMimeTypes.includes(mimeTypeMatch[1].toLowerCase())) {
-                    tempimg = `<img src="${myimg[i]}" alt="Notification image">`;
-                    foundImage = true;
-                    break;
+                    const validImg = validation(myimg[i], "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                    if (validImg !== '') {
+                      tempimg = `<img src="${validImg}" alt="Notification image">`;
+                      foundImage = true;
+                      break;
+                    }
                   }
                 } catch {
                 }
@@ -9011,7 +9023,7 @@ body {
                 throw new Error("Failed");
               }
               var messageData = JSON.parse(thisText);
-              var myimg = Array.isArray(messageData.image) ? messageData.image : [];
+              var myimg = Array.isArray(messageData.image) ? messageData.image.map(img => validation(img, "", ['data:image/jpeg;base64,', 'data:image/png;base64,'])).filter(img => img !== '') : [];
               storeFile(Crypto.SHA256(JSON.stringify(myimg)), myimg);
               storeFile(Crypto.SHA256(listing.message), thisText);
               listing.image = Crypto.SHA256(JSON.stringify(myimg));
@@ -9099,11 +9111,10 @@ body {
           const li = document.createElement('li');
           const fileData = myimgs[i];
           const [fileTypePrefix, base64Content] = fileData.split(';base64,');
-
-          // Check if the file type is an image
-          if (fileTypePrefix.startsWith('data:image')) {
+          const validImg = validation(fileData, "", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+          if (validImg !== '') {
               const img = document.createElement('img');
-              img.src = fileTypePrefix + ';base64,' + base64Content;
+              img.src = validImg;
               img.classList.add('popup-image');
               li.appendChild(img);
               imageCount++;

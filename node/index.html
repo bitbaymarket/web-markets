@@ -222,7 +222,7 @@
             if (response.data.result) {
                 Swal.fire('Verification Result:' + DOMPurify.sanitize(JSON.stringify(response.data.result)));
             } else if (response.data.error) {
-                Swal.fire('Error:' + response.data.error);
+                Swal.fire('Error:' + DOMPurify.sanitize(String(response.data.error)));
             }
             return DOMPurify.sanitize(JSON.stringify(response.data.result)); // Sanitizing response content
         } catch (error) {
@@ -416,24 +416,34 @@
         var orderData;
         try {
           message = JSON.parse(message);
+          const rawImages = Array.isArray(message?.image) ? message.image : (message?.image ? [message.image] : []);
           orderData = {
             message: DOMPurify.sanitize(message?.message),
             contact: DOMPurify.sanitize(message?.contact),
-            image: Array.isArray(message?.image) ? message.image.map(img => DOMPurify.sanitize(img)) : (message?.image ? [DOMPurify.sanitize(message.image)] : []),
+            image: rawImages.map(img => {
+              if (typeof img !== 'string') return null;
+              const validPrefixes = ['data:image/jpeg;base64,', 'data:image/png;base64,'];
+              for (const p of validPrefixes) {
+                if (img.startsWith(p)) {
+                  return p + img.slice(p.length).replace(/[^A-Za-z0-9+/=]/g, '');
+                }
+              }
+              return null;
+            }).filter(img => img !== null),
             title: DOMPurify.sanitize(message?.title),
             location: DOMPurify.sanitize(message?.location)
           };
           orderData['image'] = orderData.image.map((img, index) => {
             try {
-              const mime = img.match(/^data:(.*);base64,/)[1];  // Match base64 data URL
-              if (['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'].includes(mime)) {
+              const mime = img.match(/^data:(.*);base64,/)[1];
+              if (['image/jpeg', 'image/png'].includes(mime)) {
                 dataURLtoFile(img, `image${index}.${mime.split('/')[1]}`);
                 return img;
               }
             } catch {
-              return null;  // Return null for invalid or non-base64 images
+              return null;
             }
-            return null;  // Return null for any image that doesn't match the valid mime types
+            return null;
           }).filter(img => img !== null);
         } catch (e) {
           return {'false':'Invalid JSON'};
@@ -486,7 +496,7 @@
     }
 
     async function validateOrderData(orderData) {
-      const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
+      const validImageTypes = ['image/jpeg', 'image/png'];
       let imagesResult = true;
       let textResult = true;
 
