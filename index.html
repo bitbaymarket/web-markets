@@ -3467,26 +3467,31 @@ body {
       return clean(input);
     }
 
+    var _safeDivStylesCache = null;
+
     function SafeDiv(rawHtml, containerStyle = "", height = "150px") {
       function sanitizeHtml(html) {
         const temp = document.createElement("div");
         temp.innerHTML = html;
+        const toRemove = [];
         const walker = document.createTreeWalker(temp, NodeFilter.SHOW_ELEMENT, null, false);
         while (walker.nextNode()) {
           const el = walker.currentNode;
           el.removeAttribute("width");
           el.removeAttribute("height");
           el.removeAttribute("position");
-          if (el.tagName === "SCRIPT") { el.remove(); continue; }
+          if (el.tagName === "SCRIPT") { toRemove.push(el); continue; }
           [...el.attributes].forEach(attr => {
             if (attr.name.startsWith("on")) el.removeAttribute(attr.name);
           });
         }
+        toRemove.forEach(el => el.remove());
         return temp.innerHTML;
       }
       const cleanedHtml = sanitizeHtml(rawHtml);
 
       function getMajorityStyles() {
+        if (_safeDivStylesCache) return _safeDivStylesCache;
         const elements = document.body.querySelectorAll("*");
         const colorCount = {}, fontSizeCount = {}, fontFamilyCount = {}, bgCount = {};
         elements.forEach(el => {
@@ -3497,12 +3502,14 @@ body {
           if (s.backgroundColor !== "rgba(0, 0, 0, 0)") bgCount[s.backgroundColor] = (bgCount[s.backgroundColor] || 0) + 1;
         });
         const majority = (obj) => Object.entries(obj).sort((a, b) => b[1] - a[1])[0]?.[0];
-        return {
-          color: majority(colorCount) || "#000",
-          fontSize: majority(fontSizeCount) || "16px",
-          fontFamily: majority(fontFamilyCount) || "sans-serif",
-          background: majority(bgCount) || "transparent"
+        const sanitizeCss = (val) => val ? val.replace(/[<>"'`;{}()\\]/g, '') : '';
+        _safeDivStylesCache = {
+          color: sanitizeCss(majority(colorCount)) || "#000",
+          fontSize: sanitizeCss(majority(fontSizeCount)) || "16px",
+          fontFamily: sanitizeCss(majority(fontFamilyCount)) || "sans-serif",
+          background: sanitizeCss(majority(bgCount)) || "transparent"
         };
+        return _safeDivStylesCache;
       }
       const majority = getMajorityStyles();
 
