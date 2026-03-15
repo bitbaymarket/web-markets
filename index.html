@@ -9204,9 +9204,7 @@ body {
                         const tempLink = document.createElement('a');
                         tempLink.href = blobUrl;
                         tempLink.download = translateThis('downloaded_file') + '_' + (idx + 1) + ext;
-                        document.body.appendChild(tempLink);
                         tempLink.click();
-                        document.body.removeChild(tempLink);
                         URL.revokeObjectURL(blobUrl);
                     } catch (e) {
                         console.error('Error downloading file:', e);
@@ -9215,8 +9213,10 @@ body {
             }
         });
         downloadContainer.appendChild(downloadAllLink);
-        popup.appendChild(downloadContainer);
+        // imageContainer.appendChild(downloadContainer); 
       }
+
+      // popup.appendChild(downloadContainer);
 
       const details = document.createElement('div');
       details.classList.add('popup-details');
