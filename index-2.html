@@ -5294,22 +5294,31 @@ body {
               jsondata.image = [''];
               jsondata.message = DOMPurify.sanitize(text);
               jsondata.contact = '';
+              jsondata.title = '';
+              jsondata.location = '';
             } else {
               var myimg = Array.isArray(messageData.image) ? messageData.image : [''];
               storeFile(Crypto.SHA256(JSON.stringify(myimg)), myimg);
               jsondata.image = Crypto.SHA256(JSON.stringify(myimg));
               jsondata.message = messageData.message;
-              jsondata.contact = messageData.contact;
+              jsondata.contact = validation(messageData.contact, ". ,!?@+/=");
+              jsondata.title = validation(messageData.title, ". ,!?@+/=");
+              jsondata.location = validation(messageData.location, ". ,!?@+/=");
             }
           } catch (e) {
             console.log("Error loading data");
             jsondata.image = [''];
             jsondata.message = DOMPurify.sanitize(text);
             jsondata.contact = '';
+            jsondata.title = '';
+            jsondata.location = '';
           }
         } else {
           jsondata.image = [''];
           jsondata.message = '';
+          jsondata.contact = '';
+          jsondata.title = '';
+          jsondata.location = '';
         }
         jsondata.hash = hash;
       });
