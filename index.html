@@ -3513,37 +3513,50 @@ body {
       }
       const majority = getMajorityStyles();
 
+      const isSmallField = (height !== 'auto' && parseInt(height) < 60);
+
       const iframe = document.createElement("iframe");
-      iframe.setAttribute("sandbox", "allow-same-origin");
+      iframe.setAttribute("sandbox", isSmallField ? "" : "allow-scripts");
       iframe.style.border = "none";
       iframe.style.display = "block";
       iframe.style.width = "100%";
       iframe.style.height = height;
-
-      const isSmallField = (height !== 'auto' && parseInt(height) < 60);
       iframe.style.overflow = isSmallField ? "hidden" : "auto";
 
-      iframe.srcdoc = `<!DOCTYPE html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; font-src data:;"><style>html, body {margin:0; padding:0; width:100%; height:${isSmallField ? '100%' : 'auto'}; box-sizing:border-box; font-size:${majority.fontSize}; font-family:${majority.fontFamily}; display:${isSmallField ? 'flex' : 'block'}; align-items:${isSmallField ? 'center' : 'unset'}; overflow:${isSmallField ? 'hidden' : 'auto'};} * {box-sizing:border-box;}</style></head><body><div style="width:100%;">${cleanedHtml}</div></body></html>`;
+      const arr = new Uint32Array(2);
+      crypto.getRandomValues(arr);
+      const frameId = 'sd_' + arr[0].toString(36) + arr[1].toString(36);
+      const resizeScript = isSmallField ? '' : `<script>window.addEventListener('load',function(){parent.postMessage({type:'safediv-resize',id:'${frameId}',height:document.body.scrollHeight},'*');});<\/script>`;
+      const csp = isSmallField
+        ? "default-src 'none'; style-src 'unsafe-inline'; font-src data:;"
+        : "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; font-src data:;";
+
+      iframe.srcdoc = `<!DOCTYPE html><html><head><meta http-equiv="Content-Security-Policy" content="${csp}">${resizeScript}<style>html, body {margin:0; padding:0; width:100%; height:${isSmallField ? '100%' : 'auto'}; box-sizing:border-box; font-size:${majority.fontSize}; font-family:${majority.fontFamily}; display:${isSmallField ? 'flex' : 'block'}; align-items:${isSmallField ? 'center' : 'unset'}; overflow:${isSmallField ? 'hidden' : 'auto'};} * {box-sizing:border-box;}</style></head><body><div style="width:100%;">${cleanedHtml}</div></body></html>`;
 
       const container = document.createElement("div");
       container.style.cssText = containerStyle;
       container.style.width = "100%";
       container.style.overflow = "hidden";
       container.style.height = height;
+
       if (!isSmallField) {
-        iframe.addEventListener('load', function() {
-          try {
-            const MAX_HEIGHT = 400;
-            const contentHeight = this.contentDocument.body.scrollHeight;
+        const MAX_HEIGHT = 400;
+        function onResizeMessage(e) {
+          if (e.data && e.data.type === 'safediv-resize' && e.data.id === frameId) {
+            window.removeEventListener('message', onResizeMessage);
+            const contentHeight = parseInt(e.data.height, 10);
+            if (!Number.isFinite(contentHeight) || contentHeight < 0) return;
             const finalHeight = Math.min(contentHeight, MAX_HEIGHT);
-            this.style.height = finalHeight + 'px';
+            iframe.style.height = finalHeight + 'px';
             container.style.height = finalHeight + 'px';
             if (contentHeight <= MAX_HEIGHT) {
-              container.style.overflow = "visible";
+              container.style.overflow = 'visible';
             }
-          } catch(e) {}
-        });
+          }
+        }
+        window.addEventListener('message', onResizeMessage);
       }
+
       container.appendChild(iframe);
 
       return container;
