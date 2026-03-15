@@ -9138,7 +9138,16 @@ body {
                 imageCount++;
               }
           } else {
-              downloadLinks.push(fileTypePrefix + ';base64,' + base64Content);
+              const validDocPrefixes = [
+                'data:text/plain;base64,',
+                'data:application/msword;base64,',
+                'data:application/pdf;base64,',
+                'data:application/zip;base64,'
+              ];
+              const validatedFile = validation(fileData, "+/=", validDocPrefixes);
+              if (validatedFile !== "" && validDocPrefixes.some(p => validatedFile.startsWith(p))) {
+                downloadLinks.push(validatedFile);
+              }
           }
 
           imageList.appendChild(li);
@@ -9178,20 +9187,33 @@ body {
             });
             if (result.isConfirmed) {
                 downloadLinks.forEach(link => {
-                    const tempLink = document.createElement('a');
-                    tempLink.href = link;
-                    tempLink.download = ''; 
-                    document.body.appendChild(tempLink);
-                    tempLink.click();
-                    document.body.removeChild(tempLink);
+                    try {
+                        const [prefix, b64] = link.split(';base64,');
+                        const mimeType = prefix.replace('data:', '');
+                        const binary = atob(b64);
+                        const array = new Uint8Array(binary.length);
+                        for (let k = 0; k < binary.length; k++) {
+                            array[k] = binary.charCodeAt(k);
+                        }
+                        const blob = new Blob([array], { type: mimeType });
+                        const blobUrl = URL.createObjectURL(blob);
+                        const tempLink = document.createElement('a');
+                        tempLink.href = blobUrl;
+                        tempLink.download = translateThis('downloaded_file');
+                        document.body.appendChild(tempLink);
+                        tempLink.click();
+                        document.body.removeChild(tempLink);
+                        URL.revokeObjectURL(blobUrl);
+                    } catch (e) {
+                        console.error('Error downloading file:', e);
+                    }
                 });
             }
         });
         downloadContainer.appendChild(downloadAllLink);
-        // imageContainer.appendChild(downloadContainer); 
+        popup.appendChild(downloadContainer);
       }
 
-      // popup.appendChild(downloadContainer);
       const details = document.createElement('div');
       details.classList.add('popup-details');
 
