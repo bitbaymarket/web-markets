@@ -6513,7 +6513,7 @@ body {
             }
         } catch (error) {
             console.log("Caught error:", error);
-            return DOMPurify.sanitize(JSON.stringify({ error: validation(DOMPurify.sanitize(String(error.message)), ". ,") }));
+            return { error: validation(error.message, ". ,") };
         }
     }
     var notifyOnce = false;
