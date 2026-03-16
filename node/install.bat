@@ -126,9 +126,8 @@ pip install transformers accelerate Pillow
 echo.
 echo Downloading model: %MODEL_NAME%
 echo This may take a while depending on your internet connection...
-set "MODEL_DIR=%AI_DIR%\model"
 
-python -c "from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor; print('Downloading model...'); m = Qwen2_5_VLForConditionalGeneration.from_pretrained('%MODEL_NAME%', cache_dir='%AI_DIR:\=/%/cache'); m.save_pretrained('%MODEL_DIR:\=/%'); print('Downloading processor...'); p = AutoProcessor.from_pretrained('%MODEL_NAME%', cache_dir='%AI_DIR:\=/%/cache'); p.save_pretrained('%MODEL_DIR:\=/%'); print('Model saved to %MODEL_DIR%')"
+python "%SCRIPT_DIR%download_model.py" "%MODEL_NAME%" "%AI_DIR%"
 if errorlevel 1 (
     echo ERROR: Failed to download the model.
     echo If you need authentication, run: pip install huggingface_hub ^&^& huggingface-cli login
@@ -141,7 +140,7 @@ echo ===========================================================
 echo   Installation complete!
 echo ===========================================================
 echo.
-echo Model installed to: %MODEL_DIR%
+echo Model installed to: %AI_DIR%\model
 echo.
 echo To start the local moderation server, run: run.bat
 echo Then set sightengineApiUser to "local" in config.js

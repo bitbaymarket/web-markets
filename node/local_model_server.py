@@ -23,6 +23,7 @@ except ImportError:
 RPC_PORT = 10000
 MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ai-model", "model")
 MAX_IMAGE_DIM = 150
+MAX_REQUEST_SIZE = 50 * 1024 * 1024  # 50MB
 REQUEST_TIMEOUT = 60  # seconds
 
 # Prompts
@@ -49,7 +50,7 @@ device = None
 def detect_device():
     """Detect best available device (CUDA GPU or CPU)."""
     if torch.cuda.is_available():
-        vram_bytes = torch.cuda.get_device_properties(0).total_mem
+        vram_bytes = torch.cuda.get_device_properties(0).total_memory
         vram_gb = vram_bytes / (1024 ** 3)
         gpu_name = torch.cuda.get_device_properties(0).name
         print(f"Detected GPU: {gpu_name} with {vram_gb:.1f} GB VRAM")
@@ -229,7 +230,7 @@ class RPCHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
             content_length = int(self.headers.get("Content-Length", 0))
-            if content_length > 50 * 1024 * 1024:  # 50MB limit
+            if content_length > MAX_REQUEST_SIZE:
                 self._send_error(-32600, "Request too large")
                 return
 
