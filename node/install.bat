@@ -15,10 +15,12 @@ echo.
 
 :: Ask user which model to install
 echo Which Qwen3-VL model would you like to install?
-echo   1) Qwen3-VL-2B-Instruct (smaller, ~4GB, less VRAM needed)
-echo   2) Qwen3-VL-4B-Instruct (larger, ~8GB, better accuracy)
+echo   1) Qwen3-VL-2B-Instruct  (smallest,  ~4GB VRAM)
+echo   2) Qwen3-VL-4B-Instruct  (small,     ~8GB VRAM)
+echo   3) Qwen3-VL-8B-Instruct  (medium,   ~16GB VRAM, better accuracy)
+echo   4) Qwen3-VL-32B-Instruct (large,    ~64GB VRAM, best accuracy)
 echo.
-set /p MODEL_CHOICE="Enter 1 or 2: "
+set /p MODEL_CHOICE="Enter 1, 2, 3, or 4: "
 
 if "%MODEL_CHOICE%"=="1" (
     set "MODEL_NAME=Qwen/Qwen3-VL-2B-Instruct"
@@ -26,8 +28,14 @@ if "%MODEL_CHOICE%"=="1" (
 ) else if "%MODEL_CHOICE%"=="2" (
     set "MODEL_NAME=Qwen/Qwen3-VL-4B-Instruct"
     echo Selected: Qwen3-VL-4B-Instruct
+) else if "%MODEL_CHOICE%"=="3" (
+    set "MODEL_NAME=Qwen/Qwen3-VL-8B-Instruct"
+    echo Selected: Qwen3-VL-8B-Instruct
+) else if "%MODEL_CHOICE%"=="4" (
+    set "MODEL_NAME=Qwen/Qwen3-VL-32B-Instruct"
+    echo Selected: Qwen3-VL-32B-Instruct
 ) else (
-    echo Invalid choice. Please enter 1 or 2.
+    echo Invalid choice. Please enter 1, 2, 3, or 4.
     pause
     exit /b 1
 )
