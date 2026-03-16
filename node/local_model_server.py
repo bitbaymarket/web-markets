@@ -19,7 +19,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 # Attempt imports; will fail gracefully if not installed yet
 try:
     import torch
-    from transformers import AutoModelForImageTextToText, AutoProcessor
+    from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
     from PIL import Image
 except ImportError:
     print("ERROR: Required packages not installed. Run install.bat first.")
@@ -81,7 +81,7 @@ def load_model():
     print(f"Loading model from {MODEL_DIR} ...")
     dtype = torch.float16 if device == "cuda" else torch.float32
 
-    model = AutoModelForImageTextToText.from_pretrained(
+    model = Qwen3VLForConditionalGeneration.from_pretrained(
         MODEL_DIR,
         torch_dtype=dtype,
         device_map="auto" if device == "cuda" else None,
@@ -105,17 +105,6 @@ def resize_image(image_bytes):
         new_h = int(h * scale)
         img = img.resize((new_w, new_h), Image.LANCZOS)
     return img
-
-
-def save_temp_image(img):
-    """Save a PIL Image to a temp file and return the path."""
-    temp_path = os.path.join(
-        MODEL_DIR, "..",
-        f"_temp_moderation_{threading.get_ident()}.png",
-    )
-    temp_path = os.path.abspath(temp_path)
-    img.save(temp_path, format="PNG")
-    return temp_path
 
 
 def run_inference(messages, timeout=REQUEST_TIMEOUT):
@@ -195,27 +184,18 @@ def moderate_image(b64_data):
 
     img = resize_image(image_bytes)
 
-    # Save to a temp file so the processor can load it via file:// URI
-    temp_path = save_temp_image(img)
-
+    # Pass PIL Image directly in memory — never write to disk
     messages = [
         {
             "role": "user",
             "content": [
-                {"type": "image", "image": f"file://{temp_path}"},
+                {"type": "image", "image": img},
                 {"type": "text", "text": IMAGE_PROMPT},
             ],
         }
     ]
 
     text, err = run_inference(messages)
-
-    # Clean up temp file
-    try:
-        os.remove(temp_path)
-    except OSError:
-        pass
-
     if err:
         return None, err
 

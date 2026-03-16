@@ -20,12 +20,12 @@ def main():
     model_dir = os.path.join(ai_dir, "model")
     cache_dir = os.path.join(ai_dir, "cache")
 
-    from transformers import AutoModelForImageTextToText, AutoProcessor
+    from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
 
     print(f"Downloading model: {model_name}")
     print("This may take a while depending on your internet connection...")
 
-    model = AutoModelForImageTextToText.from_pretrained(
+    model = Qwen3VLForConditionalGeneration.from_pretrained(
         model_name, cache_dir=cache_dir
     )
     model.save_pretrained(model_dir)
