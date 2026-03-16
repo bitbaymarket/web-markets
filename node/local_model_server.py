@@ -5,7 +5,14 @@ Listens on port 10000 for JSON-RPC requests to moderate images and text.
 Uses the official Qwen3-VL API from:
   https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct
   https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct
+  https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct
+  https://huggingface.co/Qwen/Qwen3-VL-32B-Instruct
 Requires transformers >= 4.57.0
+
+NOTE: This can only be so reliable and there is no warranty especially with the more compact models.
+Because the technology is always evolving the node is under no obligation for the accuracy of the moderation.
+The users themselves are the ones responsible for content. For production use it is strongly recommended to
+use the larger models supplied by Qwen3 which can go all the way up to 235B.
 """
 
 import sys
@@ -33,24 +40,16 @@ REQUEST_TIMEOUT = 60  # seconds
 
 # Prompts
 IMAGE_PROMPT = (
-    "Look at this image. Does it contain any of the following: nudity, bare skin, "
-    "sexual content, violence, gore, illegal activity, drugs, weapons, or anything "
-    "that would be considered inappropriate or illegal? "
-    "Respond with only a single word: true if the image is safe and legal, "
-    "or false if it is not. Do not elaborate."
+    "true or false: This image contains nudity"
 )
 
 TEXT_PROMPT = (
-    "Read the following text. Does it solicit or promote illegal activity, violence, "
-    "drugs, weapons, hate speech, or any inappropriate content? "
-    "Respond with only a single word: true if the text is safe and legal, "
-    "or false if it is not. Do not elaborate.\n\nText: "
+    "\n\nThe text you just read was legal/safe content. Respond one word true or false. "
 )
 
 model = None
 processor = None
 device = None
-
 
 def detect_device():
     """Detect best available device (CUDA GPU or CPU)."""
@@ -65,7 +64,6 @@ def detect_device():
     else:
         print("No NVIDIA GPU detected. Using CPU (will be slower).")
         return "cpu"
-
 
 def load_model():
     """Load the Qwen3-VL model and processor."""
@@ -93,7 +91,6 @@ def load_model():
     processor = AutoProcessor.from_pretrained(MODEL_DIR)
     print("Model loaded successfully.")
 
-
 def resize_image(image_bytes):
     """Resize image so max dimension is MAX_IMAGE_DIM to reduce tokens."""
     img = Image.open(io.BytesIO(image_bytes))
@@ -105,7 +102,6 @@ def resize_image(image_bytes):
         new_h = int(h * scale)
         img = img.resize((new_w, new_h), Image.LANCZOS)
     return img
-
 
 def run_inference(messages, timeout=REQUEST_TIMEOUT):
     """Run model inference with a timeout. Returns the generated text.
@@ -154,8 +150,8 @@ def run_inference(messages, timeout=REQUEST_TIMEOUT):
         return None, error[0]
     return result[0], None
 
-
 def parse_bool_response(text):
+    #print(str(text))
     """Extract the first occurrence of 'true' or 'false' from model output."""
     if text is None:
         return None
@@ -169,7 +165,6 @@ def parse_bool_response(text):
     if false_pos == -1:
         return True
     return true_pos < false_pos
-
 
 def moderate_image(b64_data):
     """Moderate an image given as base64 string. Returns True if safe."""
@@ -190,41 +185,136 @@ def moderate_image(b64_data):
             "role": "user",
             "content": [
                 {"type": "image", "image": img},
-                {"type": "text", "text": IMAGE_PROMPT},
+                {"type": "text", "text": "true or false: This image contains nudity"},
             ],
         }
     ]
-
     text, err = run_inference(messages)
+    nextQ = False
     if err:
         return None, err
-
     result = parse_bool_response(text)
+    if result == None or result == True:
+        result = False
+    else:
+        nextQ = True
+    if nextQ:
+        nextQ = False
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image", "image": img},
+                    {"type": "text", "text": "true or false: This image contains children"},
+                ],
+            }
+        ]
+        text, err = run_inference(messages)
+        if err:
+            return None, err
+        result = parse_bool_response(text)
+        if result == None or result == True:
+            result = False
+        else:
+            nextQ = True
+        if nextQ:
+            nextQ = False
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image", "image": img},
+                        {"type": "text", "text": "true or false: This image contains guns"},
+                    ],
+                }
+            ]
+            text, err = run_inference(messages)
+            if err:
+                return None, err
+            result = parse_bool_response(text)
+            if result == None or result == True:
+                result = False
+            else:
+                nextQ = True
+            if nextQ:
+                nextQ = False
+                messages = [
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "image", "image": img},
+                            {"type": "text", "text": "true or false: This image contains recreational drugs"},
+                        ],
+                    }
+                ]
+                text, err = run_inference(messages)
+                if err:
+                    return None, err
+                result = parse_bool_response(text)
+                if result == None or result == True:
+                    result = False
+                else:
+                    result = True
     if result is None:
         return None, f"Could not parse model response: {text}"
     return result, None
 
+def chunk_text(text, words_per_chunk=10, long_word_threshold=20):
+    """Break text into word chunks, handling very long words separately."""
+    words = text.split()
+    chunks = []
+    current_chunk = []
+
+    for word in words:
+        if len(word) > long_word_threshold:
+            # Finish the current chunk first
+            if current_chunk:
+                chunks.append(" ".join(current_chunk))
+                current_chunk = []
+            # Analyze the long word as its own chunk
+            chunks.append(word)
+        else:
+            current_chunk.append(word)
+            if len(current_chunk) >= words_per_chunk:
+                chunks.append(" ".join(current_chunk))
+                current_chunk = []
+
+    # Add any remaining words
+    if current_chunk:
+        chunks.append(" ".join(current_chunk))
+
+    return chunks
 
 def moderate_text(text_content):
-    """Moderate text content. Returns True if safe."""
-    messages = [
-        {
-            "role": "user",
-            "content": [
-                {"type": "text", "text": TEXT_PROMPT + text_content},
-            ],
-        }
-    ]
+    """
+    Moderate text content safely.
+    Returns True if all chunks are safe, False if any chunk is unsafe.
+    Returns (None, error_message) if something goes wrong.
+    """
+    try:
+        chunks = chunk_text(text_content)
+        for chunk in chunks:
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": chunk + TEXT_PROMPT},
+                    ],
+                }
+            ]
+            text, err = run_inference(messages)
+            if err:
+                return None, err
 
-    text, err = run_inference(messages)
-    if err:
-        return None, err
+            result = parse_bool_response(text)
+            if result is None:
+                return None, f"Could not parse model response: {text}"
+            if result is False:
+                return False, None  # Early exit if any chunk is unsafe
 
-    result = parse_bool_response(text)
-    if result is None:
-        return None, f"Could not parse model response: {text}"
-    return result, None
-
+        return True, None  # All chunks were safe
+    except Exception as e:
+        return None, str(e)
 
 class RPCHandler(BaseHTTPRequestHandler):
     """Simple JSON-RPC handler for moderation requests."""
@@ -307,7 +397,6 @@ class RPCHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         print(f"[RPC] {args[0]}")
 
-
 def main():
     print("=" * 60)
     print("  Local AI Moderation Server (Qwen3-VL)")
@@ -325,7 +414,6 @@ def main():
     except KeyboardInterrupt:
         print("\nShutting down server...")
         server.shutdown()
-
 
 if __name__ == "__main__":
     main()
