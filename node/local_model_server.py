@@ -1,6 +1,11 @@
 """
 Local AI Moderation RPC Server using Qwen3-VL.
 Listens on port 10000 for JSON-RPC requests to moderate images and text.
+
+Uses the official Qwen3-VL API from:
+  https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct
+  https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct
+Requires transformers >= 4.57.0
 """
 
 import sys
@@ -14,7 +19,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 # Attempt imports; will fail gracefully if not installed yet
 try:
     import torch
-    from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
+    from transformers import AutoModelForImageTextToText, AutoProcessor
     from PIL import Image
 except ImportError:
     print("ERROR: Required packages not installed. Run install.bat first.")
@@ -76,7 +81,7 @@ def load_model():
     print(f"Loading model from {MODEL_DIR} ...")
     dtype = torch.float16 if device == "cuda" else torch.float32
 
-    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+    model = AutoModelForImageTextToText.from_pretrained(
         MODEL_DIR,
         torch_dtype=dtype,
         device_map="auto" if device == "cuda" else None,
@@ -102,34 +107,47 @@ def resize_image(image_bytes):
     return img
 
 
+def save_temp_image(img):
+    """Save a PIL Image to a temp file and return the file:// URI."""
+    temp_path = os.path.join(MODEL_DIR, "..", "_temp_moderation.png")
+    temp_path = os.path.abspath(temp_path)
+    img.save(temp_path, format="PNG")
+    return temp_path
+
+
 def run_inference(messages, timeout=REQUEST_TIMEOUT):
-    """Run model inference with a timeout. Returns the generated text."""
+    """Run model inference with a timeout. Returns the generated text.
+
+    Uses the Qwen3-VL chat template API:
+      processor.apply_chat_template(messages, tokenize=True,
+          add_generation_prompt=True, return_dict=True, return_tensors="pt")
+    """
     result = [None]
     error = [None]
 
     def _infer():
         try:
-            text = processor.apply_chat_template(
-                messages, tokenize=False, add_generation_prompt=True
-            )
-            inputs = processor(
-                text=[text],
-                images=messages[0].get("_images"),
-                padding=True,
+            inputs = processor.apply_chat_template(
+                messages,
+                tokenize=True,
+                add_generation_prompt=True,
+                return_dict=True,
                 return_tensors="pt",
             )
-            inputs = {k: v.to(model.device) if hasattr(v, "to") else v for k, v in inputs.items()}
+            inputs = inputs.to(model.device)
 
             with torch.no_grad():
-                output_ids = model.generate(
-                    **inputs,
-                    max_new_tokens=10,
-                    do_sample=False,
-                )
-            # Decode only the newly generated tokens
-            generated_ids = output_ids[:, inputs["input_ids"].shape[1]:]
+                generated_ids = model.generate(**inputs, max_new_tokens=10)
+
+            # Trim input tokens from output to get only generated tokens
+            generated_ids_trimmed = [
+                out_ids[len(in_ids):]
+                for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+            ]
             result[0] = processor.batch_decode(
-                generated_ids, skip_special_tokens=True
+                generated_ids_trimmed,
+                skip_special_tokens=True,
+                clean_up_tokenization_spaces=False,
             )[0]
         except Exception as e:
             error[0] = str(e)
@@ -174,18 +192,27 @@ def moderate_image(b64_data):
 
     img = resize_image(image_bytes)
 
+    # Save to a temp file so the processor can load it via file:// URI
+    temp_path = save_temp_image(img)
+
     messages = [
         {
             "role": "user",
             "content": [
-                {"type": "image", "image": img},
+                {"type": "image", "image": f"file://{temp_path}"},
                 {"type": "text", "text": IMAGE_PROMPT},
             ],
-            "_images": [img],
         }
     ]
 
     text, err = run_inference(messages)
+
+    # Clean up temp file
+    try:
+        os.remove(temp_path)
+    except OSError:
+        pass
+
     if err:
         return None, err
 

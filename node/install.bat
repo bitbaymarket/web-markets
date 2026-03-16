@@ -121,7 +121,7 @@ if errorlevel 1 (
 
 echo.
 echo Installing other dependencies...
-pip install transformers accelerate Pillow
+pip install "transformers>=4.57.0" accelerate Pillow
 
 echo.
 echo Downloading model: %MODEL_NAME%
