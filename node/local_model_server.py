@@ -108,8 +108,11 @@ def resize_image(image_bytes):
 
 
 def save_temp_image(img):
-    """Save a PIL Image to a temp file and return the file:// URI."""
-    temp_path = os.path.join(MODEL_DIR, "..", "_temp_moderation.png")
+    """Save a PIL Image to a temp file and return the path."""
+    temp_path = os.path.join(
+        MODEL_DIR, "..",
+        f"_temp_moderation_{threading.get_ident()}.png",
+    )
     temp_path = os.path.abspath(temp_path)
     img.save(temp_path, format="PNG")
     return temp_path
