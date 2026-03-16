@@ -1,0 +1,4 @@
+ai-model/
+node/ai-model/
+__pycache__/
+*.pyc
