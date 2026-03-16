@@ -60,7 +60,7 @@
         document.getElementById("serverData").innerHTML = 'Configuration (static/config.js) file data not complete. Please review credentials.';
         initiated = false;
       }
-      if(window.sightengineApiSecret == '') {
+      if(window.sightengineApiUser !== 'local' && window.sightengineApiSecret == '') {
         document.getElementById("serverData").innerHTML = 'Configuration (static/config.js) file data not complete. Please review credentials.';
         initiated = false;
       }
@@ -526,6 +526,45 @@
       let textResult = true;
 
       try {
+        // Local AI moderation mode
+        if (window.sightengineApiUser === 'local') {
+          if (orderData.image && orderData.image.length > 0) {
+            const validatedImages = orderData.image
+              .map(img => {
+                try {
+                  const mime = img.match(/data:(.*);base64,/)[1];
+                  if (validImageTypes.includes(mime)) {
+                    return validation(img, "+/=", ['data:image/jpeg;base64,', 'data:image/png;base64,']);
+                  }
+                } catch { return ""; }
+                return "";
+              })
+              .filter(img => img !== "");
+            if (validatedImages.length > 0) {
+              const localImageResult = await moderateImageLocal(validatedImages);
+              if (localImageResult === null) {
+                throw new Error("Local image moderation failed.");
+              }
+              imagesResult = localImageResult;
+            }
+          }
+          if (orderData.title || orderData.message || orderData.location || orderData.contact) {
+            const localTextResult = await moderateTextLocal(
+              `${orderData.title} ${orderData.message} ${orderData.location} ${orderData.contact}`
+            );
+            if (localTextResult === null) {
+              throw new Error("Local text moderation failed.");
+            }
+            textResult = localTextResult;
+          }
+          if (imagesResult && textResult) {
+            return true;
+          } else {
+            return [imagesResult, textResult];
+          }
+        }
+
+        // SightEngine moderation mode
         if (orderData.image && orderData.image.length > 0) {
           const images = orderData.image
             .map((img, index) => {
@@ -633,6 +672,60 @@
         return result;
       } catch (error) {
         console.error("Error moderating text:", error);
+        return null;
+      }
+    }
+
+    // ---- Local AI Moderation (Qwen3-VL via RPC on port 10000) ----
+    const LOCAL_RPC_URL = 'http://127.0.0.1:10000';
+    const LOCAL_RPC_TIMEOUT = 65000; // 65 seconds
+
+    async function localRpcCall(method, params) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), LOCAL_RPC_TIMEOUT);
+      try {
+        const response = await fetch(LOCAL_RPC_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jsonrpc: '2.0', method: method, params: params, id: 1 }),
+          signal: controller.signal
+        });
+        const result = await response.json();
+        if (result.error) {
+          console.error("Local RPC error:", result.error.message);
+          return null;
+        }
+        return result.result;
+      } catch (error) {
+        console.error("Local RPC call failed:", error);
+        return null;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function moderateImageLocal(base64Images) {
+      try {
+        const images = Array.isArray(base64Images) ? base64Images : [base64Images];
+        for (const img of images) {
+          const result = await localRpcCall('moderate_image', { image: img });
+          if (result === null) return null;
+          if (!result.safe) return false;
+        }
+        return true;
+      } catch (error) {
+        console.error("Error moderating image locally:", error);
+        return null;
+      }
+    }
+
+    async function moderateTextLocal(text) {
+      try {
+        const result = await localRpcCall('moderate_text', { text: text });
+        if (result === null) return null;
+        return result.safe;
+      } catch (error) {
+        console.error("Error moderating text locally:", error);
         return null;
       }
     }
