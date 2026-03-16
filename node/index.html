@@ -101,7 +101,7 @@
     if (chainID == "137") {
         web3 = new Web3(new RotatingProvider());
     } else {
-        web3 = new Web3("https://eth-sepolia.public.blastapi.io");
+        web3 = new Web3("https://ethereum-sepolia-rpc.publicnode.com");
     }
 
     function validation(input, extra = "", prefixes = []) {
@@ -299,7 +299,7 @@
               }
             ];
         } else {
-            web3 = new Web3("https://eth-sepolia.public.blastapi.io");
+            web3 = new Web3("https://ethereum-sepolia-rpc.publicnode.com");
             DDEcontract = new web3.eth.Contract(DDEabi, "0xc1620929B151ecB45beB7093AfFb1F9A359656d9");
             tokens = [
               {
@@ -315,7 +315,7 @@
           if(datalen == 0) {
             return {'false':'user has not registred public key'};
           }
-          const registeredData = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(request.address, datalen-1).call())));
+          const registeredData = validation(JSON.parse(DOMPurify.sanitize(await DDEcontract.methods.userdata(request.address, datalen-1).call())),"+/=");
           if("publickey" in registeredData) {
             if(registeredData['publickey'] != request.publicKey) {
               return {'false':'public key mismatch'};
