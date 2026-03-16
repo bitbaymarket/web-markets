@@ -7,8 +7,12 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
   <label for="signRequest">Sign Request:</label>
   <input type="text" id="signRequest">
+  <br><label for="imageUpload">Images (max 4):</label>
+  <input type="file" id="imageUpload" accept="image/jpeg,image/png" multiple>
+  <div id="imagePreview"></div>
   <button onclick="signRequest()">Sign</button>
   <button onclick="verify()">Verify Signed</button>
+  <button id="localTestBtn" style="display:none" onclick="localTest()">Local Test</button>
   <label for="verifyRequest">Verify Request:</label>
   <input type="text" id="verifyRequest">
   <button onclick="verifyRequest()">Verify</button>
@@ -84,6 +88,9 @@
       } else {
         reqdb = JSON.parse(reqdb);
       }
+      if (window.sightengineApiUser === 'local') {
+        document.getElementById('localTestBtn').style.display = '';
+      }
     }
 
     // Poll every 1000ms to check when things finish loading
@@ -98,6 +105,74 @@
     var chainID = "11155111" //Testnet
     var web3;
     var showMod = false;
+    var uploadedImages = [];
+
+    function processImage(file) {
+      return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onerror = function() { reject(new Error('Failed to read file')); };
+        reader.onload = function(e) {
+          var img = new Image();
+          img.onerror = function() { reject(new Error('Failed to load image')); };
+          img.onload = function() {
+            var canvas = document.createElement('canvas');
+            var w = img.width, h = img.height, max = 500;
+            if (w > max || h > max) {
+              if (w > h) { h = Math.round(h * max / w); w = max; }
+              else { w = Math.round(w * max / h); h = max; }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', 0.85));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    document.getElementById('imageUpload').addEventListener('change', async function(e) {
+      var files = Array.from(e.target.files).slice(0, 4);
+      uploadedImages = [];
+      document.getElementById('imagePreview').innerHTML = '';
+      for (var file of files) {
+        if (!['image/jpeg', 'image/png'].includes(file.type)) continue;
+        try {
+          var dataUrl = await processImage(file);
+          uploadedImages.push(dataUrl);
+          var img = document.createElement('img');
+          img.src = dataUrl;
+          img.style.maxWidth = '100px';
+          img.style.margin = '4px';
+          document.getElementById('imagePreview').appendChild(img);
+        } catch (err) {
+          console.error('Image processing failed:', err);
+        }
+      }
+    });
+
+    async function localTest() {
+      var text = document.getElementById("signRequest").value.trim();
+      if (!text && uploadedImages.length === 0) { Swal.fire('Nothing to test'); return; }
+      try {
+        var result = true;
+        if (uploadedImages.length > 0) {
+          var imgResult = await moderateImageLocal(uploadedImages);
+          if (imgResult === null) { Swal.fire('Local test error: image moderation unavailable'); return; }
+          if (!imgResult) result = false;
+        }
+        if (text) {
+          var txtResult = await moderateTextLocal(text);
+          if (txtResult === null) { Swal.fire('Local test error: text moderation unavailable'); return; }
+          if (!txtResult) result = false;
+        }
+        Swal.fire('Local test result: ' + (result ? 'Pass (safe)' : 'Fail (unsafe)'));
+      } catch (err) {
+        Swal.fire('Local test error: ' + validation(err.message, ". ,"));
+      }
+    }
+
     if (chainID == "137") {
         web3 = new Web3(new RotatingProvider());
     } else {
@@ -209,7 +284,9 @@
       var request = {};
       request.address = await web3.eth.accounts.privateKeyToAccount(testUserPrivateKey).address;
       request.chain = chainID;
-      const requestToSign = '{"message": "' + document.getElementById("signRequest").value + '"}';
+      var msgObj = { message: document.getElementById("signRequest").value };
+      if (uploadedImages.length > 0) msgObj.image = uploadedImages;
+      const requestToSign = JSON.stringify(msgObj);
       console.log("Signing request:", requestToSign);
       request.hash = hashObject(requestToSign);
       request.publicKey = testPublicKey;
